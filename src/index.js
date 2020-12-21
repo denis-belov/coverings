@@ -6,6 +6,7 @@ import './index.scss';
 import '@babel/polyfill';
 import * as THREE from 'three';
 import getOrbitControls from 'three/examples/js/controls/OrbitControls.js';
+import earcut from 'earcut';
 
 
 
@@ -13,28 +14,42 @@ getOrbitControls(THREE);
 
 
 
+const log = console.log.bind(null);
 const [ parent_tag ] = document.getElementsByClassName('coverings');
 const [ tile_texture ] = document.getElementById('textures').getElementsByTagName('img');
-const log = console.log.bind(null);
+const [ add_wall_mode_button ] = document.getElementsByClassName('coverings-actions')[0].children;
 
 
 
-const [ plan_canvas, scene_canvas ] = document.getElementsByTagName('canvas');
+const [ canvas ] = document.getElementsByTagName('canvas');
 
-plan_canvas.style.zIndex = 0;
-scene_canvas.style.zIndex = 1;
+
 
 let W = window.innerWidth;
 let H = window.innerHeight;
 
 
 
-plan_canvas.width = W;
-plan_canvas.height = H;
+let add_wall_mode = 0;
+const walls_to_add_new = [];
+
+add_wall_mode_button.addEventListener('click', () => {
+
+	add_wall_mode = 1 - add_wall_mode;
+
+	if (add_wall_mode) {
+
+		add_wall_mode_button.classList.add('-pressed');
+	}
+	else {
+
+		add_wall_mode_button.classList.remove('-pressed');
+	}
+});
 
 
 
-const renderer = new THREE.WebGLRenderer({ canvas: scene_canvas, antialias: true });
+const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
 // renderer.outputEncoding = THREE.sRGBEncoding;
 // renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -72,7 +87,7 @@ texture_floor.wrapT = THREE.RepeatWrapping;
 texture_floor.needsUpdate = true;
 log(texture_floor);
 
-const material_floor = new THREE.MeshBasicMaterial({ map: texture_floor, side: THREE.BackSide });
+const material_floor = new THREE.MeshBasicMaterial({ map: texture_floor, side: THREE.BackSide, wireframe: false });
 
 const mesh_floor = new THREE.Mesh(geometry_floor, material_floor);
 
@@ -87,23 +102,15 @@ scene.add(hemisphere_light);
 const camera = new THREE.OrthographicCamera(-W / 2, W / 2, H / 2, -H / 2, 1, 10000);
 camera.zoom = 10;
 camera.updateProjectionMatrix();
-scene_canvas.addEventListener('wheel', (evt) => camera.translateZ(Math.sign(evt.deltaY) * 0.1));
+// canvas.addEventListener('wheel', (evt) => camera.translateZ(Math.sign(evt.deltaY) * 0.1));
 
-const orbit_controls = new THREE.OrbitControls(camera, scene_canvas);
+const orbit_controls = new THREE.OrbitControls(camera, canvas);
 orbit_controls.enableZoom = false;
 orbit_controls.update();
 
 camera.rotateX(-Math.PI * 0.5);
 camera.translateZ(100);
 camera.lookAt(scene.position);
-
-
-
-// const plan_ctx = plan_canvas.getContext('2d');
-
-
-
-// let drawPlan = null;
 
 
 
@@ -129,24 +136,27 @@ class Point {
 
 			evt.preventDefault();
 
-			const last_z = this.z;
+			if (!add_wall_mode) {
 
-			this.z = Point.instances.length - 1;
-			this.circle.style.zIndex = this.z + 3;
+				const last_z = this.z;
 
-			Point.instances.forEach((point) => {
+				this.z = Point.instances.length - 1;
+				this.circle.style.zIndex = this.z + 2;
 
-				if (point !== this && point.z > last_z) {
+				Point.instances.forEach((point) => {
 
-					point.circle.style.zIndex = --point.z + 3;
-				}
-			});
+					if (point !== this && point.z > last_z) {
 
-			this.circle.classList.add('-mousedown');
+						point.circle.style.zIndex = --point.z + 2;
+					}
+				});
 
-			window.addEventListener('mousemove', Point.move);
+				this.circle.classList.add('-mousedown');
 
-			Point.selected = this;
+				window.addEventListener('mousemove', Point.move);
+
+				Point.selected = this;
+			}
 		});
 
 		parent_tag.appendChild(this.circle);
@@ -156,22 +166,28 @@ class Point {
 		Point.instances.push(this);
 	}
 
-	set (x = 0, y = 0) {
+	set (x = this.x, y = this.y) {
 
 		this.x = x;
 		this.y = y;
 
 		this.circle.style.left = `${ this.x - 30 }px`;
 		this.circle.style.top = `${ H - this.y - 30 }px`;
+
+		this.updateWalls();
+		this.updateGeometries();
 	}
 
-	updatePosition (movementX, movementY) {
+	move (movementX, movementY) {
 
 		this.x += movementX;
 		this.y -= movementY;
 
 		this.circle.style.left = `${ this.x - 30 }px`;
 		this.circle.style.top = `${ H - this.y - 30 }px`;
+
+		this.updateWalls();
+		this.updateGeometries();
 	}
 
 	updateWalls () {
@@ -185,6 +201,7 @@ class Point {
 			wall.rect.style.width = `${ distance_between_points + 30 }px`;
 			wall.rect.style.left = `${ ((this.x + conjugate_point.x - distance_between_points) * 0.5) - 15 }px`;
 			wall.rect.style.top = `${ (H - this.y + H - conjugate_point.y) * 0.5 - 15 }px`;
+			wall.rect.inner.innerHTML = `${ (distance_between_points * 0.1).toFixed(2) } m`;
 			const points_vector = { x: conjugate_point.x - this.x, y: conjugate_point.y - this.y };
 			let angle = Math.acos(
 
@@ -202,10 +219,80 @@ class Point {
 				angle *= -1;
 			}
 
+			if (wall.points.indexOf(this) === 0) {
+
+				if (this.x > conjugate_point.x) {
+
+					wall.rect.inner.style.transform = 'translate(0px, -17px) rotate(180deg)';
+				}
+				else {
+
+					wall.rect.inner.style.transform = 'translate(0px, -17px) rotate(0deg)';
+				}
+			}
+			else {
+
+				if (this.x > conjugate_point.x) {
+
+					wall.rect.inner.style.transform = 'translate(0px, -2px) rotate(180deg)';
+				}
+				else {
+
+					wall.rect.inner.style.transform = 'translate(0px, -2px) rotate(0deg)';
+				}
+			}
+
 			wall.rect.style.transform = `rotate(${ -angle / Math.PI * 180 }deg)`;
 		});
+	}
 
-		// drawPlan();
+	updateGeometries () {
+
+		Point.instances.forEach((point) => 	point.updateSceneCoordinates());
+
+		position_data.length = 0;
+		position_data_floor.length = 0;
+		uv_data_floor.length = 0;
+
+		Wall.instances.forEach((wall) => {
+
+			position_data.push(
+	
+				wall.points[0].scene_x, 0, wall.points[0].scene_y,
+				wall.points[0].scene_x, 3, wall.points[0].scene_y,
+				wall.points[1].scene_x, 0, wall.points[1].scene_y,
+	
+				wall.points[1].scene_x, 0, wall.points[1].scene_y,
+				wall.points[0].scene_x, 3, wall.points[0].scene_y,
+				wall.points[1].scene_x, 3, wall.points[1].scene_y,
+			);
+		});
+
+
+
+		const resolution = H / W;
+
+		const scene_coordinates = [];
+		const uv_coordinates = [];
+
+		Point.instances.forEach((point) => {
+
+			scene_coordinates.push(point.scene_x, point.scene_y);
+			uv_coordinates.push(point.x / W * 10, point.y / H * 10 * resolution);
+		});
+
+		earcut(scene_coordinates).forEach((index) => {
+
+			position_data_floor.push(scene_coordinates[(index * 2) + 0], 0, scene_coordinates[(index * 2) + 1]);
+			uv_data_floor.push(uv_coordinates[(index * 2) + 0], uv_coordinates[(index * 2) + 1]);
+		});
+
+
+
+		// eliminate allocation of typed arrays from the function
+		geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(position_data), 3));
+		geometry_floor.setAttribute('position', new THREE.BufferAttribute(new Float32Array(position_data_floor), 3));
+		geometry_floor.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uv_data_floor), 2));
 	}
 
 	updateSceneCoordinates () {
@@ -214,22 +301,16 @@ class Point {
 		this.scene_y = (window.innerHeight * 0.5 - this.y) * 0.1;
 	}
 
-	move () {
+	destroy () {
 
-		this.updatePosition(movementX, movementY);
-		this.updateWalls();
-	}
+		parent_tag.remove(this.circle);
 
-	static set (x, y) {
-
-		Point.selected.set(x, y);
-		Point.selected.updateWalls();
+		delete this;
 	}
 
 	static move ({ movementX, movementY }) {
 
-		Point.selected.updatePosition(movementX, movementY);
-		Point.selected.updateWalls();
+		Point.selected.move(movementX, movementY);
 
 
 
@@ -263,73 +344,6 @@ class Point {
 
 		// let avX = (minX + maxX) * 0.5;
 		// let avY = (minY + maxY) * 0.5;
-
-		Point.instances.forEach((point) => {
-
-			// Point.selected = point;
-
-			// Point.move({ movementX: (window.innerWidth * 0.5) - avX, movementY: (window.innerHeight * 0.5) - avY });
-
-			point.updateSceneCoordinates();
-		});
-
-		position_data.length = 0;
-		position_data_floor.length = 0;
-		uv_data_floor.length = 0;
-
-		let last_wall = Wall.instances[0];
-
-		const p1 = last_wall.points[0];
-		let last_p3 = last_wall.points[1];
-
-		Wall.instances.forEach((wall, wall_index) => {
-
-			position_data.push(
-
-				wall.points[0].scene_x, 0, wall.points[0].scene_y,
-				wall.points[0].scene_x, 3, wall.points[0].scene_y,
-				wall.points[1].scene_x, 0, wall.points[1].scene_y,
-
-				wall.points[1].scene_x, 0, wall.points[1].scene_y,
-				wall.points[0].scene_x, 3, wall.points[0].scene_y,
-				wall.points[1].scene_x, 3, wall.points[1].scene_y,
-			);
-
-				if (wall_index < Wall.instances.length - 2) {
-
-					const p2 = last_p3;
-
-					const [ next_wall ] = p2.walls.filter((_wall) => (_wall !== last_wall));
-
-					last_wall = next_wall;
-
-					const [ p3 ] = next_wall.points.filter((point) => (point !== p2));
-
-					position_data_floor.push(
-
-						p1.scene_x, 0, p1.scene_y,
-						p2.scene_x, 0, p2.scene_y,
-						p3.scene_x, 0, p3.scene_y,
-					);
-
-					const resolution = H / W;
-
-					uv_data_floor.push(
-
-						p1.x / W * 10, p1.y / H * 10 * resolution,
-						p2.x / W * 10, p2.y / H * 10 * resolution,
-						p3.x / W * 10, p3.y / H * 10 * resolution,
-					);
-
-					last_p3 = p3;
-				}
-		});
-
-		// log(uv_data_floor);
-
-		geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(position_data), 3));
-		geometry_floor.setAttribute('position', new THREE.BufferAttribute(new Float32Array(position_data_floor), 3));
-		geometry_floor.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uv_data_floor), 2));
 	}
 }
 
@@ -354,14 +368,62 @@ class Wall {
 
 			evt.preventDefault();
 
-			window.addEventListener('mousemove', Wall.move);
+			if (!add_wall_mode) {
 
-			Wall.selected = this;
+				window.addEventListener('mousemove', Wall.move);
+
+				Wall.selected = this;
+			}
 		});
+
+		this.rect.addEventListener('click', () => {
+
+			if (add_wall_mode) {
+
+				this.rect.classList.add('-selected');
+
+				walls_to_add_new.push(this);
+
+				if (walls_to_add_new.length >= 2) {
+
+					add_wall_mode = 0;
+
+					console.log(walls_to_add_new);
+
+					add_wall_mode_button.classList.remove('-pressed');
+
+					setTimeout(() => {
+
+						Wall.instances.forEach((wall) => wall.rect.classList.remove('-selected'));
+
+						const [ shared_point ] = [ ...walls_to_add_new[0].points, ...walls_to_add_new[1].points ].filter((point) => (walls_to_add_new[0].points.includes(point) && walls_to_add_new[1].points.includes(point)));
+
+						walls_to_add_new.length = 0;
+
+						log(shared_point, Point.instances.indexOf(shared_point));
+					}, 250);
+				}
+			}
+		});
+
+		this.rect.inner = document.createElement('div');
+
+		this.rect.inner.className = 'coverings-rect-inner';
+
+		this.rect.appendChild(this.rect.inner);
 
 		parent_tag.appendChild(this.rect);
 
 		Wall.instances.push(this);
+	}
+
+	destroy () {
+
+		this.rect.remove(this.rect.inner);
+
+		parent_tag.remove(this.rect);
+
+		delete this;
 	}
 
 	static move (evt) {
@@ -382,23 +444,6 @@ class Wall {
 
 Wall.selected = null;
 Wall.instances = [];
-
-
-
-// drawPlan = () => {
-
-// 	plan_ctx.clearRect(0, 0, W, H);
-
-// 	Wall.instances.forEach((wall) => {
-
-// 		plan_ctx.beginPath();
-// 		plan_ctx.moveTo(wall.points[0].x, wall.points[0].y);
-// 		plan_ctx.lineWidth = 10;
-// 		plan_ctx.lineCap = 'square';
-// 		plan_ctx.lineTo(wall.points[1].x, wall.points[1].y);
-// 		plan_ctx.stroke();
-// 	});
-// };
 
 
 
@@ -423,15 +468,13 @@ window.addEventListener('mouseup', () => {
 
 
 
-// drawPlan();
-
-
-
 const wall1 = new Wall(new Point(0 + (W * 0.5) - 25, 0 + (H * 0.5) - 25), new Point(0 + (W * 0.5) - 25,   100 + (H * 0.5) - 25));
 const wall2 = new Wall(wall1.points[1],                                   new Point(100 + (W * 0.5) - 25, 100 + (H * 0.5) - 25));
 const wall3 = new Wall(wall2.points[1],                                   new Point(100 + (W * 0.5) - 25, 0   + (H * 0.5) - 25));
 const wall4 = new Wall(wall3.points[1],                                   new Point(25  + (W * 0.5) - 25, 0   + (H * 0.5) - 25));
 const wall5 = new Wall(wall4.points[1],                                   wall1.points[0]                                      );
+
+Point.instances.forEach((point) => point.set());
 
 const animate = () => {
 
