@@ -7,11 +7,21 @@ html
 		link(rel="stylesheet", href="index.css")
 
 	body
-		div#textures(style="display: none;")
-			img#tile(src="textures/tile.jpg")
+
+		#textures
+
+			img#tile1(src="textures/tile1.jpg")
+			img#tile2(src="textures/tile2.jpg")
+
 		.coverings
-			.coverings-canvas
-				canvas
+
+			canvas
+
+			.coverings-plan
+
 			.coverings-actions
+
 				#add_wall_mode_button.coverings-actions-switch Add wall
+				#orbit_mode_button.coverings-actions-switch Switch to orbit mode
+
 		script(type="text/javascript", src="index.js")
