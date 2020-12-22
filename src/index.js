@@ -163,7 +163,6 @@ const orbit_controls = new THREE.OrbitControls(orbit_camera, canvas);
 orbit_controls.enableZoom = true;
 orbit_controls.enableDamping = true;
 orbit_controls.dumpingFactor = 10;
-// orbit_controls.update();
 
 
 
