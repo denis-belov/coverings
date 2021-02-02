@@ -6,17 +6,10 @@
 import './index.scss';
 import '@babel/polyfill';
 import * as THREE from 'three';
-import getOrbitControls from 'three/examples/js/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import earcut from 'earcut';
 
-
-
 import Point from './point';
-
-
-
-getOrbitControls(THREE);
-
 
 
 // const ROOM_HEIGHT = 2.5;
@@ -159,7 +152,7 @@ orbit_camera.translateZ(20);
 
 let camera = plan_camera;
 
-const orbit_controls = new THREE.OrbitControls(orbit_camera, canvas);
+const orbit_controls = new OrbitControls(orbit_camera, canvas);
 orbit_controls.enableZoom = true;
 orbit_controls.enableDamping = true;
 orbit_controls.dumpingFactor = 10;
