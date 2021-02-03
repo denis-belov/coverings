@@ -1,3 +1,5 @@
+// Webpack 5.* dev server's live reload doesn't work correctly, try to update all dependencies to the latest later.
+
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');

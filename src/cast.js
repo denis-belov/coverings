@@ -1,0 +1,7 @@
+const METERS_TO_PIXELS = 100;
+
+export default {
+
+	METERS_TO_PIXELS,
+	PIXELS_TO_METERS: 1 / METERS_TO_PIXELS,
+};
