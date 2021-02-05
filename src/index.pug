@@ -7,10 +7,11 @@ html
 
 	body
 
-		#textures
+		#hidden
 
 			img#tile_texture1(src="textures/tile_texture1.jpg")
 			img#tile_texture2(src="textures/tile_texture2.jpg")
+			input(type="file" accept="model/gltf-binary")
 
 		.coverings
 
@@ -20,5 +21,6 @@ html
 
 			.coverings-actions
 
+				#upload_model_button.coverings-actions-switch Upload model
 				#add_wall_mode_button.coverings-actions-switch Add wall
-				#orbit_mode_button.coverings-actions-switch Switch to orbit mode
+				#mode_toggle_BUTTON.coverings-actions-switch Plan mode

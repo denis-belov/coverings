@@ -17,9 +17,11 @@ import Wall from './wall';
 
 import {
 
-	add_wall_mode_BUTTON,
-	orbit_mode_BUTTON,
 	coverings_plan_NODE,
+	upload_model_BUTTON,
+	add_wall_mode_BUTTON,
+	mode_toggle_BUTTON,
+	upload_model_INPUT,
 } from './dom';
 
 import {
@@ -27,7 +29,29 @@ import {
 	camera,
 	orbit_camera,
 	plan_camera,
+	uploadModel,
 } from './three';
+
+
+
+const file_reader = new FileReader();
+
+file_reader.addEventListener('loadend', (evt) => {
+
+	uploadModel(evt);
+
+	upload_model_INPUT.value = null;
+});
+
+upload_model_INPUT.addEventListener('change', (evt) => {
+
+	file_reader.readAsArrayBuffer(evt.target.files[0]);
+});
+
+upload_model_BUTTON.addEventListener('click', () => {
+
+	upload_model_INPUT.click();
+});
 
 
 
@@ -45,15 +69,15 @@ add_wall_mode_BUTTON.addEventListener('click', () => {
 	}
 });
 
-orbit_mode_BUTTON.addEventListener('click', () => {
+mode_toggle_BUTTON.addEventListener('click', () => {
 
 	modes.orbit_mode = 1 - modes.orbit_mode;
 
 	if (modes.orbit_mode) {
 
-		orbit_mode_BUTTON.innerHTML = 'Switch to plan mode';
+		mode_toggle_BUTTON.innerHTML = 'Orbit mode';
 
-		orbit_mode_BUTTON.classList.add('-pressed');
+		mode_toggle_BUTTON.classList.add('-pressed');
 
 		coverings_plan_NODE.classList.add('-hidden');
 
@@ -63,9 +87,9 @@ orbit_mode_BUTTON.addEventListener('click', () => {
 
 		// disable add_wall_mode_BUTTON
 
-		orbit_mode_BUTTON.innerHTML = 'Switch to orbit mode';
+		mode_toggle_BUTTON.innerHTML = 'Plan mode';
 
-		orbit_mode_BUTTON.classList.remove('-pressed');
+		mode_toggle_BUTTON.classList.remove('-pressed');
 
 		coverings_plan_NODE.classList.remove('-hidden');
 
@@ -83,13 +107,25 @@ window.addEventListener('mouseup', () => {
 
 		window.removeEventListener('mousemove', Point.move);
 
-		Point.selected = null;
+		// Point.selected = null;
 	}
 
 	if (Wall.selected) {
 
 		window.removeEventListener('mousemove', Wall.move);
 
-		Wall.selected = null;
+		// Wall.selected = null;
+	}
+});
+
+window.addEventListener('keydown', (evt) => {
+
+	if (evt.code === 'KeyD' && Point.instances.length > 3) {
+
+		const new_points = Point.instances.slice();
+
+		new_points.splice(new_points.indexOf(Point.selected), 1);
+
+		Point.makeContour(new_points);
 	}
 });

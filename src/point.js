@@ -12,6 +12,8 @@ import * as THREE from 'three';
 
 import { coverings_plan_NODE } from './dom';
 
+import Wall from './wall';
+
 import modes from './modes';
 import cast from './cast';
 
@@ -23,12 +25,12 @@ import {
 	uv_data_walls,
 	position_data_floor,
 	uv_data_floor,
-	camera,
+	plan_camera,
 } from './three';
 
 
 
-const TEST_ROOM_HEIGHT = 3;
+const TEST_ROOM_HEIGHT_METERS = 3;
 
 
 
@@ -66,59 +68,31 @@ export default class Point {
 
 			const next_point = point_array[point_index + 1] || point_array[0];
 
-			const [ wall ] = point.walls.filter((_wall) => _wall.points.includes(next_point));
-
 			position_data_walls.push(
 
 				point.scene_x, 0, point.scene_y,
-				point.scene_x, TEST_ROOM_HEIGHT, point.scene_y,
+				point.scene_x, TEST_ROOM_HEIGHT_METERS, point.scene_y,
 				next_point.scene_x, 0, next_point.scene_y,
 
 				next_point.scene_x, 0, next_point.scene_y,
-				point.scene_x, TEST_ROOM_HEIGHT, point.scene_y,
-				next_point.scene_x, TEST_ROOM_HEIGHT, next_point.scene_y,
+				point.scene_x, TEST_ROOM_HEIGHT_METERS, point.scene_y,
+				next_point.scene_x, TEST_ROOM_HEIGHT_METERS, next_point.scene_y,
 			);
+
+			const wall_pixel_length = point.distanceTo(next_point);
 
 			// tile segment size = (2m,2m)
 			uv_data_walls.push(
 
 				0, 0,
-				0, TEST_ROOM_HEIGHT / 2,
-				wall.pixel_length * cast.PIXELS_TO_METERS / 2, 0,
+				0, TEST_ROOM_HEIGHT_METERS / 2,
+				wall_pixel_length * cast.PIXELS_TO_METERS / 2, 0,
 
-				wall.pixel_length * cast.PIXELS_TO_METERS / 2, 0,
-				0, TEST_ROOM_HEIGHT / 2,
-				wall.pixel_length * cast.PIXELS_TO_METERS / 2, TEST_ROOM_HEIGHT / 2,
+				wall_pixel_length * cast.PIXELS_TO_METERS / 2, 0,
+				0, TEST_ROOM_HEIGHT_METERS / 2,
+				wall_pixel_length * cast.PIXELS_TO_METERS / 2, TEST_ROOM_HEIGHT_METERS / 2,
 			);
 		});
-
-		// Wall.instances.forEach((wall) => {
-
-		// 	// log(rate);
-
-		// 	position_data_walls.push(
-
-		// 		wall.points[0].scene_x, 0, wall.points[0].scene_y,
-		// 		wall.points[0].scene_x, TEST_ROOM_HEIGHT * 5, wall.points[0].scene_y,
-		// 		wall.points[1].scene_x, 0, wall.points[1].scene_y,
-
-		// 		wall.points[1].scene_x, 0, wall.points[1].scene_y,
-		// 		wall.points[0].scene_x, TEST_ROOM_HEIGHT * 5, wall.points[0].scene_y,
-		// 		wall.points[1].scene_x, TEST_ROOM_HEIGHT * 5, wall.points[1].scene_y,
-		// 	);
-		// 	log(wall.points[0].scene_x, wall.points[0].pixel_y);
-
-		// 	uv_data_walls.push(
-
-		// 		0, 0,
-		// 		0, TEST_ROOM_HEIGHT,
-		// 		wall.pixel_length * 0.02, 0,
-
-		// 		wall.pixel_length * 0.02, 0,
-		// 		0, TEST_ROOM_HEIGHT,
-		// 		wall.pixel_length * 0.02, TEST_ROOM_HEIGHT,
-		// 	);
-		// });
 
 
 
@@ -154,51 +128,58 @@ export default class Point {
 	static move ({ movementX, movementY }) {
 
 		Point.selected.move(movementX, movementY);
+	}
 
+	static makeContour (points) {
 
+		const walls = [];
 
-		// let minX = 999999;
-		// let maxX = -999999;
-		// let minY = 999999;
-		// let maxY = -999999;
+		Point.destroyContour();
 
-		// Point.instances.forEach((point) => {
+		Point.instances.push(...points);
 
-		// 	if (point.pixel_y < minX) {
+		Point.instances.forEach((point, index) => {
 
-		// 		minX = point.pixel_y;
-		// 	}
+			const wall = new Wall(points[index], points[index + 1] || points[0]);
 
-		// 	if (point.pixel_y > maxX) {
+			walls.push(wall);
 
-		// 		maxX = point.pixel_y;
-		// 	}
+			point.z_index = index;
 
-		// 	if (point.y < minY) {
+			point.walls.push(wall);
 
-		// 		minY = point.y;
-		// 	}
+			coverings_plan_NODE.appendChild(point.circle);
+		});
 
-		// 	if (point.y > maxY) {
+		walls.forEach((wall, index) => (wall.next_wall = walls[index + 1] || walls[0]));
 
-		// 		maxY = point.y;
-		// 	}
-		// });
+		console.log(walls);
 
-		// let avX = (minX + maxX) * 0.5;
-		// let avY = (minY + maxY) * 0.5;
+		Point.instances.forEach((point) => point.set());
+	}
+
+	static destroyContour () {
+
+		Point.instances.forEach((point) => {
+
+			point.z_index = 0;
+			point.walls.length = 0;
+		});
+
+		Point.instances.length = 0;
+
+		coverings_plan_NODE.innerHTML = '';
 	}
 
 
 
-	constructor (meter_x = 0, meter_y = 0, push = 1) {
+	constructor (meter_x = 0, meter_y = 0) {
 
 		// 2D coordinates in window space (pixel)
 		this.pixel_x = (meter_x * cast.METERS_TO_PIXELS) + (window.innerWidth / 2);
 		this.pixel_y = (meter_y * cast.METERS_TO_PIXELS) + (window.innerHeight / 2);
 
-		// z-index
-		this.z_index = Point.instances.length;
+		this.z_index = 0;
 
 		this.scene_x = 0;
 		this.scene_y = 0;
@@ -236,55 +217,64 @@ export default class Point {
 			}
 		});
 
-		coverings_plan_NODE.appendChild(this.circle);
-
 		this.walls = [];
-
-		if (push) {
-
-			Point.instances.push(this);
-		}
 	}
 
-	set (pixel_x = this.pixel_x, pixel_y = this.pixel_y) {
+	distanceTo (point) {
 
-		this.pixel_x = pixel_x;
-		this.pixel_y = pixel_y;
+		return Math.sqrt(Math.pow(this.pixel_x - point.pixel_x, 2) + Math.pow(this.pixel_y - point.pixel_y, 2));
+	}
+
+	centerWith (point) {
+
+		return new Point(
+
+			(((this.pixel_x + point.pixel_x) / 2) - (window.innerWidth / 2)) * cast.PIXELS_TO_METERS,
+			(((this.pixel_y + point.pixel_y) / 2) - (window.innerHeight / 2)) * cast.PIXELS_TO_METERS,
+		);
+	}
+
+	doPositionDependentActions () {
 
 		this.circle.style.left = `${ this.pixel_x - 30 }px`;
 		this.circle.style.top = `${ window.innerHeight - this.pixel_y - 30 }px`;
 
-		this.updateWalls();
+		this.updateAdjointWalls();
 
 		Point.updateGeometries();
 	}
 
-	move (movementX, movementY) {
+	set (position_x = this.pixel_x, position_y = this.pixel_y) {
 
-		this.pixel_x += movementX;
-		this.pixel_y -= movementY;
+		this.pixel_x = position_x;
+		this.pixel_y = position_y;
 
-		this.circle.style.left = `${ this.pixel_x - 30 }px`;
-		this.circle.style.top = `${ window.innerHeight - this.pixel_y - 30 }px`;
-
-		this.updateWalls();
-
-		Point.updateGeometries();
+		this.doPositionDependentActions();
 	}
 
-	updateWalls () {
+	move (movement_x = 0, movement_y = 0) {
+
+		this.pixel_x += movement_x;
+		this.pixel_y -= movement_y;
+
+		this.doPositionDependentActions();
+	}
+
+	updateAdjointWalls () {
 
 		this.walls.forEach((wall) => {
 
 			const [ conjugate_point ] = wall.points.filter((point) => (point !== this));
 
-			wall.pixel_length = Math.sqrt(Math.pow(this.pixel_x - conjugate_point.pixel_x, 2) + Math.pow(this.pixel_y - conjugate_point.pixel_y, 2));
+			wall.pixel_length = this.distanceTo(conjugate_point);
 
 			wall.rect.style.width = `${ wall.pixel_length + 30 }px`;
 			wall.rect.style.left = `${ ((this.pixel_x + conjugate_point.pixel_x - wall.pixel_length) * 0.5) - 15 }px`;
 			wall.rect.style.top = `${ ((window.innerHeight - this.pixel_y + window.innerHeight - conjugate_point.pixel_y) * 0.5) - 15 }px`;
 			wall.rect.inner.innerHTML = `${ (wall.pixel_length * cast.PIXELS_TO_METERS).toFixed(2) } m`;
+
 			const points_vector = { pixel_x: conjugate_point.pixel_x - this.pixel_x, pixel_y: conjugate_point.pixel_y - this.pixel_y };
+
 			let angle = Math.acos(
 
 				points_vector.pixel_x /
@@ -326,25 +316,13 @@ export default class Point {
 
 	updateSceneCoordinatesPlanMode () {
 
-		this.scene_x = (this.pixel_x - (window.innerWidth * 0.5)) / camera._.zoom;
-		this.scene_y = ((window.innerHeight * 0.5) - this.pixel_y) / camera._.zoom;
+		this.scene_x = (this.pixel_x - (window.innerWidth * 0.5)) / plan_camera.zoom;
+		this.scene_y = ((window.innerHeight * 0.5) - this.pixel_y) / plan_camera.zoom;
 	}
 
 	updateSceneCoordinatesOrbitMode () {
 
 		this.scene_x = (this.pixel_x - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS;
 		this.scene_y = ((window.innerHeight * 0.5) - this.pixel_y) * cast.PIXELS_TO_METERS;
-	}
-
-	destroy () {
-
-		if (Point.instances.includes(this)) {
-
-			Point.instances.splice(Point.instances.indexOf(this), 1);
-		}
-
-		coverings_plan_NODE.removeChild(this.circle);
-
-		delete this;
 	}
 }

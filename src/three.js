@@ -7,7 +7,10 @@ max-len,
 
 
 import * as THREE from 'three';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
 import {
 
@@ -26,6 +29,15 @@ const CAMERA_FAR = 1000;
 const PERSPECTIVE_CAMERA_FOV = 45;
 // const TEXTURE_ANISOTROPY = 16;
 const MATERIAL_WIREFRAME = false;
+
+
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const draggable_gltf_scenes = [];
+const draggable_meshes = [];
+let raycasted_mesh = null;
+let transform_controls_attached_mesh = null;
 
 
 
@@ -125,6 +137,118 @@ export const orbit_controls = new OrbitControls(orbit_camera, canvas);
 orbit_controls.enableZoom = true;
 orbit_controls.enableDamping = true;
 orbit_controls.dumpingFactor = 10;
+
+
+
+const draco_loader = new DRACOLoader();
+draco_loader.setDecoderPath('https://www.gstatic.com/draco/v1/decoders/');
+
+export const gltf_loader = new GLTFLoader();
+gltf_loader.setDRACOLoader(draco_loader);
+
+// gltf_loader.load(
+
+// 	'models/washing_machine_new.glb',
+
+// 	(gltf) => scene.add(gltf.scene),
+// );
+
+export const uploadModel = (evt) => {
+
+	gltf_loader.parse(
+
+		evt.target.result,
+
+		null,
+
+		(gltf) => {
+
+			const meshes = [];
+
+			gltf.scene.traverse((elm) => {
+
+				if (elm.isMesh) {
+
+					meshes.push(elm);
+
+					elm._meshes = meshes;
+				}
+			});
+
+			draggable_gltf_scenes.push(gltf.scene);
+
+			gltf.scene.traverse((elm) => {
+				if (elm.isMesh) {
+					draggable_meshes.push(elm);
+				}
+			});
+
+			scene.add(...draggable_gltf_scenes);
+		},
+	);
+};
+
+const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
+
+transform_controls.addEventListener('change', () => {
+
+	if (transform_controls_attached_mesh) {
+
+		transform_controls_attached_mesh._meshes.forEach((elm) => {
+
+			elm.position.copy(transform_controls_attached_mesh.position);
+			elm.rotation.copy(transform_controls_attached_mesh.rotation);
+		});
+	}
+});
+
+transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
+
+scene.add(transform_controls);
+
+canvas.addEventListener('mousemove', (evt) => {
+
+	mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
+	mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
+
+	raycaster.setFromCamera(mouse, orbit_camera);
+
+	const intersects = raycaster.intersectObjects(draggable_meshes);
+
+	if (intersects.length) {
+
+		if (raycasted_mesh) {
+
+			raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x000000));
+		}
+
+		raycasted_mesh = intersects.sort((a, b) => (a.distance - b.distance))[0].object;
+
+		raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x00FF00));
+	}
+	else if (raycasted_mesh) {
+
+		raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x000000));
+
+		raycasted_mesh = null;
+	}
+});
+
+canvas.addEventListener('dblclick', () => {
+
+	if (raycasted_mesh) {
+
+		transform_controls_attached_mesh = raycasted_mesh;
+
+		transform_controls.attach(transform_controls_attached_mesh);
+	}
+	else {
+
+		transform_controls_attached_mesh = null;
+
+		transform_controls.detach();
+	}
+});
 
 
 

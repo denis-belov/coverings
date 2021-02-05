@@ -21,7 +21,6 @@ module.exports = (env, argv) => ({
 	output: {
 
 		path: path.join(__dirname, 'build'),
-		// filename: 'index.js',
 	},
 
 	module: {
@@ -30,19 +29,49 @@ module.exports = (env, argv) => ({
 
 			{
 				test: /\.js$/,
-				enforce: 'pre',
-				use: [ { loader: 'source-map-loader' } ],
+				exclude: /node_modules/,
+				use:
+
+					argv.mode === 'development' ?
+
+						'babel-loader' :
+
+						[
+							'babel-loader',
+							'eslint-loader',
+						],
 			},
 
 			{
-				test: /\.js$/,
-				exclude: /node_modules/,
+				test: /\.(css|scss)$/,
 				use: [
 
-					{ loader: 'babel-loader' },
-					// linting with webapp eslint config
-					// { loader: 'eslint-loader' },
+					MiniCssExtractPlugin.loader,
+					// to insert css into html
+					// 'style-loader',
+					'css-loader',
+					'postcss-loader',
+					'sass-loader',
 				],
+			},
+
+			{
+				test: /\.pug$/,
+				use: [
+
+					'html-loader',
+					'pug-html-loader',
+				],
+			},
+
+			{
+				test: /\.html$/,
+				use: { loader: 'html-loader', options: { minimize: true } },
+			},
+
+			{
+				test: /\.(png|jpg|jpeg)$/,
+				use: 'base64-inline-loader',
 			},
 
 			{
@@ -76,42 +105,10 @@ module.exports = (env, argv) => ({
 					},
 				],
 			},
-
-			{
-				test: /\.(css|scss)$/,
-				use: [
-
-					{ loader: MiniCssExtractPlugin.loader },
-					// to insert css into html
-					// { loader: 'style-loader' },
-					{ loader: 'css-loader' },
-					{ loader: 'postcss-loader' },
-					{ loader: 'sass-loader' },
-				],
-			},
-
-			{
-				test: /\.pug$/,
-				use: [
-
-					{ loader: 'html-loader' },
-					{ loader: 'pug-html-loader' },
-				],
-			},
-
-			{
-				test: /\.html$/,
-				use: [ { loader: 'html-loader', options: { minimize: true } } ],
-			},
-
-			{
-				test: /\.(png|jpg|jpeg)$/,
-				use: [ { loader: 'base64-inline-loader' } ],
-			},
 		],
 	},
 
-	devtool: argv.NODE_ENV === 'development' ? 'source-map' : false,
+	devtool: argv.mode === 'development' ? 'source-map' : false,
 
 	plugins: [
 
@@ -136,7 +133,7 @@ module.exports = (env, argv) => ({
 
 			patterns: [
 
-				// { from: 'src/models', to: 'models' },
+				{ from: 'src/models', to: 'models' },
 				{ from: 'src/textures', to: 'textures' },
 			],
 		}),
