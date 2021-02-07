@@ -12,6 +12,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
+import cast from './cast';
+
 import {
 
 	tile_texture1,
@@ -118,7 +120,7 @@ const hemisphere_light = new THREE.HemisphereLight('white', 'white', 1);
 scene.add(hemisphere_light);
 
 export const plan_camera = new THREE.OrthographicCamera(...getOrthographicCameraAttributes());
-plan_camera.zoom = 10;
+plan_camera.zoom = cast.METERS_TO_PIXELS;
 plan_camera.updateProjectionMatrix();
 
 /* eslint-disable no-magic-numbers */

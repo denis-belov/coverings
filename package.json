@@ -15,7 +15,6 @@
     "pug-html-loader": "1.1.5",
     "style-loader": "2.0.0",
     "css-loader": "5.0.1",
-    "postcss-loader": "4.2.0",
     "sass-loader": "10.1.1",
     "json-loader": "0.5.7",
     "base64-inline-loader": "1.1.1",

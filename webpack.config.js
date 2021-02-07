@@ -50,7 +50,6 @@ module.exports = (env, argv) => ({
 					// to insert css into html
 					// 'style-loader',
 					'css-loader',
-					'postcss-loader',
 					'sass-loader',
 				],
 			},

@@ -85,18 +85,18 @@ export default class Wall {
 
 						const shared_index = Point.instances.indexOf(shared_point);
 
-						const old_points = Point.instances.slice();
+						const new_points = Point.instances.slice();
 
 						if (Wall.walls_to_add_new[0].next_wall === Wall.walls_to_add_new[1]) {
 
-							old_points.splice(shared_index, 1, new_point1, new_point2);
+							new_points.splice(shared_index, 1, new_point1, new_point2);
 						}
 						else {
 
-							old_points.splice(shared_index, 1, new_point2, new_point1);
+							new_points.splice(shared_index, 1, new_point2, new_point1);
 						}
 
-						Point.makeContour(old_points);
+						Point.makeContour(new_points);
 
 						Wall.walls_to_add_new.length = 0;
 					}, TIME_TO_WAIT_FOR_APPENDING_WALL);

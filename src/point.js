@@ -25,7 +25,6 @@ import {
 	uv_data_walls,
 	position_data_floor,
 	uv_data_floor,
-	plan_camera,
 } from './three';
 
 
@@ -38,19 +37,14 @@ export default class Point {
 
 	static selected = null;
 	static instances = [];
+	// undo/redo
+	static states = [];
 
 
 
 	static updateSceneCoordinates () {
 
-		if (modes.orbit_mode) {
-
-			Point.instances.forEach((point) => point.updateSceneCoordinatesOrbitMode());
-		}
-		else {
-
-			Point.instances.forEach((point) => point.updateSceneCoordinatesPlanMode());
-		}
+		Point.instances.forEach((point) => point.updateSceneCoordinates());
 	}
 
 	// optimize geometries with index buffers ?
@@ -85,34 +79,27 @@ export default class Point {
 			uv_data_walls.push(
 
 				0, 0,
-				0, TEST_ROOM_HEIGHT_METERS / 2,
-				wall_pixel_length * cast.PIXELS_TO_METERS / 2, 0,
+				0, TEST_ROOM_HEIGHT_METERS / 6,
+				wall_pixel_length * cast.PIXELS_TO_METERS / 6, 0,
 
-				wall_pixel_length * cast.PIXELS_TO_METERS / 2, 0,
-				0, TEST_ROOM_HEIGHT_METERS / 2,
-				wall_pixel_length * cast.PIXELS_TO_METERS / 2, TEST_ROOM_HEIGHT_METERS / 2,
+				wall_pixel_length * cast.PIXELS_TO_METERS / 6, 0,
+				0, TEST_ROOM_HEIGHT_METERS / 6,
+				wall_pixel_length * cast.PIXELS_TO_METERS / 6, TEST_ROOM_HEIGHT_METERS / 6,
 			);
 		});
 
 
 
-		const resolution = window.innerHeight / window.innerWidth;
-
 		const scene_coordinates = [];
-		const uv_coordinates = [];
 
-		Point.instances.forEach((point) => {
+		Point.instances.forEach((point) => scene_coordinates.push(point.scene_x, point.scene_y));
 
-			scene_coordinates.push(point.scene_x, point.scene_y);
-			uv_coordinates.push(point.pixel_x / window.innerWidth * 50, point.pixel_y / window.innerHeight * 50 * resolution);
-		});
+		const triangles = earcut(scene_coordinates);
 
-		const tri = earcut(scene_coordinates);
-
-		tri.forEach((index) => {
+		triangles.forEach((index) => {
 
 			position_data_floor.push(scene_coordinates[(index * 2) + 0], 0, scene_coordinates[(index * 2) + 1]);
-			uv_data_floor.push(uv_coordinates[(index * 2) + 0], uv_coordinates[(index * 2) + 1]);
+			uv_data_floor.push(scene_coordinates[(index * 2) + 0] / 6, scene_coordinates[(index * 2) + 1] / 6);
 		});
 
 
@@ -152,8 +139,6 @@ export default class Point {
 		});
 
 		walls.forEach((wall, index) => (wall.next_wall = walls[index + 1] || walls[0]));
-
-		console.log(walls);
 
 		Point.instances.forEach((point) => point.set());
 	}
@@ -314,13 +299,7 @@ export default class Point {
 		});
 	}
 
-	updateSceneCoordinatesPlanMode () {
-
-		this.scene_x = (this.pixel_x - (window.innerWidth * 0.5)) / plan_camera.zoom;
-		this.scene_y = ((window.innerHeight * 0.5) - this.pixel_y) / plan_camera.zoom;
-	}
-
-	updateSceneCoordinatesOrbitMode () {
+	updateSceneCoordinates () {
 
 		this.scene_x = (this.pixel_x - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS;
 		this.scene_y = ((window.innerHeight * 0.5) - this.pixel_y) * cast.PIXELS_TO_METERS;

@@ -15,6 +15,8 @@ import modes from './modes';
 import Point from './point';
 import Wall from './wall';
 
+import cast from './cast';
+
 import {
 
 	coverings_plan_NODE,
@@ -22,6 +24,7 @@ import {
 	add_wall_mode_BUTTON,
 	mode_toggle_BUTTON,
 	upload_model_INPUT,
+	canvas,
 } from './dom';
 
 import {
@@ -96,7 +99,7 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 		camera._ = plan_camera;
 	}
 
-	Point.updateGeometries();
+	// Point.updateGeometries();
 });
 
 window.addEventListener('mouseup', () => {
@@ -116,6 +119,8 @@ window.addEventListener('mouseup', () => {
 
 		// Wall.selected = null;
 	}
+
+	Point.states.push(Point.instances.slice());
 });
 
 window.addEventListener('keydown', (evt) => {
@@ -128,4 +133,22 @@ window.addEventListener('keydown', (evt) => {
 
 		Point.makeContour(new_points);
 	}
+	else if (evt.code === 'KeyZ') {
+
+		Point.makeContour(Point.states.pop());
+	}
 });
+
+// window.addEventListener('wheel', (evt) => {
+
+// 	if (!modes.orbit_mode) {
+
+// 		const asd = Math.sign(evt.deltaY);
+
+// 		cast.METERS_TO_PIXELS += asd;
+
+// 		plan_camera.zoom = cast.METERS_TO_PIXELS;
+
+// 		plan_camera.updateProjectionMatrix();
+// 	}
+// });
