@@ -10,12 +10,14 @@ max-len,
 
 
 
+// import Loader from 'external-data-loader';
+
 import modes from './modes';
 
 import Point from './point';
 import Wall from './wall';
 
-import cast from './cast';
+// import cast from './cast';
 
 import {
 
@@ -24,16 +26,25 @@ import {
 	add_wall_mode_BUTTON,
 	mode_toggle_BUTTON,
 	upload_model_INPUT,
-	canvas,
+	// floor_tile_SELECT,
+	// canvas,
 } from './dom';
 
 import {
 
-	camera,
-	orbit_camera,
-	plan_camera,
+	// camera,
+	// orbit_camera,
+	// plan_camera,
 	uploadModel,
+	// tilable_mesh,
 } from './three';
+
+
+// console.log(Loader);
+
+
+
+// const loader = new Loader();
 
 
 
@@ -84,7 +95,7 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 		coverings_plan_NODE.classList.add('-hidden');
 
-		camera._ = orbit_camera;
+		// camera._ = orbit_camera;
 	}
 	else {
 
@@ -96,7 +107,7 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 		coverings_plan_NODE.classList.remove('-hidden');
 
-		camera._ = plan_camera;
+		// camera._ = plan_camera;
 	}
 
 	// Point.updateGeometries();
@@ -120,7 +131,7 @@ window.addEventListener('mouseup', () => {
 		// Wall.selected = null;
 	}
 
-	Point.states.push(Point.instances.slice());
+	// Point.states.push(Point.instances.slice());
 });
 
 window.addEventListener('keydown', (evt) => {
@@ -139,16 +150,67 @@ window.addEventListener('keydown', (evt) => {
 	}
 });
 
+// let wall_index = 0;
+
+// floor_tile_SELECT.addEventListener('change', async () => {
+
+// 	if (tilable_mesh._) {
+
+// 		// console.log(evt);
+
+// 		const info = await fetch(
+
+// 			'/textures/1/info.json',
+
+// 			{
+// 				method: 'get',
+// 			},
+// 		)
+// 			.then((response) => response.json());
+
+// 		if (info.textures) {
+
+// 			const sources = {};
+
+// 			for (const texture in info.textures) {
+
+// 				sources[texture] = { source: info.textures[texture], type: 'image' };
+// 			}
+
+// 			await loader.load({
+
+// 				sources,
+
+// 				// progress: () => 0,
+// 			});
+// 		}
+
+// 		// console.log(loader);
+
+// 		console.log(tilable_mesh._);
+
+// 		[ ... ].setTile(info.sizes, loader.content);
+
+// 		loader.content = {};
+// 	}
+// });
+
 // window.addEventListener('wheel', (evt) => {
 
-// 	if (!modes.orbit_mode) {
+// 	// if (!modes.orbit_mode) {
 
-// 		const asd = Math.sign(evt.deltaY);
+// 	// 	const asd = Math.sign(evt.deltaY);
 
-// 		cast.METERS_TO_PIXELS += asd;
+// 	// 	cast.METERS_TO_PIXELS += asd;
 
-// 		plan_camera.zoom = cast.METERS_TO_PIXELS;
+// 	// 	plan_camera.zoom = cast.METERS_TO_PIXELS;
 
-// 		plan_camera.updateProjectionMatrix();
-// 	}
+// 	// 	plan_camera.updateProjectionMatrix();
+// 	// }
+
+// 	orbit_camera.zoom += Math.sign(evt.deltaY) * 0.1;
+
+// 	console.log(orbit_camera.zoom);
+
+// 	orbit_camera.updateProjectionMatrix();
 // });
