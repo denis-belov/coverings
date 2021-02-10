@@ -1,0 +1,12 @@
+{
+  "sizes": [ 1.6, 1.6 ],
+
+  "textures": {
+
+    "base": "/textures/3/base.png",
+    "ao": "/textures/3/ao.png",
+    "normal": "/textures/3/normal.png",
+    "roughness": "/textures/3/roughness.png",
+    "metalness": "/textures/3/metalness.png"
+  }
+}
