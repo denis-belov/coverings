@@ -68084,20 +68084,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wall__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./wall */ "./src/wall.js");
 /* harmony import */ var _dom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./dom */ "./src/dom.js");
 /* harmony import */ var _three__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./three */ "./src/three.js");
-/*
-eslint-disable
-
-max-len,
-*/
-// make string constants
-// import Loader from 'external-data-loader';
 
 
- // import cast from './cast';
 
 
- // console.log(Loader);
-// const loader = new Loader();
 
 var file_reader = new FileReader();
 file_reader.addEventListener('loadend', function (evt) {
@@ -68125,72 +68115,23 @@ _dom__WEBPACK_IMPORTED_MODULE_3__["mode_toggle_BUTTON"].addEventListener('click'
   if (_modes__WEBPACK_IMPORTED_MODULE_0__["default"].orbit_mode) {
     _dom__WEBPACK_IMPORTED_MODULE_3__["mode_toggle_BUTTON"].innerHTML = 'Orbit mode';
     _dom__WEBPACK_IMPORTED_MODULE_3__["mode_toggle_BUTTON"].classList.add('-pressed');
-    _dom__WEBPACK_IMPORTED_MODULE_3__["coverings_plan_NODE"].classList.add('-hidden'); // camera._ = orbit_camera;
+    _dom__WEBPACK_IMPORTED_MODULE_3__["coverings_plan_NODE"].classList.add('-hidden');
   } else {
-    // disable add_wall_mode_BUTTON
     _dom__WEBPACK_IMPORTED_MODULE_3__["mode_toggle_BUTTON"].innerHTML = 'Plan mode';
     _dom__WEBPACK_IMPORTED_MODULE_3__["mode_toggle_BUTTON"].classList.remove('-pressed');
-    _dom__WEBPACK_IMPORTED_MODULE_3__["coverings_plan_NODE"].classList.remove('-hidden'); // camera._ = plan_camera;
-  } // Point.updateGeometries();
-
+    _dom__WEBPACK_IMPORTED_MODULE_3__["coverings_plan_NODE"].classList.remove('-hidden');
+  }
 });
 window.addEventListener('mouseup', function () {
   if (_point__WEBPACK_IMPORTED_MODULE_1__["default"].selected) {
     _point__WEBPACK_IMPORTED_MODULE_1__["default"].selected.circle.classList.remove('-mousedown');
-    window.removeEventListener('mousemove', _point__WEBPACK_IMPORTED_MODULE_1__["default"].move); // Point.selected = null;
+    window.removeEventListener('mousemove', _point__WEBPACK_IMPORTED_MODULE_1__["default"].move);
   }
 
   if (_wall__WEBPACK_IMPORTED_MODULE_2__["default"].selected) {
-    window.removeEventListener('mousemove', _wall__WEBPACK_IMPORTED_MODULE_2__["default"].move); // Wall.selected = null;
-  } // Point.states.push(Point.instances.slice());
-
-});
-window.addEventListener('keydown', function (evt) {
-  if (evt.code === 'KeyD' && _point__WEBPACK_IMPORTED_MODULE_1__["default"].instances.length > 3) {
-    var new_points = _point__WEBPACK_IMPORTED_MODULE_1__["default"].instances.slice();
-    new_points.splice(new_points.indexOf(_point__WEBPACK_IMPORTED_MODULE_1__["default"].selected), 1);
-    _point__WEBPACK_IMPORTED_MODULE_1__["default"].makeContour(new_points);
-  } else if (evt.code === 'KeyZ') {
-    _point__WEBPACK_IMPORTED_MODULE_1__["default"].makeContour(_point__WEBPACK_IMPORTED_MODULE_1__["default"].states.pop());
+    window.removeEventListener('mousemove', _wall__WEBPACK_IMPORTED_MODULE_2__["default"].move);
   }
-}); // let wall_index = 0;
-// floor_tile_SELECT.addEventListener('change', async () => {
-// 	if (tilable_mesh._) {
-// 		// console.log(evt);
-// 		const info = await fetch(
-// 			'/textures/1/info.json',
-// 			{
-// 				method: 'get',
-// 			},
-// 		)
-// 			.then((response) => response.json());
-// 		if (info.textures) {
-// 			const sources = {};
-// 			for (const texture in info.textures) {
-// 				sources[texture] = { source: info.textures[texture], type: 'image' };
-// 			}
-// 			await loader.load({
-// 				sources,
-// 				// progress: () => 0,
-// 			});
-// 		}
-// 		// console.log(loader);
-// 		console.log(tilable_mesh._);
-// 		[ ... ].setTile(info.sizes, loader.content);
-// 		loader.content = {};
-// 	}
-// });
-// window.addEventListener('wheel', (evt) => {
-// 	// if (!modes.orbit_mode) {
-// 	// 	const asd = Math.sign(evt.deltaY);
-// 	// 	cast.METERS_TO_PIXELS += asd;
-// 	// 	plan_camera.zoom = cast.METERS_TO_PIXELS;
-// 	// 	plan_camera.updateProjectionMatrix();
-// 	// }
-// 	orbit_camera.zoom += Math.sign(evt.deltaY) * 0.1;
-// 	console.log(orbit_camera.zoom);
-// 	orbit_camera.updateProjectionMatrix();
-// });
+});
 
 /***/ }),
 
@@ -68207,7 +68148,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! earcut */ "./node_modules/earcut/src/earcut.js");
 /* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(earcut__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _three__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./three */ "./src/three.js");
+/* harmony import */ var _tileable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./tileable */ "./src/tileable.js");
+/* harmony import */ var _three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./three */ "./src/three.js");
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -68226,84 +68170,37 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/*
-eslint-disable
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
 
-no-magic-numbers,
-*/
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
 
- // import { coverings_plan_NODE } from './dom';
-// import Wall from './wall';
-// import modes from './modes';
-// import cast from './cast';
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
 
- // const TEST_ROOM_HEIGHT_METERS = 3;
-// inherit Floor and Wall from base class
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
-var Floor = /*#__PURE__*/function () {
-  function Floor(room) {
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+
+
+
+
+
+var Floor = /*#__PURE__*/function (_Tileable) {
+  _inherits(Floor, _Tileable);
+
+  var _super = _createSuper(Floor);
+
+  function Floor() {
     _classCallCheck(this, Floor);
 
-    this.room = room;
-    this.tile_sizes = [1, 1];
-    this.geometry = new three__WEBPACK_IMPORTED_MODULE_1__["BufferGeometry"]();
-    this.geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array([]), 3));
-    this.geometry.setAttribute('normal', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array([]), 3));
-    this.geometry.setAttribute('uv', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array([]), 2));
-    this.geometry.setAttribute('uv2', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](this.geometry.attributes.uv.array, 2));
-    this.base_texture = new three__WEBPACK_IMPORTED_MODULE_1__["Texture"]();
-    this.base_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_2__["webgl_maximum_anisotropy"];
-    this.base_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.base_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.normal_texture = new three__WEBPACK_IMPORTED_MODULE_1__["Texture"]();
-    this.normal_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_2__["webgl_maximum_anisotropy"];
-    this.normal_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.normal_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"]; // ambient_occlusion
-
-    this.ao_texture = new three__WEBPACK_IMPORTED_MODULE_1__["Texture"]();
-    this.ao_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_2__["webgl_maximum_anisotropy"];
-    this.ao_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.ao_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.roughness_texture = new three__WEBPACK_IMPORTED_MODULE_1__["Texture"]();
-    this.roughness_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_2__["webgl_maximum_anisotropy"];
-    this.roughness_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.roughness_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.metalness_texture = new three__WEBPACK_IMPORTED_MODULE_1__["Texture"]();
-    this.metalness_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_2__["webgl_maximum_anisotropy"];
-    this.metalness_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.metalness_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_1__["RepeatWrapping"];
-    this.material = new three__WEBPACK_IMPORTED_MODULE_1__["MeshPhysicalMaterial"]({
-      map: this.base_texture,
-      normalMap: this.normal_texture,
-      aoMap: this.ao_texture,
-      roughnessMap: this.roughness_texture,
-      metalnessMap: this.metalness_texture,
-      // side: THREE.BackSide,
-      wireframe: _three__WEBPACK_IMPORTED_MODULE_2__["MATERIAL_WIREFRAME"]
-    });
-    this.mesh = new three__WEBPACK_IMPORTED_MODULE_1__["Mesh"](this.geometry, this.material);
-    this.mesh.userData.parent = this;
-    _three__WEBPACK_IMPORTED_MODULE_2__["raycastable_meshes"].push(this.mesh);
-    _three__WEBPACK_IMPORTED_MODULE_2__["scene"].add(this.mesh); // floor_scene.add(this.mesh);
+    return _super.apply(this, arguments);
   }
 
   _createClass(Floor, [{
-    key: "setTile",
-    value: function setTile(tile_sizes, textures) {
-      this.tile_sizes = tile_sizes;
-      this.base_texture.image = textures.base;
-      this.normal_texture.image = textures.normal;
-      this.ao_texture.image = textures.ao;
-      this.roughness_texture.image = textures.roughness;
-      this.metalness_texture.image = textures.metalness;
-      console.log(textures);
-      this.base_texture.needsUpdate = true;
-      this.normal_texture.needsUpdate = true;
-      this.ao_texture.needsUpdate = true;
-      this.roughness_texture.needsUpdate = true;
-      this.metalness_texture.needsUpdate = true; // this.material.needsUpdate = true;
-    }
-  }, {
     key: "updateGeometry",
     value: function updateGeometry() {
       var _this = this;
@@ -68315,37 +68212,32 @@ var Floor = /*#__PURE__*/function () {
       var scene_coordinates = [];
       this.room.points.forEach(function (point) {
         return scene_coordinates.push(point.scene_x, point.scene_z);
-      }); // console.log(scene_coordinates);
-
+      });
       index_data_floor.push.apply(index_data_floor, _toConsumableArray(earcut__WEBPACK_IMPORTED_MODULE_0___default()(scene_coordinates).reverse()));
       index_data_floor.forEach(function (index) {
-        if (!position_data_floor[index * 3]) {
-          position_data_floor[index * 3 + 0] = _this.room.points[index].scene_x;
-          position_data_floor[index * 3 + 1] = 0;
-          position_data_floor[index * 3 + 2] = _this.room.points[index].scene_z;
-          normal_data_floor[index * 3 + 0] = 0;
-          normal_data_floor[index * 3 + 1] = 1;
-          normal_data_floor[index * 3 + 2] = 0;
-          uv_data_floor[index * 2 + 0] = _this.room.points[index].scene_x / _this.tile_sizes[0];
-          uv_data_floor[index * 2 + 1] = _this.room.points[index].scene_z / _this.tile_sizes[1];
+        if (!position_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"]]) {
+          position_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"] + 0] = _this.room.points[index].scene_x;
+          position_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"] + 1] = 0;
+          position_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"] + 2] = _this.room.points[index].scene_z;
+          normal_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"] + 0] = 0;
+          normal_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"] + 1] = 1;
+          normal_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"] + 2] = 0;
+          uv_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_2"] + 0] = _this.room.points[index].scene_x / _this.tile_sizes[0];
+          uv_data_floor[index * _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_2"] + 1] = _this.room.points[index].scene_z / _this.tile_sizes[1];
         }
       }); // eliminate allocation of typed arrays from the function
       // make walls geometry calculations when toggling orbital mode on and show walls in orbital mode only
 
       this.geometry.setIndex(new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Uint16Array(index_data_floor), 1));
-      this.geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array(position_data_floor), 3));
-      this.geometry.setAttribute('normal', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array(normal_data_floor), 3));
-      this.geometry.setAttribute('uv', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array(uv_data_floor), 2));
-      this.geometry.setAttribute('uv2', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](this.geometry.attributes.uv.array, 2)); // this.geometry.index.needsUpdate = true;
-      // this.geometry.attributes.position.needsUpdate = true;
-      // this.geometry.attributes.normal.needsUpdate = true;
-      // this.geometry.attributes.uv.needsUpdate = true;
-      // this.geometry.attributes.uv2.needsUpdate = true;
+      this.geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array(position_data_floor), _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"]));
+      this.geometry.setAttribute('normal', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array(normal_data_floor), _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"]));
+      this.geometry.setAttribute('uv', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](new Float32Array(uv_data_floor), _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_2"]));
+      this.geometry.setAttribute('uv2', new three__WEBPACK_IMPORTED_MODULE_1__["BufferAttribute"](this.geometry.attributes.uv.array, _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_2"]));
     }
   }]);
 
   return Floor;
-}();
+}(_tileable__WEBPACK_IMPORTED_MODULE_2__["default"]);
 
 
 
@@ -68375,14 +68267,7 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-// make number consts
 // make plan scale
-
-/*
-eslint-disable
-
-no-magic-numbers,
-*/
 
 
 
@@ -68393,10 +68278,8 @@ no-magic-numbers,
 
 
 var room = new _room__WEBPACK_IMPORTED_MODULE_5__["default"]();
-room.makeContour(3, [new _point__WEBPACK_IMPORTED_MODULE_4__["default"](-3, -3), new _point__WEBPACK_IMPORTED_MODULE_4__["default"](-3, 3), new _point__WEBPACK_IMPORTED_MODULE_4__["default"](3, 3), new _point__WEBPACK_IMPORTED_MODULE_4__["default"](4.5, -1.5), new _point__WEBPACK_IMPORTED_MODULE_4__["default"](3, -3) // new Point(1.5, -4.5),
-]);
-var loader = new external_data_loader__WEBPACK_IMPORTED_MODULE_2___default.a(); // let wall_index = 0;
-
+room.makeContour(3, [new _point__WEBPACK_IMPORTED_MODULE_4__["default"](-3, -3), new _point__WEBPACK_IMPORTED_MODULE_4__["default"](-3, 3), new _point__WEBPACK_IMPORTED_MODULE_4__["default"](3, 3), new _point__WEBPACK_IMPORTED_MODULE_4__["default"](4.5, -1.5), new _point__WEBPACK_IMPORTED_MODULE_4__["default"](3, -3)]);
+var loader = new external_data_loader__WEBPACK_IMPORTED_MODULE_2___default.a();
 _dom__WEBPACK_IMPORTED_MODULE_6__["material_BUTTONS"].forEach(function (BUTTON) {
   BUTTON.addEventListener('click', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
     var info, sources, texture;
@@ -68404,8 +68287,8 @@ _dom__WEBPACK_IMPORTED_MODULE_6__["material_BUTTONS"].forEach(function (BUTTON) 
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            if (!_three__WEBPACK_IMPORTED_MODULE_7__["tilable_mesh"]._) {
-              _context.next = 11;
+            if (!_three__WEBPACK_IMPORTED_MODULE_7__["tileable_mesh"]._) {
+              _context.next = 12;
               break;
             }
 
@@ -68440,13 +68323,12 @@ _dom__WEBPACK_IMPORTED_MODULE_6__["material_BUTTONS"].forEach(function (BUTTON) 
             });
 
           case 9:
-            // console.log(loader);
-            _three__WEBPACK_IMPORTED_MODULE_7__["tilable_mesh"]._.userData.parent.setTile(info.sizes, loader.content); // room.walls[wall_index++];
-
+            _three__WEBPACK_IMPORTED_MODULE_7__["tileable_mesh"]._.userData.parent.setTile(info.sizes, loader.content);
 
             loader.content = {};
+            room.updateGeometries();
 
-          case 11:
+          case 12:
           case "end":
             return _context.stop();
         }
@@ -68497,8 +68379,9 @@ _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
             return wall.setTile(info.sizes, loader.content);
           });
           loader.content = {};
+          room.updateGeometries();
 
-        case 11:
+        case 12:
         case "end":
           return _context2.stop();
       }
@@ -68596,56 +68479,10 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-/*
-eslint-disable
 
-no-magic-numbers,
-*/
-// import earcut from 'earcut';
-// import * as THREE from 'three';
-// import { coverings_plan_NODE } from './dom';
-// import Floor from './floor';
-// import Wall from './wall';
 
- // import {
-// 	// geometry_walls,
-// 	// geometry_floor,
-// 	// position_data_walls,
-// 	// uv_data_walls,
-// 	// index_data_floor,
-// 	// position_data_floor,
-// 	// normal_data_floor,
-// 	// uv_data_floor,
-// 	// mesh_floor,
-// 	scene,
-// 	webgl_maximum_anisotropy,
-// 	MATERIAL_WIREFRAME,
-// } from './three';
-// const TEST_ROOM_HEIGHT_METERS = 3;
 
 var Point = /*#__PURE__*/function () {
-  // static makeContour (points) {
-  // 	const walls = [];
-  // 	Point.destroyContour();
-  // 	Point.instances.push(...points);
-  // 	Point.instances.forEach((point, index) => {
-  // 		const wall = new Wall(points[index], points[index + 1] || points[0]);
-  // 		walls.push(wall);
-  // 		point.z_index = index;
-  // 		point.walls.push(wall);
-  // 		coverings_plan_NODE.appendChild(point.circle);
-  // 	});
-  // 	Wall.instances = walls;
-  // 	Point.instances.forEach((point) => point.set());
-  // }
-  // static destroyContour () {
-  // 	Point.instances.forEach((point) => {
-  // 		point.z_index = 0;
-  // 		point.walls.length = 0;
-  // 	});
-  // 	Point.instances.length = 0;
-  // 	coverings_plan_NODE.innerHTML = '';
-  // }
   function Point() {
     var _this = this;
 
@@ -68656,8 +68493,7 @@ var Point = /*#__PURE__*/function () {
 
     // 2D coordinates in window space (pixel)
     this.pixel_x = meter_x * _cast__WEBPACK_IMPORTED_MODULE_1__["default"].METERS_TO_PIXELS + window.innerWidth / 2;
-    this.pixel_y = meter_y * _cast__WEBPACK_IMPORTED_MODULE_1__["default"].METERS_TO_PIXELS + window.innerHeight / 2; // this.z_index = 0;
-
+    this.pixel_y = meter_y * _cast__WEBPACK_IMPORTED_MODULE_1__["default"].METERS_TO_PIXELS + window.innerHeight / 2;
     this.scene_x = 0;
     this.scene_z = 0;
     this.circle = document.createElement('div');
@@ -68667,8 +68503,7 @@ var Point = /*#__PURE__*/function () {
 
       if (!_modes__WEBPACK_IMPORTED_MODULE_0__["default"].add_wall_mode) {
         console.log(_this.circle.style.zIndex);
-        var last_z_index = _this.circle.style.zIndex; // this.z_index = document.getElementsByClassName('coverings-plan-circle').length - 1;
-
+        var last_z_index = _this.circle.style.zIndex;
         _this.circle.style.zIndex = document.getElementsByClassName('coverings-plan-circle').length - 1 + 12;
         Array.from(document.getElementsByClassName('coverings-plan-circle')).forEach(function (elm) {
           if (elm !== _this.circle && elm.style.zIndex > last_z_index) {
@@ -68748,8 +68583,7 @@ var Point = /*#__PURE__*/function () {
           pixel_x: conjugate_point.pixel_x - _this2.pixel_x,
           pixel_y: conjugate_point.pixel_y - _this2.pixel_y
         };
-        var angle = Math.acos(points_vector.pixel_x / ( // ?
-        Math.sqrt(1 + 0) * Math.sqrt(points_vector.pixel_x * points_vector.pixel_x + points_vector.pixel_y * points_vector.pixel_y)));
+        var angle = Math.acos(points_vector.pixel_x / Math.sqrt(points_vector.pixel_x * points_vector.pixel_x + points_vector.pixel_y * points_vector.pixel_y));
 
         if (_this2.pixel_y > conjugate_point.pixel_y) {
           angle = -Math.abs(angle);
@@ -68778,46 +68612,7 @@ var Point = /*#__PURE__*/function () {
     }
   }], [{
     key: "move",
-    value: // static instances = [];
-    // // undo/redo
-    // static states = [];
-    // static updateSceneCoordinates () {
-    // 	Point.instances.forEach((point) => point.updateSceneCoordinates());
-    // }
-    // // optimize geometries with index buffers ?
-    // static updateGeometries () {
-    // 	// make for this point only
-    // 	Point.updateSceneCoordinates();
-    // 	// position_data_floor.length = 0;
-    // 	// normal_data_floor.length = 0;
-    // 	// uv_data_floor.length = 0;
-    // 	// maybe will render walls as single mesh
-    // 	Wall.instances.forEach((wall) => wall.updateGeomrtry());
-    // 	// const scene_coordinates = [];
-    // 	// Point.instances.forEach((point) => scene_coordinates.push(point.scene_x, point.scene_z));
-    // 	// index_data_floor.length = 0;
-    // 	// index_data_floor.push(...earcut(scene_coordinates).reverse());
-    // 	// index_data_floor.forEach((index) => {
-    // 	// 	if (!position_data_floor[index * 3]) {
-    // 	// 		position_data_floor[(index * 3) + 0] = Point.instances[index].scene_x;
-    // 	// 		position_data_floor[(index * 3) + 1] = 0;
-    // 	// 		position_data_floor[(index * 3) + 2] = Point.instances[index].scene_z;
-    // 	// 		normal_data_floor[(index * 3) + 0] = 0;
-    // 	// 		normal_data_floor[(index * 3) + 1] = 1;
-    // 	// 		normal_data_floor[(index * 3) + 2] = 0;
-    // 	// 		uv_data_floor[(index * 2) + 0] = Point.instances[index].scene_x / 6;
-    // 	// 		uv_data_floor[(index * 2) + 1] = Point.instances[index].scene_z / 6;
-    // 	// 	}
-    // 	// });
-    // 	// // eliminate allocation of typed arrays from the function
-    // 	// // make walls geometry calculations when toggling orbital mode on and show walls in orbital mode only
-    // 	// geometry_floor.setIndex(new THREE.BufferAttribute(new Uint16Array(index_data_floor), 1));
-    // 	// geometry_floor.setAttribute('position', new THREE.BufferAttribute(new Float32Array(position_data_floor), 3));
-    // 	// geometry_floor.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normal_data_floor), 3));
-    // 	// geometry_floor.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uv_data_floor), 2));
-    // 	// geometry_floor.setAttribute('uv2', new THREE.BufferAttribute(geometry_floor.attributes.uv.array, 2));
-    // }
-    function move(_ref) {
+    value: function move(_ref) {
       var movementX = _ref.movementX,
           movementY = _ref.movementY;
       Point.selected.move(movementX, movementY);
@@ -68865,26 +68660,17 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-/*
-eslint-disable
-
-no-magic-numbers,
-*/
-// import earcut from 'earcut';
-// import * as THREE from 'three';
 
 
- // import modes from './modes';
-// import cast from './cast';
 
- // const TEST_ROOM_HEIGHT_METERS = 3;
+
 
 var Room = /*#__PURE__*/function () {
   function Room() {
     _classCallCheck(this, Room);
 
     this.points = [];
-    this.floor = new _floor__WEBPACK_IMPORTED_MODULE_1__["default"](this);
+    this.floor = new _floor__WEBPACK_IMPORTED_MODULE_1__["default"](this, 'FrontSide');
     this.walls = [];
     this.height = 0;
   }
@@ -68903,36 +68689,33 @@ var Room = /*#__PURE__*/function () {
 
       this.walls.length = 0;
       this.points.forEach(function (point, index) {
-        var wall = new _wall__WEBPACK_IMPORTED_MODULE_2__["default"](_this, points[index], points[index + 1] || points[0]);
+        var wall = new _wall__WEBPACK_IMPORTED_MODULE_2__["default"](_this, 'BackSide', points[index], points[index + 1] || points[0]);
 
         _this.walls.push(wall);
 
         point.z_index = index;
         point.walls.push(wall);
         _dom__WEBPACK_IMPORTED_MODULE_0__["coverings_plan_NODE"].appendChild(point.circle);
-      }); // Wall.instances = walls;
-
+      });
       this.points.forEach(function (point) {
         return point.set();
       });
-      _three__WEBPACK_IMPORTED_MODULE_3__["orbit_camera"].position.set(0, 10, 0); // orbit_camera.lookAt(0, this.height * 0.5, 0);
-
-      _three__WEBPACK_IMPORTED_MODULE_3__["orbit_controls"].target.set(0, this.height * 0.5, 0); // console.log(orbit_camera);
-      // orbit_camera.updateMatrixWorld();
+      _three__WEBPACK_IMPORTED_MODULE_3__["orbit_controls"].target.set(0, this.height / 2, 0);
     }
   }, {
     key: "destroyContour",
     value: function destroyContour() {
+      _three__WEBPACK_IMPORTED_MODULE_3__["raycastable_meshes"].length = 0;
+      this.walls.forEach(function (wall) {
+        return _three__WEBPACK_IMPORTED_MODULE_3__["scene"].remove(wall.mesh);
+      });
       this.points.forEach(function (point) {
         point.z_index = 0;
         point.walls.length = 0;
       });
       this.points.length = 0;
       _dom__WEBPACK_IMPORTED_MODULE_0__["coverings_plan_NODE"].innerHTML = '';
-    } // updatePointSceneCoordinates () {
-    // 	this.points.forEach((point) => point.updateSceneCoordinates());
-    // }
-
+    }
   }, {
     key: "updateGeometries",
     value: function updateGeometries() {
@@ -68957,15 +68740,17 @@ var Room = /*#__PURE__*/function () {
 /*!**********************!*\
   !*** ./src/three.js ***!
   \**********************/
-/*! exports provided: MATERIAL_WIREFRAME, raycastable_meshes, tilable_mesh, intersects, renderer, webgl_maximum_anisotropy, scene, plan_camera, orbit_camera, orbit_controls, gltf_loader, uploadModel */
+/*! exports provided: MATERIAL_WIREFRAME, ATTRIBUTE_SIZE_2, ATTRIBUTE_SIZE_3, raycastable_meshes, intersects, tileable_mesh, renderer, webgl_maximum_anisotropy, scene, plan_camera, orbit_camera, orbit_controls, gltf_loader, uploadModel */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "MATERIAL_WIREFRAME", function() { return MATERIAL_WIREFRAME; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ATTRIBUTE_SIZE_2", function() { return ATTRIBUTE_SIZE_2; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ATTRIBUTE_SIZE_3", function() { return ATTRIBUTE_SIZE_3; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "raycastable_meshes", function() { return raycastable_meshes; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tilable_mesh", function() { return tilable_mesh; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "intersects", function() { return intersects; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "tileable_mesh", function() { return tileable_mesh; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderer", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "webgl_maximum_anisotropy", function() { return webgl_maximum_anisotropy; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "scene", function() { return scene; });
@@ -69000,11 +68785,6 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-/*
-eslint-disable
-
-no-magic-numbers,
-*/
 
 
 
@@ -69013,28 +68793,26 @@ no-magic-numbers,
 // import { Reflector } from 'three/examples/jsm/objects/Reflector';
 
 
- // import Wall from './wall';
 
 
 var CLEAR_COLOR = 'grey';
-var ATTRIBUTE_SIZE_2 = 2;
-var ATTRIBUTE_SIZE_3 = 3;
 var CAMERA_NEAR = 0.1;
 var CAMERA_FAR = 1000;
-var PERSPECTIVE_CAMERA_FOV = 45; // const TEXTURE_ANISOTROPY = 16;
-
+var PERSPECTIVE_CAMERA_FOV = 45;
 var MATERIAL_WIREFRAME = false;
+var ATTRIBUTE_SIZE_2 = 2;
+var ATTRIBUTE_SIZE_3 = 3;
+var raycasted_mesh = null;
+var transform_controls_attached_mesh = null;
 var raycaster = new three__WEBPACK_IMPORTED_MODULE_0__["Raycaster"]();
 var mouse = new three__WEBPACK_IMPORTED_MODULE_0__["Vector2"]();
 var draggable_gltf_scenes = [];
 var draggable_meshes = [];
 var raycastable_meshes = [];
-var raycasted_mesh = null;
-var transform_controls_attached_mesh = null;
-var tilable_mesh = {
+var intersects = [];
+var tileable_mesh = {
   _: null
 };
-var intersects = [];
 
 var getOrthographicCameraAttributes = function getOrthographicCameraAttributes() {
   return [-window.innerWidth / 2, window.innerWidth / 2, window.innerHeight / 2, -window.innerHeight / 2, CAMERA_NEAR, CAMERA_FAR];
@@ -69055,29 +68833,27 @@ renderer.setClearColor(CLEAR_COLOR);
 renderer.clearColor();
 renderer.physicallyCorrectLights = true;
 var webgl_maximum_anisotropy = renderer.capabilities.getMaxAnisotropy();
-var scene = new three__WEBPACK_IMPORTED_MODULE_0__["Scene"](); // export const floor_scene = new THREE.Scene();
-
+var scene = new three__WEBPACK_IMPORTED_MODULE_0__["Scene"]();
 var ambient_light = new three__WEBPACK_IMPORTED_MODULE_0__["AmbientLight"](0xFFFFFF);
-scene.add(ambient_light); // floor_scene.add(ambient_light);
-
+scene.add(ambient_light);
 [[1.5, 3, 1.5], [1.5, 3, -1.5], [-1.5, 3, -1.5], [-1.5, 3, 1.5]].forEach(function (spot_light_position) {
   var _spot_light$position, _spot_light$target$po;
 
-  var spot_light = new three__WEBPACK_IMPORTED_MODULE_0__["SpotLight"](0xFFFFFF, 3);
+  var spot_light = new three__WEBPACK_IMPORTED_MODULE_0__["SpotLight"](0xFFFFFF);
+  spot_light.intensity = 10;
   spot_light.distance = 0;
   spot_light.penumbra = 0.5;
-  spot_light.decay = 1;
+  spot_light.decay = 2;
   spot_light.angle = Math.PI * 0.5;
 
   (_spot_light$position = spot_light.position).set.apply(_spot_light$position, _toConsumableArray(spot_light_position));
 
-  scene.add(spot_light); // floor_scene.add(spot_light);
+  scene.add(spot_light);
 
   (_spot_light$target$po = spot_light.target.position).set.apply(_spot_light$target$po, _toConsumableArray(spot_light_position));
 
   spot_light.target.position.y = 0;
-  scene.add(spot_light.target); // floor_scene.add(spot_light.target);
-  // const spot_light_helper = new THREE.SpotLightHelper(spot_light);
+  scene.add(spot_light.target); // const spot_light_helper = new THREE.SpotLightHelper(spot_light);
   // scene.add(spot_light_helper);
 }); // const rect_light = new THREE.RectAreaLight(0xffffff, 1, 2, 2);
 // rect_light.position.set(0, 1.5, -2.99);
@@ -69092,9 +68868,8 @@ plan_camera.updateProjectionMatrix();
 plan_camera.rotateX(-Math.PI * 0.5);
 plan_camera.translateZ(1);
 plan_camera.lookAt(scene.position);
-var orbit_camera = _construct(three__WEBPACK_IMPORTED_MODULE_0__["PerspectiveCamera"], _toConsumableArray(getPerspectiveCameraAttributes())); // orbit_camera.rotateX(-Math.PI * 0.125);
-
-orbit_camera.position.z = 10;
+var orbit_camera = _construct(three__WEBPACK_IMPORTED_MODULE_0__["PerspectiveCamera"], _toConsumableArray(getPerspectiveCameraAttributes()));
+orbit_camera.position.y = 12;
 var orbit_controls = new three_examples_jsm_controls_OrbitControls__WEBPACK_IMPORTED_MODULE_3__["OrbitControls"](orbit_camera, _dom__WEBPACK_IMPORTED_MODULE_7__["canvas"]);
 orbit_controls.enableZoom = true;
 orbit_controls.enableDamping = true;
@@ -69188,15 +68963,107 @@ _dom__WEBPACK_IMPORTED_MODULE_7__["canvas"].addEventListener('dblclick', functio
       } else {
         transform_controls_attached_mesh = null;
         transform_controls.detach();
-        tilable_mesh._ = raycasted_mesh;
+        tileable_mesh._ = raycasted_mesh;
       }
     } else {
       transform_controls_attached_mesh = null;
       transform_controls.detach();
-      tilable_mesh._ = null;
+      tileable_mesh._ = null;
     }
   }
 });
+
+/***/ }),
+
+/***/ "./src/tileable.js":
+/*!*************************!*\
+  !*** ./src/tileable.js ***!
+  \*************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Tileable; });
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var _three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./three */ "./src/three.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var Tileable = /*#__PURE__*/function () {
+  function Tileable(room, side) {
+    _classCallCheck(this, Tileable);
+
+    this.room = room;
+    this.tile_sizes = [1, 1];
+    this.geometry = new three__WEBPACK_IMPORTED_MODULE_0__["BufferGeometry"]();
+    this.geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_0__["BufferAttribute"](new Float32Array([]), _three__WEBPACK_IMPORTED_MODULE_1__["ATTRIBUTE_SIZE_3"]));
+    this.geometry.setAttribute('normal', new three__WEBPACK_IMPORTED_MODULE_0__["BufferAttribute"](new Float32Array([]), _three__WEBPACK_IMPORTED_MODULE_1__["ATTRIBUTE_SIZE_3"]));
+    this.geometry.setAttribute('uv', new three__WEBPACK_IMPORTED_MODULE_0__["BufferAttribute"](new Float32Array([]), _three__WEBPACK_IMPORTED_MODULE_1__["ATTRIBUTE_SIZE_2"]));
+    this.geometry.setAttribute('uv2', new three__WEBPACK_IMPORTED_MODULE_0__["BufferAttribute"](this.geometry.attributes.uv.array, _three__WEBPACK_IMPORTED_MODULE_1__["ATTRIBUTE_SIZE_2"]));
+    this.base_texture = new three__WEBPACK_IMPORTED_MODULE_0__["Texture"]();
+    this.base_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_1__["webgl_maximum_anisotropy"];
+    this.base_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.base_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.normal_texture = new three__WEBPACK_IMPORTED_MODULE_0__["Texture"]();
+    this.normal_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_1__["webgl_maximum_anisotropy"];
+    this.normal_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.normal_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"]; // ambient_occlusion
+
+    this.ao_texture = new three__WEBPACK_IMPORTED_MODULE_0__["Texture"]();
+    this.ao_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_1__["webgl_maximum_anisotropy"];
+    this.ao_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.ao_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.roughness_texture = new three__WEBPACK_IMPORTED_MODULE_0__["Texture"]();
+    this.roughness_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_1__["webgl_maximum_anisotropy"];
+    this.roughness_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.roughness_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.metalness_texture = new three__WEBPACK_IMPORTED_MODULE_0__["Texture"]();
+    this.metalness_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_1__["webgl_maximum_anisotropy"];
+    this.metalness_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.metalness_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_0__["RepeatWrapping"];
+    this.material = new three__WEBPACK_IMPORTED_MODULE_0__["MeshPhysicalMaterial"]({
+      map: this.base_texture,
+      normalMap: this.normal_texture,
+      aoMap: this.ao_texture,
+      roughnessMap: this.roughness_texture,
+      metalnessMap: this.metalness_texture,
+      side: three__WEBPACK_IMPORTED_MODULE_0__[side],
+      wireframe: _three__WEBPACK_IMPORTED_MODULE_1__["MATERIAL_WIREFRAME"]
+    });
+    this.mesh = new three__WEBPACK_IMPORTED_MODULE_0__["Mesh"](this.geometry, this.material);
+    this.mesh.userData.parent = this;
+    _three__WEBPACK_IMPORTED_MODULE_1__["raycastable_meshes"].push(this.mesh);
+    _three__WEBPACK_IMPORTED_MODULE_1__["scene"].add(this.mesh);
+  }
+
+  _createClass(Tileable, [{
+    key: "setTile",
+    value: function setTile(tile_sizes, textures) {
+      this.tile_sizes = tile_sizes;
+      this.base_texture.image = textures.base;
+      this.normal_texture.image = textures.normal;
+      this.ao_texture.image = textures.ao;
+      this.roughness_texture.image = textures.roughness;
+      this.metalness_texture.image = textures.metalness;
+      this.base_texture.needsUpdate = true;
+      this.normal_texture.needsUpdate = true;
+      this.ao_texture.needsUpdate = true;
+      this.roughness_texture.needsUpdate = true;
+      this.metalness_texture.needsUpdate = true;
+    }
+  }]);
+
+  return Tileable;
+}();
+
+
 
 /***/ }),
 
@@ -69215,6 +69082,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
 /* harmony import */ var _three__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./three */ "./src/three.js");
 /* harmony import */ var _cast__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./cast */ "./src/cast.js");
+/* harmony import */ var _tileable__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./tileable */ "./src/tileable.js");
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -69241,65 +69111,67 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-// import Point from './point';
 
 
- // import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-// import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
 
- // import {
-// 	tile_texture1,
-// 	tile_texture3,
-// 	tile_texture4,
-// 	tile_texture5,
-// 	tile_texture6,
-// 	// tile_texture2,
-// 	// canvas,
-// } from './dom';
-// const CLEAR_COLOR = 0xFFFFFF;
-// const ATTRIBUTE_SIZE_2 = 2;
-// const ATTRIBUTE_SIZE_3 = 3;
-// const CAMERA_NEAR = 0.1;
-// const CAMERA_FAR = 1000;
-// const PERSPECTIVE_CAMERA_FOV = 45;
-// const TEXTURE_ANISOTROPY = 16;
-// const MATERIAL_WIREFRAME = false;
+
 
 var TIME_TO_WAIT_FOR_APPENDING_WALL = 250;
-var TEST_ROOM_HEIGHT_METERS = 3;
 
-var Wall = /*#__PURE__*/function () {
-  function Wall(room, point1, point2) {
-    var _this = this;
+var Wall = /*#__PURE__*/function (_Tileable) {
+  _inherits(Wall, _Tileable);
+
+  var _super = _createSuper(Wall);
+
+  function Wall(room, side, point1, point2) {
+    var _this;
 
     _classCallCheck(this, Wall);
 
-    // rename to related_points
-    this.points = [point1, point2];
-    this.room = room;
-    this.pixel_length = 0;
-    this.points[0].walls.push(this);
-    this.points[1].walls.push(this);
-    this.rect = document.createElement('div');
-    this.rect.className = 'coverings-plan-rect';
-    this.rect.addEventListener('mousedown', function (evt) {
+    _this = _super.call(this, room, side); // rename to related_points
+
+    _this.points = [point1, point2];
+    _this.pixel_length = 0;
+    console.log(_this.points);
+
+    _this.points[0].walls.push(_assertThisInitialized(_this));
+
+    _this.points[1].walls.push(_assertThisInitialized(_this));
+
+    _this.rect = document.createElement('div');
+    _this.rect.className = 'coverings-plan-rect';
+
+    _this.rect.addEventListener('mousedown', function (evt) {
       evt.preventDefault();
 
       if (!_modes__WEBPACK_IMPORTED_MODULE_1__["default"].add_wall_mode) {
         window.addEventListener('mousemove', Wall.move);
-        Wall.selected = _this;
+        Wall.selected = _assertThisInitialized(_this);
       }
     });
-    this.rect.addEventListener('click', function () {
+
+    _this.rect.addEventListener('click', function () {
       if (_modes__WEBPACK_IMPORTED_MODULE_1__["default"].add_wall_mode) {
         _this.rect.classList.add('-selected');
 
-        Wall.walls_to_add_new.push(_this);
+        Wall.walls_to_add_new.push(_assertThisInitialized(_this));
 
         if (Wall.walls_to_add_new.length >= 2) {
           _modes__WEBPACK_IMPORTED_MODULE_1__["default"].add_wall_mode = 0;
@@ -69334,68 +69206,17 @@ var Wall = /*#__PURE__*/function () {
         }
       }
     });
-    this.rect.inner = document.createElement('div');
-    this.rect.inner.className = 'coverings-plan-rect-inner';
-    this.rect.appendChild(this.rect.inner);
-    _dom__WEBPACK_IMPORTED_MODULE_0__["coverings_plan_NODE"].appendChild(this.rect);
-    this.tile_sizes = [1, 1];
-    this.geometry = new three__WEBPACK_IMPORTED_MODULE_2__["BufferGeometry"]();
-    this.geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array([]), 3));
-    this.geometry.setAttribute('normal', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array([]), 3));
-    this.geometry.setAttribute('uv', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array([]), 2));
-    this.geometry.setAttribute('uv2', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](this.geometry.attributes.uv.array, 2));
-    this.base_texture = new three__WEBPACK_IMPORTED_MODULE_2__["Texture"]();
-    this.base_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_3__["webgl_maximum_anisotropy"];
-    this.base_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.base_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.normal_texture = new three__WEBPACK_IMPORTED_MODULE_2__["Texture"]();
-    this.normal_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_3__["webgl_maximum_anisotropy"];
-    this.normal_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.normal_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"]; // ambient_occlusion
 
-    this.ao_texture = new three__WEBPACK_IMPORTED_MODULE_2__["Texture"]();
-    this.ao_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_3__["webgl_maximum_anisotropy"];
-    this.ao_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.ao_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.roughness_texture = new three__WEBPACK_IMPORTED_MODULE_2__["Texture"]();
-    this.roughness_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_3__["webgl_maximum_anisotropy"];
-    this.roughness_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.roughness_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.metalness_texture = new three__WEBPACK_IMPORTED_MODULE_2__["Texture"]();
-    this.metalness_texture.anisotropy = _three__WEBPACK_IMPORTED_MODULE_3__["webgl_maximum_anisotropy"];
-    this.metalness_texture.wrapS = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.metalness_texture.wrapT = three__WEBPACK_IMPORTED_MODULE_2__["RepeatWrapping"];
-    this.material = new three__WEBPACK_IMPORTED_MODULE_2__["MeshPhysicalMaterial"]({
-      map: this.base_texture,
-      normalMap: this.normal_texture,
-      aoMap: this.ao_texture,
-      roughnessMap: this.roughness_texture,
-      metalnessMap: this.metalness_texture,
-      side: three__WEBPACK_IMPORTED_MODULE_2__["BackSide"],
-      wireframe: _three__WEBPACK_IMPORTED_MODULE_3__["MATERIAL_WIREFRAME"]
-    });
-    this.mesh = new three__WEBPACK_IMPORTED_MODULE_2__["Mesh"](this.geometry, this.material);
-    this.mesh.userData.parent = this;
-    _three__WEBPACK_IMPORTED_MODULE_3__["raycastable_meshes"].push(this.mesh);
-    _three__WEBPACK_IMPORTED_MODULE_3__["scene"].add(this.mesh);
+    _this.rect.inner = document.createElement('div');
+    _this.rect.inner.className = 'coverings-plan-rect-inner';
+
+    _this.rect.appendChild(_this.rect.inner);
+
+    _dom__WEBPACK_IMPORTED_MODULE_0__["coverings_plan_NODE"].appendChild(_this.rect);
+    return _this;
   }
 
   _createClass(Wall, [{
-    key: "setTile",
-    value: function setTile(tile_sizes, textures) {
-      this.tile_sizes = tile_sizes;
-      this.base_texture.image = textures.base;
-      this.normal_texture.image = textures.normal;
-      this.ao_texture.image = textures.ao;
-      this.roughness_texture.image = textures.roughness;
-      this.metalness_texture.image = textures.metalness;
-      this.base_texture.needsUpdate = true;
-      this.normal_texture.needsUpdate = true;
-      this.ao_texture.needsUpdate = true;
-      this.roughness_texture.needsUpdate = true;
-      this.metalness_texture.needsUpdate = true; // this.material.needsUpdate = true;
-    }
-  }, {
     key: "updateGeometry",
     value: function updateGeometry() {
       var _this$points = _slicedToArray(this.points, 2),
@@ -69409,7 +69230,7 @@ var Wall = /*#__PURE__*/function () {
       var plane_geometry = new three__WEBPACK_IMPORTED_MODULE_2__["PlaneBufferGeometry"](point.distanceTo(next_point) * _cast__WEBPACK_IMPORTED_MODULE_4__["default"].PIXELS_TO_METERS, this.room.height);
       var vv1 = new three__WEBPACK_IMPORTED_MODULE_2__["Vector3"](1, 0, 0);
       var vv2 = new three__WEBPACK_IMPORTED_MODULE_2__["Vector3"](next_point.scene_x, 0, next_point.scene_z).sub(new three__WEBPACK_IMPORTED_MODULE_2__["Vector3"](point.scene_x, 0, point.scene_z)).normalize();
-      var q = new three__WEBPACK_IMPORTED_MODULE_2__["Quaternion"]().setFromUnitVectors(vv1, vv2);
+      var quat = new three__WEBPACK_IMPORTED_MODULE_2__["Quaternion"]().setFromUnitVectors(vv1, vv2);
       var position = point.centerWith2(next_point);
       wall_data_index.push.apply(wall_data_index, _toConsumableArray(plane_geometry.index.array));
       wall_data_position.push.apply(wall_data_position, _toConsumableArray(plane_geometry.attributes.position.array));
@@ -69419,17 +69240,16 @@ var Wall = /*#__PURE__*/function () {
       for (var i = 0; i < wall_data_uv.length; i += 2) {
         wall_data_uv[i + 0] *= this.pixel_length * _cast__WEBPACK_IMPORTED_MODULE_4__["default"].PIXELS_TO_METERS / this.tile_sizes[0];
         wall_data_uv[i + 1] *= this.room.height / this.tile_sizes[1];
-      } // apply constants 3, 2
-
+      }
 
       this.geometry.setIndex(new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Uint16Array(wall_data_index), 1));
-      this.geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array(wall_data_position), 3));
-      this.geometry.setAttribute('normal', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array(wall_data_normal), 3));
-      this.geometry.setAttribute('uv', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array(wall_data_uv), 2));
-      this.geometry.setAttribute('uv2', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](this.geometry.attributes.uv.array, 2));
+      this.geometry.setAttribute('position', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array(wall_data_position), _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"]));
+      this.geometry.setAttribute('normal', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array(wall_data_normal), _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_3"]));
+      this.geometry.setAttribute('uv', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](new Float32Array(wall_data_uv), _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_2"]));
+      this.geometry.setAttribute('uv2', new three__WEBPACK_IMPORTED_MODULE_2__["BufferAttribute"](this.geometry.attributes.uv.array, _three__WEBPACK_IMPORTED_MODULE_3__["ATTRIBUTE_SIZE_2"]));
       this.mesh.quaternion.identity();
-      this.mesh.applyQuaternion(q);
-      this.mesh.position.set(position[0], this.room.height * 0.5, position[1]);
+      this.mesh.applyQuaternion(quat);
+      this.mesh.position.set(position[0], this.room.height / 2, position[1]);
     }
   }], [{
     key: "move",
@@ -69444,15 +69264,11 @@ var Wall = /*#__PURE__*/function () {
   }]);
 
   return Wall;
-}();
+}(_tileable__WEBPACK_IMPORTED_MODULE_5__["default"]);
 
 _defineProperty(Wall, "selected", null);
 
 _defineProperty(Wall, "walls_to_add_new", []);
-
-_defineProperty(Wall, "instances", null);
-
-_defineProperty(Wall, "room_height", 0);
 
 
 

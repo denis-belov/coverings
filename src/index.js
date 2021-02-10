@@ -1,13 +1,4 @@
-// make number consts
 // make plan scale
-
-
-
-/*
-eslint-disable
-
-no-magic-numbers,
-*/
 
 
 
@@ -21,27 +12,16 @@ import modes from './modes';
 import Point from './point';
 import Room from './room';
 
-import {
-
-	// coverings_plan_NODE,
-	// upload_model_BUTTON,
-	// add_wall_mode_BUTTON,
-	// mode_toggle_BUTTON,
-	// upload_model_INPUT,
-	// floor_tile_SELECT,
-	material_BUTTONS,
-	// canvas,
-} from './dom';
+import { material_BUTTONS } from './dom';
 
 import {
 
 	renderer,
 	scene,
-	// floor_scene,
 	plan_camera,
 	orbit_camera,
 	orbit_controls,
-	tilable_mesh,
+	tileable_mesh,
 } from './three';
 
 import './events';
@@ -66,8 +46,6 @@ room.makeContour(
 		new Point(4.5, -1.5),
 
 		new Point(3, -3),
-
-		// new Point(1.5, -4.5),
 	],
 );
 
@@ -77,17 +55,11 @@ const loader = new Loader();
 
 
 
-// let wall_index = 0;
-
 material_BUTTONS.forEach((BUTTON) => {
 
 	BUTTON.addEventListener('click', async () => {
 
-		// console.log(tilable_mesh._);
-
-		if (tilable_mesh._) {
-
-			// console.log(evt);
+		if (tileable_mesh._) {
 
 			const info = await fetch(
 
@@ -116,13 +88,11 @@ material_BUTTONS.forEach((BUTTON) => {
 				});
 			}
 
-			// console.log(loader);
-
-			tilable_mesh._.userData.parent.setTile(info.sizes, loader.content);
-
-			// room.walls[wall_index++];
+			tileable_mesh._.userData.parent.setTile(info.sizes, loader.content);
 
 			loader.content = {};
+
+			room.updateGeometries();
 		}
 	});
 });
@@ -163,6 +133,8 @@ material_BUTTONS.forEach((BUTTON) => {
 	room.walls.forEach((wall) => wall.setTile(info.sizes, loader.content));
 
 	loader.content = {};
+
+	room.updateGeometries();
 })();
 
 

@@ -1,11 +1,3 @@
-/*
-eslint-disable
-
-no-magic-numbers,
-*/
-
-
-
 import * as THREE from 'three';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -17,42 +9,29 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import cast from './cast';
 import modes from './modes';
 
-// import Wall from './wall';
-
-import {
-
-	// // tile_texture1,
-	// tile_texture1,
-	// tile_texture2,
-	// tile_texture3,
-	// tile_texture4,
-	// tile_texture5,
-	// tile_texture6,
-	canvas,
-} from './dom';
+import { canvas } from './dom';
 
 
 
 const CLEAR_COLOR = 'grey';
-const ATTRIBUTE_SIZE_2 = 2;
-const ATTRIBUTE_SIZE_3 = 3;
 const CAMERA_NEAR = 0.1;
 const CAMERA_FAR = 1000;
 const PERSPECTIVE_CAMERA_FOV = 45;
-// const TEXTURE_ANISOTROPY = 16;
 export const MATERIAL_WIREFRAME = false;
+export const ATTRIBUTE_SIZE_2 = 2;
+export const ATTRIBUTE_SIZE_3 = 3;
 
 
 
+let raycasted_mesh = null;
+let transform_controls_attached_mesh = null;
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 const draggable_gltf_scenes = [];
 const draggable_meshes = [];
 export const raycastable_meshes = [];
-let raycasted_mesh = null;
-let transform_controls_attached_mesh = null;
-export const tilable_mesh = { _: null };
 export const intersects = [];
+export const tileable_mesh = { _: null };
 
 
 
@@ -87,13 +66,11 @@ renderer.physicallyCorrectLights = true;
 export const webgl_maximum_anisotropy = renderer.capabilities.getMaxAnisotropy();
 
 export const scene = new THREE.Scene();
-// export const floor_scene = new THREE.Scene();
 
 
 
 const ambient_light = new THREE.AmbientLight(0xFFFFFF);
 scene.add(ambient_light);
-// floor_scene.add(ambient_light);
 
 [
 	[ 1.5, 3, 1.5 ],
@@ -103,18 +80,17 @@ scene.add(ambient_light);
 ]
 	.forEach((spot_light_position) => {
 
-		const spot_light = new THREE.SpotLight(0xFFFFFF, 3);
+		const spot_light = new THREE.SpotLight(0xFFFFFF);
+		spot_light.intensity = 10;
 		spot_light.distance = 0;
 		spot_light.penumbra = 0.5;
-		spot_light.decay = 1;
+		spot_light.decay = 2;
 		spot_light.angle = Math.PI * 0.5;
 		spot_light.position.set(...spot_light_position);
 		scene.add(spot_light);
-		// floor_scene.add(spot_light);
 		spot_light.target.position.set(...spot_light_position);
 		spot_light.target.position.y = 0;
 		scene.add(spot_light.target);
-		// floor_scene.add(spot_light.target);
 
 		// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
 		// scene.add(spot_light_helper);
@@ -137,8 +113,7 @@ plan_camera.translateZ(1);
 plan_camera.lookAt(scene.position);
 
 export const orbit_camera = new THREE.PerspectiveCamera(...getPerspectiveCameraAttributes());
-// orbit_camera.rotateX(-Math.PI * 0.125);
-orbit_camera.position.z = 10;
+orbit_camera.position.y = 12;
 
 
 
@@ -294,7 +269,7 @@ canvas.addEventListener('dblclick', (evt) => {
 
 				transform_controls.detach();
 
-				tilable_mesh._ = raycasted_mesh;
+				tileable_mesh._ = raycasted_mesh;
 			}
 		}
 		else {
@@ -303,7 +278,7 @@ canvas.addEventListener('dblclick', (evt) => {
 
 			transform_controls.detach();
 
-			tilable_mesh._ = null;
+			tileable_mesh._ = null;
 		}
 	}
 });
