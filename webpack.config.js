@@ -33,7 +33,7 @@ module.exports = (env) => ({
 				exclude: /node_modules/,
 				use:
 
-					env === 'development' ?
+					env === 'development' || env === 'production' ?
 
 						'babel-loader' :
 
