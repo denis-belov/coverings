@@ -117,7 +117,7 @@ material_BUTTONS.forEach((BUTTON) => {
 
 		for (const texture in info_floor.textures) {
 
-			sources[texture] = { source: info_floor.textures[texture], type: 'image' };
+			sources[texture] = { source: `${ __STATIC_PATH__ }${ info_floor.textures[texture] }`, type: 'image' };
 		}
 
 		await loader.load({
@@ -150,7 +150,7 @@ material_BUTTONS.forEach((BUTTON) => {
 
 		for (const texture in info_walls.textures) {
 
-			sources[texture] = { source: info_walls.textures[texture], type: 'image' };
+			sources[texture] = { source: `${ __STATIC_PATH__ }${ info_walls.textures[texture] }`, type: 'image' };
 		}
 
 		await loader.load({
