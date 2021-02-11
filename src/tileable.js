@@ -12,6 +12,10 @@ import {
 
 
 
+const none_image = new Image();
+
+
+
 export default class Tileable {
 
 	constructor (room, side) {
@@ -57,11 +61,11 @@ export default class Tileable {
 
 		this.material = new THREE.MeshPhysicalMaterial({
 
-			map: this.base_texture,
-			normalMap: this.normal_texture,
-			aoMap: this.ao_texture,
-			roughnessMap: this.roughness_texture,
-			metalnessMap: this.metalness_texture,
+			map: null,
+			normalMap: null,
+			aoMap: null,
+			roughnessMap: null,
+			metalnessMap: null,
 			side: THREE[side],
 			wireframe: MATERIAL_WIREFRAME,
 		});
@@ -79,16 +83,62 @@ export default class Tileable {
 
 		this.tile_sizes = tile_sizes;
 
-		this.base_texture.image = textures.base;
-		this.normal_texture.image = textures.normal;
-		this.ao_texture.image = textures.ao;
-		this.roughness_texture.image = textures.roughness;
-		this.metalness_texture.image = textures.metalness;
+		if (textures.base) {
+
+			this.base_texture.image = textures.base;
+			this.material.map = this.base_texture;
+		}
+		else {
+
+			this.material.map = null;
+		}
+
+		if (textures.normal) {
+
+			this.normal_texture.image = textures.normal;
+			this.material.normalMap = this.normal_texture;
+		}
+		else {
+
+			this.material.normalMap = null;
+		}
+
+		if (textures.ao) {
+
+			this.ao_texture.image = textures.ao;
+			this.material.aoMap = this.ao_texture;
+		}
+		else {
+
+			this.material.aoMap = null;
+		}
+
+		if (textures.roughness) {
+
+			this.roughness_texture.image = textures.roughness;
+			this.material.roughnessMap = this.roughness_texture;
+		}
+		else {
+
+			this.material.roughnessMap = null;
+		}
+
+		if (textures.metalness) {
+
+			this.metalness_texture.image = textures.metalness;
+			this.material.metalnessMap = this.metalness_texture;
+		}
+		else {
+
+			this.material.metalnessMap = null;
+		}
 
 		this.base_texture.needsUpdate = true;
 		this.normal_texture.needsUpdate = true;
 		this.ao_texture.needsUpdate = true;
 		this.roughness_texture.needsUpdate = true;
 		this.metalness_texture.needsUpdate = true;
+
+		this.material.needsUpdate = true;
 	}
 }

@@ -15,13 +15,13 @@ export const [
 
 export const [ canvas ] = document.getElementsByTagName('canvas');
 
-export const material_BUTTONS = materials.map((elm) => {
+export const material_BUTTONS = materials.map((elm, index) => {
 
 	const BUTTON = document.createElement('div');
 
 	BUTTON.className = 'coverings-actions-switch';
 
-	BUTTON.innerHTML = elm;
+	BUTTON.innerHTML = index + 1;
 
 	document.getElementsByClassName('coverings-materials')[0].appendChild(BUTTON);
 

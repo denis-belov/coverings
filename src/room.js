@@ -18,7 +18,7 @@ export default class Room {
 
 		this.points = [];
 
-		this.floor = new Floor(this, 'FrontSide');
+		this.floor = null;
 
 		this.walls = [];
 
@@ -28,6 +28,8 @@ export default class Room {
 	makeContour (height, points) {
 
 		this.destroyContour();
+
+		this.floor = new Floor(this, 'FrontSide');
 
 		this.height = height;
 

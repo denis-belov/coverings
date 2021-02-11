@@ -63,7 +63,7 @@ material_BUTTONS.forEach((BUTTON) => {
 
 			const info = await fetch(
 
-				BUTTON.innerHTML,
+				`${ __STATIC_PATH__ }/textures/${ BUTTON.innerHTML }/info.json`,
 
 				{
 					method: 'get',
@@ -101,9 +101,9 @@ material_BUTTONS.forEach((BUTTON) => {
 
 (async () => {
 
-	const info = await fetch(
+	const info_floor = await fetch(
 
-		'/textures/1/info.json',
+		`${ __STATIC_PATH__ }/textures/3/info.json`,
 
 		{
 			method: 'get',
@@ -111,13 +111,13 @@ material_BUTTONS.forEach((BUTTON) => {
 	)
 		.then((response) => response.json());
 
-	if (info.textures) {
+	if (info_floor.textures) {
 
 		const sources = {};
 
-		for (const texture in info.textures) {
+		for (const texture in info_floor.textures) {
 
-			sources[texture] = { source: info.textures[texture], type: 'image' };
+			sources[texture] = { source: info_floor.textures[texture], type: 'image' };
 		}
 
 		await loader.load({
@@ -128,9 +128,40 @@ material_BUTTONS.forEach((BUTTON) => {
 		});
 	}
 
-	room.floor.setTile(info.sizes, loader.content);
+	room.floor.setTile(info_floor.sizes, loader.content);
 
-	room.walls.forEach((wall) => wall.setTile(info.sizes, loader.content));
+	loader.content = {};
+
+	room.updateGeometries();
+
+	const info_walls = await fetch(
+
+		`${ __STATIC_PATH__ }/textures/4/info.json`,
+
+		{
+			method: 'get',
+		},
+	)
+		.then((response) => response.json());
+
+	if (info_walls.textures) {
+
+		const sources = {};
+
+		for (const texture in info_walls.textures) {
+
+			sources[texture] = { source: info_walls.textures[texture], type: 'image' };
+		}
+
+		await loader.load({
+
+			sources,
+
+			// progress: () => 0,
+		});
+	}
+
+	room.walls.forEach((wall) => wall.setTile(info_walls.sizes, loader.content));
 
 	loader.content = {};
 

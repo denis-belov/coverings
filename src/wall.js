@@ -48,7 +48,6 @@ export default class Wall extends Tileable {
 
 		this.pixel_length = 0;
 
-		console.log(this.points);
 		this.points[0].walls.push(this);
 		this.points[1].walls.push(this);
 

@@ -38,8 +38,8 @@
     "file-saver": "^2.0.5"
   },
   "scripts": {
-    "start": "webpack-dev-server --mode=development --env=development ",
-    "build": "webpack --mode=development",
-    "prod": "webpack --mode=production"
+    "start": "webpack-dev-server --env=development ",
+    "build": "webpack --env=development",
+    "prod": "webpack --env=production"
   }
 }

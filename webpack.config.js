@@ -1,13 +1,14 @@
 // Webpack 5.* dev server's live reload doesn't work correctly, try to update all dependencies to the latest later.
 
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 
-module.exports = (env, argv) => ({
+module.exports = (env) => ({
 
 	entry: './src/index.js',
 
@@ -32,7 +33,7 @@ module.exports = (env, argv) => ({
 				exclude: /node_modules/,
 				use:
 
-					argv.mode === 'development' ?
+					env === 'development' ?
 
 						'babel-loader' :
 
@@ -107,7 +108,7 @@ module.exports = (env, argv) => ({
 		],
 	},
 
-	devtool: argv.mode === 'development' ? 'source-map' : false,
+	devtool: env === 'development' ? 'source-map' : false,
 
 	plugins: [
 
@@ -135,6 +136,11 @@ module.exports = (env, argv) => ({
 				{ from: 'src/models', to: 'models' },
 				{ from: 'src/textures', to: 'textures' },
 			],
+		}),
+
+		new webpack.DefinePlugin({
+
+			__STATIC_PATH__: env === 'development' ? '\'\'' : '\'/coverings/build\'',
 		}),
 	],
 
