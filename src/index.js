@@ -12,7 +12,17 @@ import modes from './modes';
 import Point from './point';
 import Room from './room';
 
-import { material_BUTTONS } from './dom';
+import {
+
+	material_BUTTONS,
+	mode_toggle_BUTTON,
+	coverings_plan_NODE,
+	modal,
+	width_INPUT,
+	length_INPUT,
+	height_INPUT,
+	apply_sizes_BUTTON,
+} from './dom';
 
 import {
 
@@ -28,30 +38,82 @@ import './events';
 
 
 
+const loader = new Loader();
+
+
+
 const room = new Room();
+
+
+
+// room.makeContour(
+
+// 	3,
+
+// 	[
+// 		new Point(-3, -3),
+
+// 		new Point(-3, 3),
+
+// 		new Point(3, 3),
+
+// 		new Point(4.5, -1.5),
+
+// 		new Point(3, -3),
+// 	],
+// );
 
 
 
 room.makeContour(
 
-	3,
+	2.5,
 
 	[
-		new Point(-3, -3),
+		new Point(-4 / 2, -2.5 / 2),
 
-		new Point(-3, 3),
+		new Point(-4 / 2, 2.5 / 2),
 
-		new Point(3, 3),
+		new Point(4 / 2, 2.5 / 2),
 
-		new Point(4.5, -1.5),
-
-		new Point(3, -3),
+		new Point(4 / 2, -2.5 / 2),
 	],
 );
 
 
 
-const loader = new Loader();
+
+mode_toggle_BUTTON.addEventListener('click', () => {
+
+	modes.orbit_mode = 1 - modes.orbit_mode;
+
+	if (modes.orbit_mode) {
+
+		mode_toggle_BUTTON.innerHTML = 'Orbit mode';
+
+		mode_toggle_BUTTON.classList.add('-pressed');
+
+		coverings_plan_NODE.classList.add('-hidden');
+
+		room.walls.forEach((wall) => {
+
+			if (!wall.tile) {
+
+				wall.setTile(room.wall_tile_default);
+			}
+
+			wall.updateGeometry();
+		});
+	}
+	else {
+
+		mode_toggle_BUTTON.innerHTML = 'Plan mode';
+
+		mode_toggle_BUTTON.classList.remove('-pressed');
+
+		coverings_plan_NODE.classList.remove('-hidden');
+	}
+});
 
 
 
@@ -65,9 +127,7 @@ material_BUTTONS.forEach((BUTTON) => {
 
 				`${ __STATIC_PATH__ }/textures/${ BUTTON.innerHTML }/info.json`,
 
-				{
-					method: 'get',
-				},
+				{ method: 'get' },
 			)
 				.then((response) => response.json());
 
@@ -88,85 +148,44 @@ material_BUTTONS.forEach((BUTTON) => {
 				});
 			}
 
-			tileable_mesh._.userData.parent.setTile(info.sizes, loader.content);
+			info.textures = loader.content;
+
+			tileable_mesh._.userData.parent.setTile(info);
 
 			loader.content = {};
 
-			room.updateGeometries();
+			tileable_mesh._.userData.parent.updateGeometry();
 		}
 	});
 });
 
 
 
-(async () => {
+apply_sizes_BUTTON.addEventListener('click', () => {
 
-	const info_floor = await fetch(
+	console.log(parseFloat(width_INPUT.value));
 
-		`${ __STATIC_PATH__ }/textures/3/info.json`,
+	const width = parseFloat(width_INPUT.value);
+	const length = parseFloat(length_INPUT.value);
+	const height = parseFloat(height_INPUT.value);
 
-		{
-			method: 'get',
-		},
-	)
-		.then((response) => response.json());
+	room.makeContour(
 
-	if (info_floor.textures) {
+		height,
 
-		const sources = {};
+		[
+			new Point(-length / 2, -width / 2),
 
-		for (const texture in info_floor.textures) {
+			new Point(-length / 2, width / 2),
 
-			sources[texture] = { source: `${ __STATIC_PATH__ }${ info_floor.textures[texture] }`, type: 'image' };
-		}
+			new Point(length / 2, width / 2),
 
-		await loader.load({
+			new Point(length / 2, -width / 2),
+		],
+	);
 
-			sources,
-
-			// progress: () => 0,
-		});
-	}
-
-	room.floor.setTile(info_floor.sizes, loader.content);
-
-	loader.content = {};
-
-	room.updateGeometries();
-
-	const info_walls = await fetch(
-
-		`${ __STATIC_PATH__ }/textures/4/info.json`,
-
-		{
-			method: 'get',
-		},
-	)
-		.then((response) => response.json());
-
-	if (info_walls.textures) {
-
-		const sources = {};
-
-		for (const texture in info_walls.textures) {
-
-			sources[texture] = { source: `${ __STATIC_PATH__ }${ info_walls.textures[texture] }`, type: 'image' };
-		}
-
-		await loader.load({
-
-			sources,
-
-			// progress: () => 0,
-		});
-	}
-
-	room.walls.forEach((wall) => wall.setTile(info_walls.sizes, loader.content));
-
-	loader.content = {};
-
-	room.updateGeometries();
-})();
+	modal.style.display = 'none';
+});
 
 
 

@@ -81,30 +81,39 @@ export default class Point {
 		];
 	}
 
-	doPositionDependentActions () {
+	updateStyles () {
 
 		this.circle.style.left = this.pixel_x;
 		this.circle.style.top = this.pixel_y;
 
 		this.updateAdjointWallStyles();
-
-		this.walls[0].room.updateGeometries();
 	}
 
-	set (position_x = this.pixel_x, position_y = this.pixel_y) {
+	// doPositionDependentActions () {
 
-		this.pixel_x = position_x;
-		this.pixel_y = position_y;
+	// 	this.updateStyles();
 
-		this.doPositionDependentActions();
-	}
+	// 	// this.updateSceneCoordinates();
+
+	// 	this.walls[0].room.floor.updateGeometry();
+	// }
+
+	// set (position_x = this.pixel_x, position_y = this.pixel_y) {
+
+	// 	this.pixel_x = position_x;
+	// 	this.pixel_y = position_y;
+
+	// 	this.doPositionDependentActions();
+	// }
 
 	move (movement_x = 0, movement_y = 0) {
 
 		this.pixel_x += movement_x;
 		this.pixel_y += movement_y;
 
-		this.doPositionDependentActions();
+		this.updateStyles();
+
+		this.walls[0].room.floor.updateGeometry();
 	}
 
 	updateAdjointWallStyles () {

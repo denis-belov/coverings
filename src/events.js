@@ -5,10 +5,10 @@ import Wall from './wall';
 
 import {
 
-	coverings_plan_NODE,
+	// coverings_plan_NODE,
 	upload_model_BUTTON,
 	add_wall_mode_BUTTON,
-	mode_toggle_BUTTON,
+	// mode_toggle_BUTTON,
 	upload_model_INPUT,
 } from './dom';
 
@@ -49,27 +49,27 @@ add_wall_mode_BUTTON.addEventListener('click', () => {
 	}
 });
 
-mode_toggle_BUTTON.addEventListener('click', () => {
+// mode_toggle_BUTTON.addEventListener('click', () => {
 
-	modes.orbit_mode = 1 - modes.orbit_mode;
+// 	modes.orbit_mode = 1 - modes.orbit_mode;
 
-	if (modes.orbit_mode) {
+// 	if (modes.orbit_mode) {
 
-		mode_toggle_BUTTON.innerHTML = 'Orbit mode';
+// 		mode_toggle_BUTTON.innerHTML = 'Orbit mode';
 
-		mode_toggle_BUTTON.classList.add('-pressed');
+// 		mode_toggle_BUTTON.classList.add('-pressed');
 
-		coverings_plan_NODE.classList.add('-hidden');
-	}
-	else {
+// 		coverings_plan_NODE.classList.add('-hidden');
+// 	}
+// 	else {
 
-		mode_toggle_BUTTON.innerHTML = 'Plan mode';
+// 		mode_toggle_BUTTON.innerHTML = 'Plan mode';
 
-		mode_toggle_BUTTON.classList.remove('-pressed');
+// 		mode_toggle_BUTTON.classList.remove('-pressed');
 
-		coverings_plan_NODE.classList.remove('-hidden');
-	}
-});
+// 		coverings_plan_NODE.classList.remove('-hidden');
+// 	}
+// });
 
 window.addEventListener('mouseup', () => {
 

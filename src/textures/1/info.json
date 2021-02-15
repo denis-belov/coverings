@@ -3,9 +3,9 @@
 
   "textures": {
 
-    "base": "/textures/1/base.png",
-    "ao": "/textures/1/ao.png",
-    "normal": "/textures/1/normal.png",
-    "roughness": "/textures/1/roughness.png"
+    "map": "/textures/1/map.png",
+    "ao_map": "/textures/1/ao_map.png",
+    "normal_map": "/textures/1/normal_map.png",
+    "roughness_map": "/textures/1/roughness_map.png"
   }
 }

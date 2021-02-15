@@ -3,10 +3,10 @@
 
   "textures": {
 
-    "base": "/textures/3/base.png",
-    "ao": "/textures/3/ao.png",
-    "normal": "/textures/3/normal.png",
-    "roughness": "/textures/3/roughness.png",
-    "metalness": "/textures/3/metalness.png"
+    "map": "/textures/3/map.png",
+    "ao_map": "/textures/3/ao_map.png",
+    "normal_map": "/textures/3/normal_map.png",
+    "roughness_map": "/textures/3/roughness_map.png",
+    "metalness_map": "/textures/3/metalness_map.png"
   }
 }

@@ -10,6 +10,7 @@ import * as THREE from 'three';
 
 import {
 
+	ATTRIBUTE_SIZE_1,
 	ATTRIBUTE_SIZE_2,
 	ATTRIBUTE_SIZE_3,
 } from './three';
@@ -46,7 +47,7 @@ export default class Wall extends Tileable {
 		// rename to related_points
 		this.points = [ point1, point2 ];
 
-		this.pixel_length = 0;
+		this.pixel_length = point1.distanceTo(point2);
 
 		this.points[0].walls.push(this);
 		this.points[1].walls.push(this);
@@ -137,11 +138,6 @@ export default class Wall extends Tileable {
 
 		const [ point, next_point ] = this.points;
 
-		const wall_data_index = [];
-		const wall_data_position = [];
-		const wall_data_normal = [];
-		const wall_data_uv = [];
-
 		const plane_geometry =
 			new THREE.PlaneBufferGeometry(
 
@@ -157,34 +153,45 @@ export default class Wall extends Tileable {
 
 		const position = point.centerWith2(next_point);
 
-		wall_data_index.push(...plane_geometry.index.array);
-		wall_data_position.push(...plane_geometry.attributes.position.array);
-		wall_data_normal.push(...plane_geometry.attributes.normal.array);
-		wall_data_uv.push(...plane_geometry.attributes.uv.array);
+		plane_geometry.applyMatrix4(
 
-		for (let i = 0; i < wall_data_uv.length; i += 2) {
+			new THREE.Matrix4().compose(
 
-			wall_data_uv[i + 0] *= this.pixel_length * cast.PIXELS_TO_METERS / this.tile_sizes[0];
-			wall_data_uv[i + 1] *= this.room.height / this.tile_sizes[1];
+				new THREE.Vector3(position[0], this.room.height / 2, position[1]), quat, new THREE.Vector3(1, 1, 1),
+			),
+		);
+
+		if (this.mesh.geometry.index.array.length === 0) {
+
+			this.mesh.geometry.setIndex(new THREE.BufferAttribute(plane_geometry.index.array, ATTRIBUTE_SIZE_1));
 		}
 
-		this.geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(wall_data_index), 1));
-		this.geometry.setAttribute(
+		this.mesh.geometry.setAttribute(
 
-			'position', new THREE.BufferAttribute(new Float32Array(wall_data_position), ATTRIBUTE_SIZE_3),
-		);
-		this.geometry.setAttribute(
-
-			'normal', new THREE.BufferAttribute(new Float32Array(wall_data_normal), ATTRIBUTE_SIZE_3),
-		);
-		this.geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(wall_data_uv), ATTRIBUTE_SIZE_2));
-		this.geometry.setAttribute(
-
-			'uv2', new THREE.BufferAttribute(this.geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
+			'position', new THREE.BufferAttribute(plane_geometry.attributes.position.array, ATTRIBUTE_SIZE_3),
 		);
 
-		this.mesh.quaternion.identity();
-		this.mesh.applyQuaternion(quat);
-		this.mesh.position.set(position[0], this.room.height / 2, position[1]);
+		this.mesh.geometry.setAttribute(
+
+			'normal', new THREE.BufferAttribute(plane_geometry.attributes.normal.array, ATTRIBUTE_SIZE_3),
+		);
+
+		for (let i = 0; i < plane_geometry.attributes.uv.array.length; i += 2) {
+
+			plane_geometry.attributes.uv.array[i + 0] *= this.pixel_length * cast.PIXELS_TO_METERS / this.tile.sizes[0];
+			plane_geometry.attributes.uv.array[i + 1] *= this.room.height / this.tile.sizes[1];
+		}
+
+		this.mesh.geometry.setAttribute(
+
+			'uv', new THREE.BufferAttribute(plane_geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
+		);
+
+		this.mesh.geometry.setAttribute(
+
+			'uv2', new THREE.BufferAttribute(plane_geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
+		);
+
+		this.mesh.geometry.computeBoundingSphere();
 	}
 }

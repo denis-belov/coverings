@@ -14,10 +14,11 @@ import { canvas } from './dom';
 
 
 const CLEAR_COLOR = 'grey';
-const CAMERA_NEAR = 0.1;
-const CAMERA_FAR = 1000;
+const CAMERA_NEAR = 0.001;
+const CAMERA_FAR = 100;
 const PERSPECTIVE_CAMERA_FOV = 45;
 export const MATERIAL_WIREFRAME = false;
+export const ATTRIBUTE_SIZE_1 = 1;
 export const ATTRIBUTE_SIZE_2 = 2;
 export const ATTRIBUTE_SIZE_3 = 3;
 
@@ -168,28 +169,86 @@ export const uploadModel = (evt) => {
 	);
 };
 
-const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
+// const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
 
-transform_controls.addEventListener('change', () => {
+// transform_controls.addEventListener('change', () => {
 
-	if (transform_controls_attached_mesh) {
+// 	if (transform_controls_attached_mesh) {
 
-		if (transform_controls_attached_mesh._meshes) {
+// 		if (transform_controls_attached_mesh._meshes) {
 
-			transform_controls_attached_mesh._meshes.forEach((elm) => {
+// 			transform_controls_attached_mesh._meshes.forEach((elm) => {
 
-				elm.position.copy(transform_controls_attached_mesh.position);
-				elm.rotation.copy(transform_controls_attached_mesh.rotation);
-			});
-		}
-	}
-});
+// 				elm.position.copy(transform_controls_attached_mesh.position);
+// 				elm.rotation.copy(transform_controls_attached_mesh.rotation);
+// 			});
+// 		}
+// 	}
+// });
 
-transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
+// transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
 
-scene.add(transform_controls);
+// scene.add(transform_controls);
 
-canvas.addEventListener('mousemove', (evt) => {
+// canvas.addEventListener('mousemove', (evt) => {
+
+// 	if (modes.orbit_mode) {
+
+// 		mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
+// 		mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
+
+// 		raycaster.setFromCamera(mouse, orbit_camera);
+
+// 		const _intersects = raycaster.intersectObjects(raycastable_meshes);
+// 		// intersects.length = 0;
+// 		// intersects.push(..._intersects);
+
+// 		// console.log(raycastable_meshes, _intersects.length);
+
+// 		if (_intersects.length) {
+
+// 			if (raycasted_mesh) {
+
+// 				if (raycasted_mesh._meshes) {
+
+// 					raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x000000));
+// 				}
+// 				else {
+
+// 					raycasted_mesh.material.emissive.set(0x000000);
+// 				}
+// 			}
+
+// 			raycasted_mesh = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
+
+// 			// console.log(raycasted_mesh);
+
+// 			if (raycasted_mesh._meshes) {
+
+// 				raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x00FF00));
+// 			}
+// 			else {
+
+// 				raycasted_mesh.material.emissive.set(0x00FF00);
+// 			}
+// 		}
+// 		else if (raycasted_mesh) {
+
+// 			if (raycasted_mesh._meshes) {
+
+// 				raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x000000));
+// 			}
+// 			else {
+
+// 				raycasted_mesh.material.emissive.set(0x000000);
+// 			}
+
+// 			raycasted_mesh = null;
+// 		}
+// 	}
+// });
+
+canvas.addEventListener('dblclick', (evt) => {
 
 	if (modes.orbit_mode) {
 
@@ -199,86 +258,46 @@ canvas.addEventListener('mousemove', (evt) => {
 		raycaster.setFromCamera(mouse, orbit_camera);
 
 		const _intersects = raycaster.intersectObjects(raycastable_meshes);
-		// intersects.length = 0;
-		// intersects.push(..._intersects);
+
+		console.log(raycastable_meshes, _intersects);
 
 		if (_intersects.length) {
 
-			// if (raycasted_mesh) {
-
-			// 	if (raycasted_mesh._meshes) {
-
-			// 		raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x000000));
-			// 	}
-			// 	else {
-
-			// 		raycasted_mesh.material.emissive.set(0x000000);
-			// 	}
-			// }
-
-			raycasted_mesh = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
-
-			// if (raycasted_mesh._meshes) {
-
-			// 	raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x00FF00));
-			// }
-			// else {
-
-			// 	raycasted_mesh.material.emissive.set(0x00FF00);
-			// }
-		}
-		else if (raycasted_mesh) {
-
-			// if (raycasted_mesh._meshes) {
-
-			// 	raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x000000));
-			// }
-			// else {
-
-			// 	raycasted_mesh.material.emissive.set(0x000000);
-			// }
-
-			raycasted_mesh = null;
-		}
-	}
-});
-
-canvas.addEventListener('dblclick', (evt) => {
-
-	if (modes.orbit_mode) {
-
-		// mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
-		// mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
-
-		// raycaster.setFromCamera(mouse, orbit_camera);
-
-		// const _intersects = raycaster.intersectObjects(raycastable_meshes);
-
-		if (raycasted_mesh) {
-
-			if (draggable_meshes.includes(raycasted_mesh)) {
-
-				transform_controls_attached_mesh = raycasted_mesh;
-
-				transform_controls.attach(transform_controls_attached_mesh);
-			}
-			else {
-
-
-				transform_controls_attached_mesh = null;
-
-				transform_controls.detach();
-
-				tileable_mesh._ = raycasted_mesh;
-			}
+			tileable_mesh._ = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
 		}
 		else {
 
-			transform_controls_attached_mesh = null;
-
-			transform_controls.detach();
-
 			tileable_mesh._ = null;
 		}
+
+		console.log(tileable_mesh);
+
+		// if (raycasted_mesh) {
+
+		// 	if (draggable_meshes.includes(raycasted_mesh)) {
+
+		// 		transform_controls_attached_mesh = raycasted_mesh;
+
+		// 		transform_controls.attach(transform_controls_attached_mesh);
+		// 	}
+		// 	else {
+
+		// 		// console.log(raycasted_mesh);
+
+		// 		transform_controls_attached_mesh = null;
+
+		// 		transform_controls.detach();
+
+		// 		tileable_mesh._ = raycasted_mesh;
+		// 	}
+		// }
+		// else {
+
+		// 	transform_controls_attached_mesh = null;
+
+		// 	transform_controls.detach();
+
+		// 	tileable_mesh._ = null;
+		// }
 	}
 });
