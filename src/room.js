@@ -45,6 +45,8 @@ export default class Room {
 		)
 			.then((response) => response.json());
 
+
+
 		const tile_wall = await fetch(
 
 			`${ __STATIC_PATH__ }/textures/4/info.json`,
@@ -53,11 +55,13 @@ export default class Room {
 		)
 			.then((response) => response.json());
 
+
+
 		let sources = {};
 
-		for (const texture in tile_wall.textures) {
+		for (const texture in tile_floor.textures) {
 
-			sources[texture] = { source: `${ __STATIC_PATH__ }${ tile_wall.textures[texture] }`, type: 'image' };
+			sources[texture] = { source: `${ __STATIC_PATH__ }${ tile_floor.textures[texture] }`, type: 'image' };
 		}
 
 		await loader.load({
@@ -76,11 +80,13 @@ export default class Room {
 
 		loader.content = {};
 
+
+
 		sources = {};
 
-		for (const texture in tile_floor.textures) {
+		for (const texture in tile_wall.textures) {
 
-			sources[texture] = { source: `${ __STATIC_PATH__ }${ tile_floor.textures[texture] }`, type: 'image' };
+			sources[texture] = { source: `${ __STATIC_PATH__ }${ tile_wall.textures[texture] }`, type: 'image' };
 		}
 
 		await loader.load({
@@ -106,6 +112,8 @@ export default class Room {
 
 			await this.loadDefaultTextures();
 		}
+
+		console.log(this.floor_tile_default, this.wall_tile_default);
 
 		this.destroyContour();
 
@@ -140,32 +148,6 @@ export default class Room {
 
 		this.floor.setTile(this.floor_tile_default);
 		this.floor.updateGeometry();
-
-		loader.content = {};
-
-		this.walls.forEach((wall) => {
-
-			for (let i = 0; i < this.prev_walls.length; ++i) {
-
-				if (
-
-					(
-						(
-							wall.points[0] === this.prev_walls[i].points[0] &&
-							wall.points[1] === this.prev_walls[i].points[1]
-						) ||
-						(
-							wall.points[0] === this.prev_walls[i].points[1] &&
-							wall.points[1] === this.prev_walls[i].points[0]
-						)
-					) &&
-					this.prev_walls[i].tile
-				) {
-
-					wall.copy(this.prev_walls[i]);
-				}
-			}
-		});
 	}
 
 	destroyContour () {

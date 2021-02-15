@@ -93,6 +93,8 @@ export default class Tileable {
 
 	setTile (tile) {
 
+		console.log(tile.sizes);
+
 		this.tile = tile;
 
 		this.mesh.material.map.image = this.tile.textures.map || transparent_IMG;

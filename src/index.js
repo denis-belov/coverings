@@ -99,6 +99,8 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 			if (!wall.tile) {
 
+				console.log(room.wall_tile_default.sizes);
+
 				wall.setTile(room.wall_tile_default);
 			}
 
@@ -131,6 +133,8 @@ material_BUTTONS.forEach((BUTTON) => {
 			)
 				.then((response) => response.json());
 
+
+
 			if (info.textures) {
 
 				const sources = {};
@@ -147,6 +151,8 @@ material_BUTTONS.forEach((BUTTON) => {
 					// progress: () => 0,
 				});
 			}
+
+
 
 			info.textures = loader.content;
 
