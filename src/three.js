@@ -71,31 +71,36 @@ export const scene = new THREE.Scene();
 
 
 const ambient_light = new THREE.AmbientLight(0xFFFFFF);
+// ambient_light.intensity = 2;
 scene.add(ambient_light);
 
-[
-	[ 1.5, 3, 1.5 ],
-	[ 1.5, 3, -1.5 ],
-	[ -1.5, 3, -1.5 ],
-	[ -1.5, 3, 1.5 ],
-]
-	.forEach((spot_light_position) => {
+// export const spot_lights = [];
 
-		const spot_light = new THREE.SpotLight(0xFFFFFF);
-		spot_light.intensity = 10;
-		spot_light.distance = 0;
-		spot_light.penumbra = 0.5;
-		spot_light.decay = 2;
-		spot_light.angle = Math.PI * 0.5;
-		spot_light.position.set(...spot_light_position);
-		scene.add(spot_light);
-		spot_light.target.position.set(...spot_light_position);
-		spot_light.target.position.y = 0;
-		scene.add(spot_light.target);
+// [
+// 	[ 1.5, 3, 1.5 ],
+// 	[ 1.5, 3, -1.5 ],
+// 	[ -1.5, 3, -1.5 ],
+// 	[ -1.5, 3, 1.5 ],
+// ]
+// 	.forEach((spot_light_position) => {
 
-		// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
-		// scene.add(spot_light_helper);
-	});
+// 		const spot_light = new THREE.SpotLight(0xFFFFFF);
+// 		spot_light.intensity = 10;
+// 		spot_light.distance = 0;
+// 		spot_light.penumbra = 0.5;
+// 		spot_light.decay = 2;
+// 		spot_light.angle = Math.PI * 0.5;
+// 		spot_light.position.set(...spot_light_position);
+// 		scene.add(spot_light);
+// 		spot_light.target.position.set(...spot_light_position);
+// 		spot_light.target.position.y = 0;
+// 		scene.add(spot_light.target);
+
+// 		// spot_lights.push(spot_light);
+
+// 		// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
+// 		// scene.add(spot_light_helper);
+// 	});
 
 // const rect_light = new THREE.RectAreaLight(0xffffff, 1, 2, 2);
 // rect_light.position.set(0, 1.5, -2.99);

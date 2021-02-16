@@ -140,6 +140,8 @@ module.exports = (env) => ({
 
 		new webpack.DefinePlugin({
 
+			LOG: 'console.log',
+
 			__STATIC_PATH__: env === 'development' ? '\'\'' : '\'/coverings/build\'',
 		}),
 	],

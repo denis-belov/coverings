@@ -2,6 +2,7 @@
 
 
 
+import * as THREE from 'three';
 import './index.scss';
 import '@babel/polyfill';
 
@@ -99,7 +100,7 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 			if (!wall.tile) {
 
-				console.log(room.wall_tile_default.sizes);
+				// console.log(room.wall_tile_default.sizes);
 
 				wall.setTile(room.wall_tile_default);
 			}
@@ -167,13 +168,41 @@ material_BUTTONS.forEach((BUTTON) => {
 
 
 
-apply_sizes_BUTTON.addEventListener('click', () => {
+// const helpers = [];
 
-	console.log(parseFloat(width_INPUT.value));
+apply_sizes_BUTTON.addEventListener('click', () => {
 
 	const width = parseFloat(width_INPUT.value);
 	const length = parseFloat(length_INPUT.value);
 	const height = parseFloat(height_INPUT.value);
+
+	[
+		[ 1.5, height, 1.5 ],
+		[ 1.5, height, -1.5 ],
+		[ -1.5, height, -1.5 ],
+		[ -1.5, height, 1.5 ],
+	]
+		.forEach((spot_light_position) => {
+
+			const spot_light = new THREE.SpotLight(0xFFFFFF);
+			spot_light.intensity = 10;
+			spot_light.distance = 0;
+			spot_light.penumbra = 1;
+			spot_light.decay = 2;
+			spot_light.angle = Math.PI * 0.5;
+			spot_light.position.set(...spot_light_position);
+			scene.add(spot_light);
+			spot_light.target.position.set(...spot_light_position);
+			spot_light.target.position.y = 0;
+			scene.add(spot_light.target);
+
+			// spot_lights.push(spot_light);
+
+			// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
+			// helpers.push(spot_light_helper);
+			// scene.add(spot_light_helper);
+		});
+
 
 	room.makeContour(
 
@@ -195,9 +224,28 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 
 
 
+window.addEventListener('keypress', (evt) => {
+
+	// console.log(Point.selected);
+
+	if (evt.code === 'KeyD' && Point.selected) {
+
+		const new_points = room.points.slice();
+
+		new_points.splice(new_points.indexOf(Point.selected), 1);
+
+		room.makeContour(room.height, new_points);
+	}
+});
+
+
+
+
 const animate = () => {
 
 	requestAnimationFrame(animate);
+
+	// helpers.forEach((helper) => helper.update());
 
 	if (modes.orbit_mode) {
 

@@ -113,8 +113,6 @@ export default class Room {
 			await this.loadDefaultTextures();
 		}
 
-		console.log(this.floor_tile_default, this.wall_tile_default);
-
 		this.destroyContour();
 
 		this.floor = new Floor(this, 'FrontSide');

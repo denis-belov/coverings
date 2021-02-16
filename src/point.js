@@ -32,7 +32,7 @@ export default class Point {
 
 			if (!modes.add_wall_mode) {
 
-				console.log(this.circle.style.zIndex);
+				// console.log(this.circle.style.zIndex);
 
 				const last_z_index = this.circle.style.zIndex;
 
