@@ -4,8 +4,9 @@ import { transparent_IMG } from './dom';
 
 import {
 
-	scene,
-	webgl_maximum_anisotropy,
+	scene1,
+	scene2,
+	WEBGL_MAXIMUM_ANISOTROPY,
 	raycastable_meshes,
 	MATERIAL_WIREFRAME,
 	ATTRIBUTE_SIZE_1,
@@ -17,11 +18,15 @@ import {
 
 export default class Tileable {
 
-	constructor (room, side) {
+	constructor (room, side, scene) {
 
 		this.room = room;
 
 		this.tile = null;
+
+		// for using with walls
+		this.quat = new THREE.Quaternion();
+		this.position = new THREE.Vector3();
 
 		const geometry = new THREE.BufferGeometry();
 		geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(), ATTRIBUTE_SIZE_1));
@@ -35,36 +40,36 @@ export default class Tileable {
 
 		const map = new THREE.Texture();
 		map.image = transparent_IMG;
-		map.anisotropy = webgl_maximum_anisotropy;
+		map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
 		map.wrapS = THREE.RepeatWrapping;
 		map.wrapT = THREE.RepeatWrapping;
 
 		const normal_map = new THREE.Texture();
 		normal_map.image = transparent_IMG;
-		normal_map.anisotropy = webgl_maximum_anisotropy;
+		normal_map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
 		normal_map.wrapS = THREE.RepeatWrapping;
 		normal_map.wrapT = THREE.RepeatWrapping;
 
 		// ambient_occlusion
 		const ao_map = new THREE.Texture();
 		ao_map.image = transparent_IMG;
-		ao_map.anisotropy = webgl_maximum_anisotropy;
+		ao_map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
 		ao_map.wrapS = THREE.RepeatWrapping;
 		ao_map.wrapT = THREE.RepeatWrapping;
 
 		const roughness_map = new THREE.Texture();
 		roughness_map.image = transparent_IMG;
-		roughness_map.anisotropy = webgl_maximum_anisotropy;
+		roughness_map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
 		roughness_map.wrapS = THREE.RepeatWrapping;
 		roughness_map.wrapT = THREE.RepeatWrapping;
 
 		const metalness_map = new THREE.Texture();
 		metalness_map.image = transparent_IMG;
-		metalness_map.anisotropy = webgl_maximum_anisotropy;
+		metalness_map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
 		metalness_map.wrapS = THREE.RepeatWrapping;
 		metalness_map.wrapT = THREE.RepeatWrapping;
 
-		const material = new THREE.MeshPhysicalMaterial({
+		this.material = new THREE.MeshPhysicalMaterial({
 
 			map,
 			normalMap: normal_map,
@@ -75,13 +80,19 @@ export default class Tileable {
 			wireframe: MATERIAL_WIREFRAME,
 		});
 
-		this.mesh = new THREE.Mesh(geometry, material);
+		this.material2 = new THREE.MeshBasicMaterial({
+
+			map,
+			side: THREE[side],
+		});
+
+		this.mesh = new THREE.Mesh(geometry, this.material);
 		this.mesh.matrixAutoUpdate = false;
 		this.mesh.userData.parent = this;
 
 		raycastable_meshes.push(this.mesh);
 
-		scene.add(this.mesh);
+		scene1.add(this.mesh);
 	}
 
 	copy (tileable) {
@@ -95,18 +106,26 @@ export default class Tileable {
 
 		this.tile = tile;
 
-		this.mesh.material.map.image = this.tile.textures.map || transparent_IMG;
-		this.mesh.material.normalMap.image = this.tile.textures.normal_map || transparent_IMG;
-		this.mesh.material.aoMap.image = this.tile.textures.ao_map || transparent_IMG;
-		this.mesh.material.roughnessMap.image = this.tile.textures.roughness_map || transparent_IMG;
-		this.mesh.material.metalnessMap.image = this.tile.textures.metalness_map || transparent_IMG;
+		this.material.map.image = this.tile.textures.map || transparent_IMG;
+		this.material.normalMap.image = this.tile.textures.normal_map || transparent_IMG;
+		this.material.aoMap.image = this.tile.textures.ao_map || transparent_IMG;
+		this.material.roughnessMap.image = this.tile.textures.roughness_map || transparent_IMG;
+		this.material.metalnessMap.image = this.tile.textures.metalness_map || transparent_IMG;
 
-		this.mesh.material.map.needsUpdate = true;
-		this.mesh.material.normalMap.needsUpdate = true;
-		this.mesh.material.aoMap.needsUpdate = true;
-		this.mesh.material.roughnessMap.needsUpdate = true;
-		this.mesh.material.metalnessMap.needsUpdate = true;
+		this.material.map.needsUpdate = true;
+		this.material.normalMap.needsUpdate = true;
+		this.material.aoMap.needsUpdate = true;
+		this.material.roughnessMap.needsUpdate = true;
+		this.material.metalnessMap.needsUpdate = true;
 
-		this.mesh.material.needsUpdate = true;
+		this.material.needsUpdate = true;
+
+
+
+		this.material2.map.image = this.tile.textures.map || transparent_IMG;
+
+		this.material2.map.needsUpdate = true;
+
+		this.material2.needsUpdate = true;
 	}
 }

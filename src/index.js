@@ -9,6 +9,7 @@ import '@babel/polyfill';
 import Loader from 'external-data-loader';
 
 import modes from './modes';
+// import cast from './cast';
 
 import Point from './point';
 import Room from './room';
@@ -28,7 +29,9 @@ import {
 import {
 
 	renderer,
-	scene,
+	scene1,
+	scene2,
+	scene3,
 	plan_camera,
 	orbit_camera,
 	orbit_controls,
@@ -98,12 +101,14 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 		room.walls.forEach((wall) => {
 
-			if (!wall.tile) {
-
-				// console.log(room.wall_tile_default.sizes);
+			wall.tile ||
 
 				wall.setTile(room.wall_tile_default);
-			}
+
+			// if (!wall.tile) {
+
+			// 	wall.setTile(room.wall_tile_default);
+			// }
 
 			wall.updateGeometry();
 		});
@@ -191,16 +196,19 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 			spot_light.decay = 2;
 			spot_light.angle = Math.PI * 0.5;
 			spot_light.position.set(...spot_light_position);
-			scene.add(spot_light);
+			scene1.add(spot_light);
+			const spot_light_clone = spot_light.clone()
+			scene2.add(spot_light_clone);
 			spot_light.target.position.set(...spot_light_position);
 			spot_light.target.position.y = 0;
-			scene.add(spot_light.target);
+			scene1.add(spot_light.target);
+			scene2.add(spot_light_clone.target);
 
 			// spot_lights.push(spot_light);
 
 			// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
 			// helpers.push(spot_light_helper);
-			// scene.add(spot_light_helper);
+			// scene1.add(spot_light_helper);
 		});
 
 
@@ -240,6 +248,77 @@ window.addEventListener('keypress', (evt) => {
 
 
 
+// const selection_area_div = document.createElement('div');
+
+// selection_area_div.className = 'selection_area';
+
+// let x = 0;
+// let y = 0;
+
+// const test = (evt) => {
+
+// 	Object.assign(
+
+// 		selection_area_div.style,
+
+// 		{
+// 			left: evt.clientX < x ? evt.clientX : x,
+// 			top: evt.clientY < y ? evt.clientY : y,
+// 			width: Math.abs(evt.clientX - x),
+// 			height: Math.abs(evt.clientY - y),
+// 		},
+// 	);
+
+// 	selection_area_div.setAttribute(
+
+// 		'data-value',
+
+// 		`${ Math.abs((evt.clientX - x) * cast.PIXELS_TO_METERS).toFixed(2) }m
+// 		${ Math.abs((evt.clientY - y) * cast.PIXELS_TO_METERS).toFixed(2) }m`,
+// 	);
+// };
+
+// window.addEventListener('mousedown', (evt) => {
+
+// 	if (modes.selection_mode) {
+
+// 		evt.stopPropagation();
+
+// 		x = evt.clientX;
+// 		y = evt.clientY;
+
+// 		Object.assign(
+
+// 			selection_area_div.style,
+
+// 			{
+// 				width: 0,
+// 				height: 0,
+// 				left: x,
+// 				top: y,
+// 			},
+// 		);
+
+// 		document.body.appendChild(selection_area_div);
+
+// 		window.addEventListener('mousemove', test);
+// 	}
+// });
+
+// window.addEventListener('mouseup', () => {
+
+// 	window.removeEventListener('mousemove', test);
+
+// 	document.body.contains(selection_area_div) &&
+
+// 		document.body.removeChild(selection_area_div);
+// });
+
+
+
+const gl = renderer.getContext();
+
+
 
 const animate = () => {
 
@@ -247,15 +326,29 @@ const animate = () => {
 
 	// helpers.forEach((helper) => helper.update());
 
+	renderer.clearColor();
+
 	if (modes.orbit_mode) {
 
 		orbit_controls.update();
 
-		renderer.render(scene, orbit_camera);
+		gl.disable(gl.DEPTH_TEST);
+
+		renderer.render(scene1, orbit_camera);
+		renderer.render(scene2, orbit_camera);
+
+		gl.enable(gl.DEPTH_TEST);
+
+		renderer.render(scene3, orbit_camera);
+
+		// scene1.children.forEach((child) => {
+
+		// 	renderer.render(child, orbit_camera);
+		// });
 	}
 	else {
 
-		renderer.render(scene, plan_camera);
+		renderer.render(scene1, plan_camera);
 	}
 };
 

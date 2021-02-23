@@ -9,7 +9,14 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import cast from './cast';
 import modes from './modes';
 
-import { canvas } from './dom';
+import {
+
+	// mode_toggle_BUTTON,
+	// coverings_plan_NODE,
+	// mode_selection_BUTTON,
+	// selection_NODE,
+	canvas,
+} from './dom';
 
 
 
@@ -59,20 +66,38 @@ const getPerspectiveCameraAttributes = () =>
 export const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 // renderer.outputEncoding = THREE.sRGBEncoding;
 // renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.physicallyCorrectLights = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(CLEAR_COLOR);
+renderer.autoClearColor = false;
 renderer.clearColor();
-renderer.physicallyCorrectLights = true;
-
-export const webgl_maximum_anisotropy = renderer.capabilities.getMaxAnisotropy();
-
-export const scene = new THREE.Scene();
 
 
 
-const ambient_light = new THREE.AmbientLight(0xFFFFFF);
+export const WEBGL_MAXIMUM_ANISOTROPY = renderer.capabilities.getMaxAnisotropy();
+
+// floor and walls, no depth test
+export const scene1 = new THREE.Scene();
+
+// segments, no depth test
+export const scene2 = new THREE.Scene();
+
+// draggable units, depth test enabled
+export const scene3 = new THREE.Scene();
+
+
+
+const ambient_light1 = new THREE.AmbientLight(0xFFFFFF);
+const ambient_light2 = ambient_light1.clone();
+const ambient_light3 = ambient_light1.clone();
+
+// ambient_light.updateMatrix();
+// ambient_light.updateMatrixWorld();
 // ambient_light.intensity = 2;
-scene.add(ambient_light);
+
+scene1.add(ambient_light1);
+scene2.add(ambient_light2);
+scene3.add(ambient_light3);
 
 // export const spot_lights = [];
 
@@ -91,21 +116,21 @@ scene.add(ambient_light);
 // 		spot_light.decay = 2;
 // 		spot_light.angle = Math.PI * 0.5;
 // 		spot_light.position.set(...spot_light_position);
-// 		scene.add(spot_light);
+// 		scene1.add(spot_light);
 // 		spot_light.target.position.set(...spot_light_position);
 // 		spot_light.target.position.y = 0;
-// 		scene.add(spot_light.target);
+// 		scene1.add(spot_light.target);
 
 // 		// spot_lights.push(spot_light);
 
 // 		// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
-// 		// scene.add(spot_light_helper);
+// 		// scene1.add(spot_light_helper);
 // 	});
 
 // const rect_light = new THREE.RectAreaLight(0xffffff, 1, 2, 2);
 // rect_light.position.set(0, 1.5, -2.99);
 // rect_light.lookAt(0, 1.5, 0);
-// scene.add(rect_light);
+// scene1.add(rect_light);
 
 // const rect_light_helper = new RectAreaLightHelper(rect_light);
 // rect_light.add(rect_light_helper);
@@ -114,9 +139,9 @@ export const plan_camera = new THREE.OrthographicCamera(...getOrthographicCamera
 plan_camera.zoom = cast.METERS_TO_PIXELS;
 plan_camera.updateProjectionMatrix();
 
-plan_camera.rotateX(-Math.PI * 0.5);
+plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
 plan_camera.translateZ(1);
-plan_camera.lookAt(scene.position);
+plan_camera.lookAt(scene1.position);
 
 export const orbit_camera = new THREE.PerspectiveCamera(...getPerspectiveCameraAttributes());
 orbit_camera.position.y = 12;
@@ -148,7 +173,7 @@ export const uploadModel = (evt) => {
 
 			const meshes = [];
 
-			gltf.scene.traverse((elm) => {
+			gltf.scene1.traverse((elm) => {
 
 				if (elm.isMesh) {
 
@@ -158,9 +183,9 @@ export const uploadModel = (evt) => {
 				}
 			});
 
-			draggable_gltf_scenes.push(gltf.scene);
+			draggable_gltf_scenes.push(gltf.scene1);
 
-			gltf.scene.traverse((elm) => {
+			gltf.scene1.traverse((elm) => {
 
 				if (elm.isMesh) {
 
@@ -169,89 +194,114 @@ export const uploadModel = (evt) => {
 				}
 			});
 
-			scene.add(...draggable_gltf_scenes);
+			scene3.add(...draggable_gltf_scenes);
 		},
 	);
 };
 
-// const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
 
-// transform_controls.addEventListener('change', () => {
 
-// 	if (transform_controls_attached_mesh) {
+const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
 
-// 		if (transform_controls_attached_mesh._meshes) {
+transform_controls.addEventListener('change', () => {
 
-// 			transform_controls_attached_mesh._meshes.forEach((elm) => {
+	if (transform_controls_attached_mesh) {
 
-// 				elm.position.copy(transform_controls_attached_mesh.position);
-// 				elm.rotation.copy(transform_controls_attached_mesh.rotation);
-// 			});
-// 		}
-// 	}
-// });
+		if (transform_controls_attached_mesh._meshes) {
 
-// transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
+			transform_controls_attached_mesh._meshes.forEach((elm) => {
 
-// scene.add(transform_controls);
+				elm.position.copy(transform_controls_attached_mesh.position);
+				elm.rotation.copy(transform_controls_attached_mesh.rotation);
+			});
+		}
+	}
+});
 
-// canvas.addEventListener('mousemove', (evt) => {
+transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
 
-// 	if (modes.orbit_mode) {
+scene2.add(transform_controls);
 
-// 		mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
-// 		mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
 
-// 		raycaster.setFromCamera(mouse, orbit_camera);
 
-// 		const _intersects = raycaster.intersectObjects(raycastable_meshes);
-// 		// intersects.length = 0;
-// 		// intersects.push(..._intersects);
+canvas.addEventListener('mousemove', (evt) => {
 
-// 		// console.log(raycastable_meshes, _intersects.length);
+	if (modes.orbit_mode) {
 
-// 		if (_intersects.length) {
+		mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
+		mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
 
-// 			if (raycasted_mesh) {
+		raycaster.setFromCamera(mouse, orbit_camera);
 
-// 				if (raycasted_mesh._meshes) {
+		const _intersects = raycaster.intersectObjects(raycastable_meshes);
+		// intersects.length = 0;
+		// intersects.push(..._intersects);
 
-// 					raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x000000));
-// 				}
-// 				else {
+		// console.log(raycastable_meshes, _intersects.length);
 
-// 					raycasted_mesh.material.emissive.set(0x000000);
-// 				}
-// 			}
+		if (_intersects.length) {
 
-// 			raycasted_mesh = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
+			if (raycasted_mesh) {
 
-// 			// console.log(raycasted_mesh);
+				if (raycasted_mesh._meshes) {
 
-// 			if (raycasted_mesh._meshes) {
+					// raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
 
-// 				raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x00FF00));
-// 			}
-// 			else {
+					// raycasted_mesh._meshes.forEach((elm) => {
 
-// 				raycasted_mesh.material.emissive.set(0x00FF00);
-// 			}
-// 		}
-// 		else if (raycasted_mesh) {
+					// 	elm.material = elm.userData.parent.material;
+					// });
+				}
+				else {
 
-// 			if (raycasted_mesh._meshes) {
+					// raycasted_mesh.material.color.set(0xFFFFFF);
 
-// 				raycasted_mesh._meshes.forEach((elm) => elm.material.emissive.set(0x000000));
-// 			}
-// 			else {
+					// raycasted_mesh.material = raycasted_mesh.userData.parent.material;
+				}
+			}
 
-// 				raycasted_mesh.material.emissive.set(0x000000);
-// 			}
+			raycasted_mesh = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
 
-// 			raycasted_mesh = null;
-// 		}
-// 	}
-// });
+			// console.log(raycasted_mesh);
+
+			if (raycasted_mesh._meshes) {
+
+				// raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xADD8E6));
+
+				// raycasted_mesh._meshes.forEach((elm) => {
+
+				// 	elm.material = elm.userData.parent.material2;
+				// });
+			}
+			else {
+
+				// raycasted_mesh.material.color.set(0xADD8E6);
+
+				// raycasted_mesh.material = raycasted_mesh.userData.parent.material2;
+			}
+		}
+		else if (raycasted_mesh) {
+
+			if (raycasted_mesh._meshes) {
+
+				// raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
+
+				// raycasted_mesh._meshes.forEach((elm) => {
+
+				// 	elm.material = elm.userData.parent.material;
+				// });
+			}
+			else {
+
+				// raycasted_mesh.material.color.set(0xFFFFFF);
+
+				// raycasted_mesh.material = raycasted_mesh.userData.parent.material;
+			}
+
+			raycasted_mesh = null;
+		}
+	}
+});
 
 canvas.addEventListener('dblclick', (evt) => {
 
@@ -264,7 +314,9 @@ canvas.addEventListener('dblclick', (evt) => {
 
 		const _intersects = raycaster.intersectObjects(raycastable_meshes);
 
-		console.log(raycastable_meshes, _intersects);
+		LOG(_intersects)
+
+		// console.log(raycastable_meshes, _intersects);
 
 		if (_intersects.length) {
 
@@ -275,7 +327,53 @@ canvas.addEventListener('dblclick', (evt) => {
 			tileable_mesh._ = null;
 		}
 
-		console.log(tileable_mesh);
+		// tileable_mesh._.material = tileable_mesh._.userData.parent.material2;
+
+		// scene1.children.forEach((child) => {
+
+		// 	child.visible = Boolean(child === tileable_mesh._ || child instanceof THREE.AmbientLight);
+		// });
+
+		// tileable_mesh._.quaternion.set(0, 0, 0, 1);
+		// tileable_mesh._.position.set(0, 0, 0);
+		// tileable_mesh._.updateMatrix();
+
+		// // ambient_light.intensity = 2;
+
+		// mode_selection_BUTTON.innerHTML = 'Selection mode';
+
+		// // mode_toggle_BUTTON.classList.remove('-pressed');
+
+		// // coverings_plan_NODE.classList.remove('-hidden');
+
+		// selection_NODE.classList.remove('-hidden');
+
+		// // wall
+		// if (tileable_mesh._.userData.parent.points) {
+
+		// 	LOG('wall')
+
+		// 	plan_camera.rotation.set(0, Math.PI, 0);
+		// }
+		// // floor
+		// else {
+
+		// 	LOG('floor')
+
+		// 	plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
+		// }
+
+		// plan_camera.position.set(0, 0, 0);
+		// plan_camera.translateZ(1);
+		// // plan_camera.lookAt(scene1.position);
+
+		// modes.orbit_mode = 0;
+
+		// // LOG(plan_camera)
+
+		// plan_camera.updateMatrix();
+
+		// console.log(tileable_mesh);
 
 		// if (raycasted_mesh) {
 
@@ -306,3 +404,6 @@ canvas.addEventListener('dblclick', (evt) => {
 		// }
 	}
 });
+
+// var gl = renderer.context;
+// gl.disable(gl.DEPTH_TEST);

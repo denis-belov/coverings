@@ -7,7 +7,7 @@ import Wall from './wall';
 
 import {
 
-	scene,
+	scene1,
 	orbit_controls,
 	raycastable_meshes,
 } from './three';
@@ -154,10 +154,10 @@ export default class Room {
 
 		if (this.floor) {
 
-			scene.remove(this.floor.mesh);
+			scene1.remove(this.floor.mesh);
 		}
 
-		this.walls.forEach((wall) => scene.remove(wall.mesh));
+		this.walls.forEach((wall) => scene1.remove(wall.mesh));
 
 		this.points.forEach((point) => {
 

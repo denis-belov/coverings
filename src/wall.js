@@ -141,25 +141,33 @@ export default class Wall extends Tileable {
 		const plane_geometry =
 			new THREE.PlaneBufferGeometry(
 
+				// width
 				point.distanceTo(next_point) * cast.PIXELS_TO_METERS,
+
+				// height
 				this.room.height,
 			);
 
 		const vv1 = new THREE.Vector3(1, 0, 0);
-		const vv2 = new THREE.Vector3(next_point.scene_x, 0, next_point.scene_z)
-			.sub(new THREE.Vector3(point.scene_x, 0, point.scene_z)).normalize();
 
-		const quat = new THREE.Quaternion().setFromUnitVectors(vv1, vv2);
+		const vv2 =
+			new THREE.Vector3(next_point.scene_x, 0, next_point.scene_z)
+				.sub(new THREE.Vector3(point.scene_x, 0, point.scene_z))
+				.normalize();
+
+		this.quat.setFromUnitVectors(vv1, vv2);
 
 		const position = point.centerWith2(next_point);
 
-		plane_geometry.applyMatrix4(
+		this.position.set(position[0], this.room.height / 2, position[1]);
 
-			new THREE.Matrix4().compose(
+		// plane_geometry.applyMatrix4(
 
-				new THREE.Vector3(position[0], this.room.height / 2, position[1]), quat, new THREE.Vector3(1, 1, 1),
-			),
-		);
+		// 	new THREE.Matrix4().compose(
+
+		// 		new THREE.Vector3(position[0], this.room.height / 2, position[1]), quat, new THREE.Vector3(1, 1, 1),
+		// 	),
+		// );
 
 		if (this.mesh.geometry.index.array.length === 0) {
 
@@ -191,6 +199,10 @@ export default class Wall extends Tileable {
 
 			'uv2', new THREE.BufferAttribute(plane_geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
 		);
+
+		this.mesh.quaternion.copy(this.quat);
+		this.mesh.position.copy(this.position);
+		this.mesh.updateMatrix();
 
 		this.mesh.geometry.computeBoundingSphere();
 	}
