@@ -228,79 +228,108 @@ canvas.addEventListener('mousemove', (evt) => {
 
 	if (modes.orbit_mode) {
 
+		raycasted_mesh &&
+
+			raycasted_mesh.material.color.set(0xFFFFFF);
+
 		mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
 		mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
 
 		raycaster.setFromCamera(mouse, orbit_camera);
 
-		const _intersects = raycaster.intersectObjects(raycastable_meshes);
-		// intersects.length = 0;
-		// intersects.push(..._intersects);
+		let _intersects = raycaster.intersectObjects(scene2.children);
 
-		// console.log(raycastable_meshes, _intersects.length);
+		// LOG(_intersects);
 
 		if (_intersects.length) {
 
-			if (raycasted_mesh) {
+			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
 
-				if (raycasted_mesh._meshes) {
+			raycasted_mesh = nearest.object;
 
-					// raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
+			raycasted_mesh.material.color.set(0xADD8E6);
 
-					// raycasted_mesh._meshes.forEach((elm) => {
-
-					// 	elm.material = elm.userData.parent.material;
-					// });
-				}
-				else {
-
-					// raycasted_mesh.material.color.set(0xFFFFFF);
-
-					// raycasted_mesh.material = raycasted_mesh.userData.parent.material;
-				}
-			}
-
-			raycasted_mesh = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
-
-			// console.log(raycasted_mesh);
-
-			if (raycasted_mesh._meshes) {
-
-				// raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xADD8E6));
-
-				// raycasted_mesh._meshes.forEach((elm) => {
-
-				// 	elm.material = elm.userData.parent.material2;
-				// });
-			}
-			else {
-
-				// raycasted_mesh.material.color.set(0xADD8E6);
-
-				// raycasted_mesh.material = raycasted_mesh.userData.parent.material2;
-			}
+			// LOG(nearest.object.userData.parent.z_index)
 		}
-		else if (raycasted_mesh) {
+		else {
 
-			if (raycasted_mesh._meshes) {
+			// _intersects = raycaster.intersectObjects(scene.children);
 
-				// raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
+			// if (_intersects.length) {
 
-				// raycasted_mesh._meshes.forEach((elm) => {
+			// 	raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
+			// }
+			// else {
 
-				// 	elm.material = elm.userData.parent.material;
-				// });
-			}
-			else {
-
-				// raycasted_mesh.material.color.set(0xFFFFFF);
-
-				// raycasted_mesh.material = raycasted_mesh.userData.parent.material;
-			}
-
-			raycasted_mesh = null;
+			// 	raycasted_mesh.material.color.set(0xFFFFFF);
+			// }
 		}
 	}
+
+	// 	const _intersects = raycaster.intersectObjects(raycastable_meshes);
+	// 	// intersects.length = 0;
+	// 	// intersects.push(..._intersects);
+
+	// 	if (_intersects.length) {
+
+	// 		if (raycasted_mesh) {
+
+	// 			if (raycasted_mesh._meshes) {
+
+	// 				raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
+
+	// 				// raycasted_mesh._meshes.forEach((elm) => {
+
+	// 				// 	elm.material = elm.userData.parent.material;
+	// 				// });
+	// 			}
+	// 			else {
+
+	// 				raycasted_mesh.material.color.set(0xFFFFFF);
+
+	// 				// raycasted_mesh.material = raycasted_mesh.userData.parent.material;
+	// 			}
+	// 		}
+
+	// 		raycasted_mesh = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
+
+	// 		if (raycasted_mesh._meshes) {
+
+	// 			raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xADD8E6));
+
+	// 			// raycasted_mesh._meshes.forEach((elm) => {
+
+	// 			// 	elm.material = elm.userData.parent.material2;
+	// 			// });
+	// 		}
+	// 		else {
+
+	// 			raycasted_mesh.material.color.set(0xADD8E6);
+
+	// 			// raycasted_mesh.material = raycasted_mesh.userData.parent.material2;
+	// 		}
+	// 	}
+	// 	else if (raycasted_mesh) {
+
+	// 		if (raycasted_mesh._meshes) {
+
+	// 			raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
+
+	// 			// raycasted_mesh._meshes.forEach((elm) => {
+
+	// 			// 	elm.material = elm.userData.parent.material;
+	// 			// });
+	// 		}
+	// 		else {
+
+	// 			raycasted_mesh.material.color.set(0xFFFFFF);
+
+	// 			// raycasted_mesh.material = raycasted_mesh.userData.parent.material;
+	// 		}
+
+	// 		raycasted_mesh = null;
+	// 	}
+	// }
 });
 
 canvas.addEventListener('dblclick', (evt) => {
@@ -315,8 +344,6 @@ canvas.addEventListener('dblclick', (evt) => {
 		const _intersects = raycaster.intersectObjects(raycastable_meshes);
 
 		LOG(_intersects)
-
-		// console.log(raycastable_meshes, _intersects);
 
 		if (_intersects.length) {
 

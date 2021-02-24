@@ -1,3 +1,11 @@
+/*
+eslint-disable
+
+max-statements,
+*/
+
+
+
 import * as THREE from 'three';
 
 import modes from './modes';
@@ -23,13 +31,9 @@ import {
 	uploadModel,
 	plan_camera,
 	scene1,
-	scene2,
+	// scene2,
 	tileable_mesh,
 } from './three';
-
-
-
-// LOG(polybooljs)
 
 
 
@@ -66,9 +70,6 @@ add_wall_mode_BUTTON.addEventListener('click', () => {
 	}
 });
 
-// LOG(mode_selection_BUTTON)
-
-
 
 
 const selection_area_div = document.createElement('div');
@@ -80,6 +81,8 @@ let y = 0;
 
 let width = 0;
 let height = 0;
+let left = 0;
+let top = 0;
 
 const selection_area_div_coords = [];
 
@@ -87,8 +90,8 @@ const mousemove_selection_area_function = (evt) => {
 
 	selection_area_div_coords.length = 0;
 
-	const left = evt.clientX < x ? evt.clientX : x;
-	const top = evt.clientY < y ? evt.clientY : y;
+	left = evt.clientX < x ? evt.clientX : x;
+	top = evt.clientY < y ? evt.clientY : y;
 	width = Math.abs(evt.clientX - x);
 	height = Math.abs(evt.clientY - y);
 
@@ -124,8 +127,6 @@ const mousemove_selection_area_function = (evt) => {
 		left,
 		top + height,
 	);
-
-	// LOG(selection_area_div_coords)
 
 	selection_area_div.setAttribute(
 
@@ -226,9 +227,12 @@ mode_selection_BUTTON.addEventListener('click', () => {
 
 					tileable_mesh._.userData.parent.room,
 					'BackSide',
+					2,
 					tileable_mesh._.userData.parent,
 					width * cast.PIXELS_TO_METERS,
 					height * cast.PIXELS_TO_METERS,
+					(left + (width * 0.5) - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS,
+					(top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS,
 				);
 
 			test.setTile(tileable_mesh._.userData.parent.tile);

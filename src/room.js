@@ -115,7 +115,7 @@ export default class Room {
 
 		this.destroyContour();
 
-		this.floor = new Floor(this, 'FrontSide');
+		this.floor = new Floor(this, 'FrontSide', 1);
 
 		this.height = height;
 
@@ -129,7 +129,7 @@ export default class Room {
 
 		this.points.forEach((point, index) => {
 
-			const wall = new Wall(this, 'BackSide', points[index], points[index + 1] || points[0]);
+			const wall = new Wall(this, 'BackSide', 1, points[index], points[index + 1] || points[0]);
 
 			this.walls.push(wall);
 

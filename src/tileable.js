@@ -28,6 +28,9 @@ export default class Tileable {
 		this.quat = new THREE.Quaternion();
 		this.position = new THREE.Vector3();
 
+		// rename to children ?
+		this.z_index = 0;
+
 		const geometry = new THREE.BufferGeometry();
 		geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(), ATTRIBUTE_SIZE_1));
 		geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(), ATTRIBUTE_SIZE_3));
@@ -92,7 +95,7 @@ export default class Tileable {
 
 		raycastable_meshes.push(this.mesh);
 
-		scene1.add(this.mesh);
+		(scene === 1 ? scene1 : scene2).add(this.mesh);
 	}
 
 	copy (tileable) {

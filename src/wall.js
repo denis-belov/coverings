@@ -40,9 +40,9 @@ export default class Wall extends Tileable {
 
 
 
-	constructor (room, side, point1, point2) {
+	constructor (room, side, scene, point1, point2) {
 
-		super(room, side);
+		super(room, side, scene);
 
 		// rename to related_points
 		this.points = [ point1, point2 ];

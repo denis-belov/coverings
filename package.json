@@ -35,7 +35,8 @@
     "earcut": "^2.2.2",
     "three": "^0.125.2",
     "external-data-loader": "0.0.26",
-    "file-saver": "^2.0.5"
+    "file-saver": "^2.0.5",
+    "polybooljs": "1.2.0"
   },
   "scripts": {
     "start": "webpack-dev-server --env=development ",

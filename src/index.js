@@ -197,12 +197,17 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 			spot_light.angle = Math.PI * 0.5;
 			spot_light.position.set(...spot_light_position);
 			scene1.add(spot_light);
-			const spot_light_clone = spot_light.clone()
-			scene2.add(spot_light_clone);
+
 			spot_light.target.position.set(...spot_light_position);
 			spot_light.target.position.y = 0;
 			scene1.add(spot_light.target);
-			scene2.add(spot_light_clone.target);
+
+			const spot_light2 = spot_light.clone();
+			scene2.add(spot_light2);
+
+			spot_light2.target.position.set(...spot_light_position);
+			spot_light2.target.position.y = 0;
+			scene2.add(spot_light2.target);
 
 			// spot_lights.push(spot_light);
 
