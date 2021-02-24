@@ -15,6 +15,7 @@ import {
 	// coverings_plan_NODE,
 	// mode_selection_BUTTON,
 	// selection_NODE,
+	mode_selection_BUTTON,
 	canvas,
 } from './dom';
 
@@ -201,26 +202,26 @@ export const uploadModel = (evt) => {
 
 
 
-const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
+// const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
 
-transform_controls.addEventListener('change', () => {
+// transform_controls.addEventListener('change', () => {
 
-	if (transform_controls_attached_mesh) {
+// 	if (transform_controls_attached_mesh) {
 
-		if (transform_controls_attached_mesh._meshes) {
+// 		if (transform_controls_attached_mesh._meshes) {
 
-			transform_controls_attached_mesh._meshes.forEach((elm) => {
+// 			transform_controls_attached_mesh._meshes.forEach((elm) => {
 
-				elm.position.copy(transform_controls_attached_mesh.position);
-				elm.rotation.copy(transform_controls_attached_mesh.rotation);
-			});
-		}
-	}
-});
+// 				elm.position.copy(transform_controls_attached_mesh.position);
+// 				elm.rotation.copy(transform_controls_attached_mesh.rotation);
+// 			});
+// 		}
+// 	}
+// });
 
-transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
+// transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
 
-scene2.add(transform_controls);
+// scene2.add(transform_controls);
 
 
 
@@ -232,14 +233,14 @@ canvas.addEventListener('mousemove', (evt) => {
 
 			raycasted_mesh.material.color.set(0xFFFFFF);
 
+		raycasted_mesh = null;
+
 		mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
 		mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
 
 		raycaster.setFromCamera(mouse, orbit_camera);
 
 		let _intersects = raycaster.intersectObjects(scene2.children);
-
-		// LOG(_intersects);
 
 		if (_intersects.length) {
 
@@ -248,21 +249,19 @@ canvas.addEventListener('mousemove', (evt) => {
 			raycasted_mesh = nearest.object;
 
 			raycasted_mesh.material.color.set(0xADD8E6);
-
-			// LOG(nearest.object.userData.parent.z_index)
 		}
 		else {
 
-			// _intersects = raycaster.intersectObjects(scene.children);
+			_intersects = raycaster.intersectObjects(scene1.children);
 
-			// if (_intersects.length) {
+			if (_intersects.length) {
 
-			// 	raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
-			// }
-			// else {
+				const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
 
-			// 	raycasted_mesh.material.color.set(0xFFFFFF);
-			// }
+				raycasted_mesh = nearest.object;
+
+				raycasted_mesh.material.color.set(0xADD8E6);
+			}
 		}
 	}
 
@@ -336,23 +335,46 @@ canvas.addEventListener('dblclick', (evt) => {
 
 	if (modes.orbit_mode) {
 
-		mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
-		mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
+		LOG(raycasted_mesh);
 
-		raycaster.setFromCamera(mouse, orbit_camera);
+		if (raycasted_mesh) {
 
-		const _intersects = raycaster.intersectObjects(raycastable_meshes);
+			tileable_mesh._ = raycasted_mesh;
 
-		LOG(_intersects)
+			// or parent.floor
+			if (tileable_mesh._.userData.parent.wall) {
 
-		if (_intersects.length) {
+				mode_selection_BUTTON.style.display = 'none';
+			}
+			else {
 
-			tileable_mesh._ = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
+				mode_selection_BUTTON.style.display = 'inline-block';
+			}
 		}
 		else {
 
 			tileable_mesh._ = null;
+
+			mode_selection_BUTTON.style.display = 'none';
 		}
+
+		// mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
+		// mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
+
+		// raycaster.setFromCamera(mouse, orbit_camera);
+
+		// const _intersects = raycaster.intersectObjects(raycastable_meshes);
+
+		// // LOG(_intersects)
+
+		// if (_intersects.length) {
+
+		// 	tileable_mesh._ = _intersects.sort((a, b) => (a.distance - b.distance))[0].object;
+		// }
+		// else {
+
+		// 	tileable_mesh._ = null;
+		// }
 
 		// tileable_mesh._.material = tileable_mesh._.userData.parent.material2;
 

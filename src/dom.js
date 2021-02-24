@@ -10,6 +10,7 @@ export const [
 	add_wall_mode_BUTTON,
 	mode_toggle_BUTTON,
 	mode_selection_BUTTON,
+	apply_segment_BUTTON,
 ] = document.getElementsByClassName('coverings-actions')[0].children;
 
 export const [ canvas ] = document.getElementsByTagName('canvas');

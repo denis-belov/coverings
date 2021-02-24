@@ -344,7 +344,7 @@ const animate = () => {
 
 		gl.enable(gl.DEPTH_TEST);
 
-		renderer.render(scene3, orbit_camera);
+		// renderer.render(scene3, orbit_camera);
 
 		// scene1.children.forEach((child) => {
 
@@ -353,7 +353,12 @@ const animate = () => {
 	}
 	else {
 
+		gl.disable(gl.DEPTH_TEST);
+
 		renderer.render(scene1, plan_camera);
+		renderer.render(scene2, plan_camera);
+
+		gl.enable(gl.DEPTH_TEST);
 	}
 };
 

@@ -22,6 +22,7 @@ import {
 	add_wall_mode_BUTTON,
 	// mode_toggle_BUTTON,
 	mode_selection_BUTTON,
+	apply_segment_BUTTON,
 	upload_model_INPUT,
 	selection_NODE,
 } from './dom';
@@ -31,7 +32,7 @@ import {
 	uploadModel,
 	plan_camera,
 	scene1,
-	// scene2,
+	scene2,
 	tileable_mesh,
 } from './three';
 
@@ -142,9 +143,16 @@ const mouseup_selection_area_function = () => {
 	window.removeEventListener('mousemove', mousemove_selection_area_function);
 	window.removeEventListener('mouseup', mouseup_selection_area_function);
 
-	document.body.contains(selection_area_div) &&
+	LOG(width, height)
 
-		document.body.removeChild(selection_area_div);
+	if (width > 0 && height > 0) {
+
+		apply_segment_BUTTON.style.display = 'inline-block';
+	}
+	else {
+
+		apply_segment_BUTTON.style.display = 'none';
+	}
 };
 
 window.addEventListener('mousedown', (evt) => {
@@ -152,6 +160,9 @@ window.addEventListener('mousedown', (evt) => {
 	if (modes.selection_mode) {
 
 		evt.stopPropagation();
+
+		// width = 0;
+		// height = 0;
 
 		x = evt.clientX;
 		y = evt.clientY;
@@ -179,96 +190,160 @@ window.addEventListener('mousedown', (evt) => {
 
 mode_selection_BUTTON.addEventListener('click', () => {
 
-	modes.selection_mode = 1 - modes.selection_mode;
+	// or parent.floor
+	if (tileable_mesh?._?.userData?.parent?.points && !tileable_mesh._.userData.parent.wall) {
 
-	if (modes.selection_mode) {
+		const whole = tileable_mesh._.userData.parent;
 
-		mode_selection_BUTTON.classList.add('-pressed');
+		modes.selection_mode = 1 - modes.selection_mode;
 
-		tileable_mesh._.material = tileable_mesh._.userData.parent.material2;
+		if (modes.selection_mode) {
 
-		scene1.children.forEach((child) => {
+			mode_selection_BUTTON.classList.add('-pressed');
 
-			child.visible = Boolean(child === tileable_mesh._ || child instanceof THREE.AmbientLight);
-		});
+			// whole.mesh.material = whole.material2;
 
-		mode_selection_BUTTON.innerHTML = 'Selection mode';
+			scene1.children.forEach((mesh) => {
 
-		selection_NODE.classList.remove('-hidden');
+				mesh.visible =
+					Boolean(
 
-		// wall
-		if (tileable_mesh._.userData.parent.points) {
+						mesh === whole.mesh ||
+						mesh instanceof THREE.AmbientLight ||
+						mesh instanceof THREE.SpotLight,
+					);
+			});
 
-			tileable_mesh._.quaternion.set(0, 0, 0, 1);
-			tileable_mesh._.position.set(0, 0, 0);
-			tileable_mesh._.updateMatrix();
+			scene2.children.forEach((mesh) => {
 
-			plan_camera.rotation.set(0, Math.PI, 0);
-			plan_camera.position.set(0, 0, 0);
-			plan_camera.translateZ(1);
+				mesh.visible =
+					Boolean(
+
+						whole.segments.includes(mesh.userData.parent) ||
+						mesh instanceof THREE.AmbientLight ||
+						mesh instanceof THREE.SpotLight,
+					);
+			});
+
+			mode_selection_BUTTON.innerHTML = 'Selection mode';
+
+			selection_NODE.classList.remove('-hidden');
+
+			// wall
+			if (whole.points) {
+
+				tileable_mesh._.quaternion.set(0, 0, 0, 1);
+				tileable_mesh._.position.set(0, 0, 0);
+				tileable_mesh._.updateMatrix();
+
+				whole.segments.forEach((segment) => {
+
+					segment.mesh.quaternion.set(0, 0, 0, 1);
+					segment.mesh.position.set(0, 0, 0);
+					segment.mesh.updateMatrix();
+				});
+
+				plan_camera.rotation.set(0, Math.PI, 0);
+				plan_camera.position.set(0, 0, 0);
+				plan_camera.translateZ(1);
+			}
+			// // floor
+			// else {
+
+			// 	plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
+			// }
+
+			// plan_camera.position.set(0, 0, 0);
+			// plan_camera.translateZ(1);
+
+			modes.orbit_mode = 0;
 		}
-		// // floor
-		// else {
+		else {
 
-		// 	plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
-		// }
+			// LOG(888);
 
-		// plan_camera.position.set(0, 0, 0);
-		// plan_camera.translateZ(1);
+			mode_selection_BUTTON.classList.remove('-pressed');
 
-		modes.orbit_mode = 0;
+			apply_segment_BUTTON.style.display = 'none';
+
+			// whole.mesh.material = whole.material;
+
+			scene1.children.forEach((mesh) => {
+
+				mesh.visible = true;
+			});
+
+			scene2.children.forEach((mesh) => {
+
+				mesh.visible = true;
+			});
+
+			mode_selection_BUTTON.innerHTML = 'Tile mode';
+
+			selection_NODE.classList.add('-hidden');
+
+			// wall
+			if (whole.points) {
+
+				tileable_mesh._.quaternion.copy(whole.quat);
+				tileable_mesh._.position.copy(whole.position);
+				tileable_mesh._.updateMatrix();
+
+				whole.segments.forEach((segment) => {
+
+					LOG(segment)
+
+					segment.mesh.quaternion.copy(whole.quat);
+					segment.mesh.position.copy(whole.position);
+					segment.mesh.updateMatrix();
+
+					// segment.mesh.geometry.computeBoundingSphere();
+				});
+
+				plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
+				plan_camera.position.set(0, 0, 0);
+				plan_camera.translateZ(1);
+			}
+
+			document.body.contains(selection_area_div) &&
+
+				document.body.removeChild(selection_area_div);
+
+			modes.orbit_mode = 1;
+		}
 	}
-	else {
+});
 
-		if (tileable_mesh?._?.userData?.parent?.points) {
+apply_segment_BUTTON.addEventListener('click', () => {
 
-			const test =
-				new Segment(
+	// or parent.floor
+	if (tileable_mesh?._?.userData?.parent?.points && !tileable_mesh._.userData.parent.wall) {
 
-					tileable_mesh._.userData.parent.room,
-					'BackSide',
-					2,
-					tileable_mesh._.userData.parent,
-					width * cast.PIXELS_TO_METERS,
-					height * cast.PIXELS_TO_METERS,
-					(left + (width * 0.5) - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS,
-					(top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS,
-				);
+		const whole = tileable_mesh._.userData.parent;
 
-			test.setTile(tileable_mesh._.userData.parent.tile);
+		const segment =
+			new Segment(
 
-			test.updateGeometry();
-		}
+				whole.room,
+				'BackSide',
+				2,
+				whole,
+				width * cast.PIXELS_TO_METERS,
+				height * cast.PIXELS_TO_METERS,
+				(left + (width * 0.5) - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS,
+				(top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS,
+			);
 
+		whole.segments.push(segment);
 
+		segment.setTile(whole.tile);
 
-		mode_selection_BUTTON.classList.remove('-pressed');
+		segment.updateGeometry();
 
-		tileable_mesh._.material = tileable_mesh._.userData.parent.material;
-
-		scene1.children.forEach((child) => {
-
-			child.visible = true;
-		});
-
-		mode_selection_BUTTON.innerHTML = 'Tile mode';
-
-		selection_NODE.classList.add('-hidden');
-
-		// wall
-		if (tileable_mesh._.userData.parent.points) {
-
-			tileable_mesh._.quaternion.copy(tileable_mesh._.userData.parent.quat);
-			tileable_mesh._.position.copy(tileable_mesh._.userData.parent.position);
-			tileable_mesh._.updateMatrix();
-
-			plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
-			plan_camera.position.set(0, 0, 0);
-			plan_camera.translateZ(1);
-		}
-
-		modes.orbit_mode = 1;
+		LOG(123)
 	}
+
+	apply_segment_BUTTON.style.display = 'none';
 });
 
 // mode_toggle_BUTTON.addEventListener('click', () => {

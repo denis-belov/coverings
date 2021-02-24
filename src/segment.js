@@ -118,7 +118,9 @@ export default class Segment extends Tileable {
 
 		const intersection_polygons = polybooljs.intersect(segment_polygons, wall_polygons);
 
-		intersection_polygons.regions[0].forEach((elm) => scene_coordinates.push(...elm));
+		intersection_polygons?.regions?.[0] &&
+
+			intersection_polygons.regions[0].forEach((elm) => scene_coordinates.push(...elm));
 
 
 
@@ -159,10 +161,10 @@ export default class Segment extends Tileable {
 			'uv2', new THREE.BufferAttribute(this.mesh.geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
 		);
 
-		this.mesh.quaternion.copy(this.wall.quat);
-		this.mesh.position.copy(this.wall.position);
-		this.mesh.updateMatrix();
+		// this.mesh.quaternion.copy(this.wall.quat);
+		// this.mesh.position.copy(this.wall.position);
+		// this.mesh.updateMatrix();
 
-		this.mesh.geometry.computeBoundingSphere();
+		// this.mesh.geometry.computeBoundingSphere();
 	}
 }

@@ -47,6 +47,8 @@ export default class Wall extends Tileable {
 		// rename to related_points
 		this.points = [ point1, point2 ];
 
+		this.segments = [];
+
 		this.pixel_length = point1.distanceTo(point2);
 
 		this.points[0].walls.push(this);
