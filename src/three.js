@@ -174,7 +174,7 @@ export const uploadModel = (evt) => {
 
 			const meshes = [];
 
-			gltf.scene1.traverse((elm) => {
+			gltf.scene.traverse((elm) => {
 
 				if (elm.isMesh) {
 
@@ -184,9 +184,9 @@ export const uploadModel = (evt) => {
 				}
 			});
 
-			draggable_gltf_scenes.push(gltf.scene1);
+			draggable_gltf_scenes.push(gltf.scene);
 
-			gltf.scene1.traverse((elm) => {
+			gltf.scene.traverse((elm) => {
 
 				if (elm.isMesh) {
 
@@ -202,26 +202,26 @@ export const uploadModel = (evt) => {
 
 
 
-// const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
+const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
 
-// transform_controls.addEventListener('change', () => {
+transform_controls.addEventListener('change', () => {
 
-// 	if (transform_controls_attached_mesh) {
+	if (transform_controls_attached_mesh) {
 
-// 		if (transform_controls_attached_mesh._meshes) {
+		if (transform_controls_attached_mesh._meshes) {
 
-// 			transform_controls_attached_mesh._meshes.forEach((elm) => {
+			transform_controls_attached_mesh._meshes.forEach((elm) => {
 
-// 				elm.position.copy(transform_controls_attached_mesh.position);
-// 				elm.rotation.copy(transform_controls_attached_mesh.rotation);
-// 			});
-// 		}
-// 	}
-// });
+				elm.position.copy(transform_controls_attached_mesh.position);
+				elm.rotation.copy(transform_controls_attached_mesh.rotation);
+			});
+		}
+	}
+});
 
-// transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
+transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
 
-// scene2.add(transform_controls);
+scene3.add(transform_controls);
 
 
 
@@ -240,27 +240,34 @@ canvas.addEventListener('mousemove', (evt) => {
 
 		raycaster.setFromCamera(mouse, orbit_camera);
 
-		let _intersects = raycaster.intersectObjects(scene2.children);
+		// LOG(draggable_meshes)
+
+		let _intersects = raycaster.intersectObjects([ ...scene2.children, ...scene1.children, ...draggable_meshes ]);
 
 		if (_intersects.length) {
 
-			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+			const [ nearest ] = _intersects.sort((a, b) => (a.distance - b.distance));
 
 			raycasted_mesh = nearest.object;
 
-			raycasted_mesh.material.color.set(0xADD8E6);
-		}
-		else {
+			if (raycasted_mesh._meshes) {
 
-			_intersects = raycaster.intersectObjects(scene1.children);
-
-			if (_intersects.length) {
-
-				const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-				raycasted_mesh = nearest.object;
+				raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xADD8E6));
+			}
+			else {
 
 				raycasted_mesh.material.color.set(0xADD8E6);
+			}
+		}
+		else if (raycasted_mesh) {
+
+			if (raycasted_mesh._meshes) {
+
+				raycasted_mesh._meshes.forEach((elm) => elm.material.color.set(0xFFFFFF));
+			}
+			else {
+
+				raycasted_mesh.material.color.set(0xFFFFFF);
 			}
 		}
 	}
@@ -335,20 +342,46 @@ canvas.addEventListener('dblclick', (evt) => {
 
 	if (modes.orbit_mode) {
 
-		LOG(raycasted_mesh);
+		// 	if (draggable_meshes.includes(raycasted_mesh)) {
+
+		// 		transform_controls_attached_mesh = raycasted_mesh;
+
+		// 		transform_controls.attach(transform_controls_attached_mesh);
+		// 	}
+		// 	else {
+
+		// 		// console.log(raycasted_mesh);
+
+		// 		transform_controls_attached_mesh = null;
+
+		// 		transform_controls.detach();
+
+		// 		tileable_mesh._ = raycasted_mesh;
+		// 	}
+
+		// LOG(raycasted_mesh);
 
 		if (raycasted_mesh) {
 
-			tileable_mesh._ = raycasted_mesh;
+			if (draggable_meshes.includes(raycasted_mesh)) {
 
-			// or parent.floor
-			if (tileable_mesh._.userData.parent.wall) {
+				transform_controls_attached_mesh = raycasted_mesh;
 
-				mode_selection_BUTTON.style.display = 'none';
+				transform_controls.attach(transform_controls_attached_mesh);
 			}
 			else {
 
-				mode_selection_BUTTON.style.display = 'inline-block';
+				tileable_mesh._ = raycasted_mesh;
+
+				// or parent.floor
+				if (tileable_mesh._.userData.parent.wall) {
+
+					mode_selection_BUTTON.style.display = 'none';
+				}
+				else {
+
+					mode_selection_BUTTON.style.display = 'inline-block';
+				}
 			}
 		}
 		else {
@@ -356,6 +389,12 @@ canvas.addEventListener('dblclick', (evt) => {
 			tileable_mesh._ = null;
 
 			mode_selection_BUTTON.style.display = 'none';
+
+			transform_controls_attached_mesh = null;
+
+			transform_controls.detach();
+
+			tileable_mesh._ = raycasted_mesh;
 		}
 
 		// mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;

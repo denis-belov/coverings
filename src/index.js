@@ -209,6 +209,13 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 			spot_light2.target.position.y = 0;
 			scene2.add(spot_light2.target);
 
+			const spot_light3 = spot_light.clone();
+			scene3.add(spot_light3);
+
+			spot_light3.target.position.set(...spot_light_position);
+			spot_light3.target.position.y = 0;
+			scene3.add(spot_light3.target);
+
 			// spot_lights.push(spot_light);
 
 			// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
@@ -344,7 +351,7 @@ const animate = () => {
 
 		gl.enable(gl.DEPTH_TEST);
 
-		// renderer.render(scene3, orbit_camera);
+		renderer.render(scene3, orbit_camera);
 
 		// scene1.children.forEach((child) => {
 
