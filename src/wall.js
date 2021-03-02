@@ -40,14 +40,14 @@ export default class Wall extends Tileable {
 
 
 
-	constructor (room, side, scene, point1, point2) {
+	constructor (room, scene, point1, point2) {
 
-		super(room, side, scene);
+		super(room, scene);
+
+		// this.type = 'wall';
 
 		// rename to related_points
 		this.points = [ point1, point2 ];
-
-		this.segments = [];
 
 		this.pixel_length = point1.distanceTo(point2);
 
@@ -157,7 +157,7 @@ export default class Wall extends Tileable {
 				.sub(new THREE.Vector3(point.scene_x, 0, point.scene_z))
 				.normalize();
 
-		this.quat.setFromUnitVectors(vv1, vv2);
+		this.quaternion.setFromUnitVectors(vv1, vv2);
 
 		const position = point.centerWith2(next_point);
 
@@ -167,7 +167,7 @@ export default class Wall extends Tileable {
 
 		// 	new THREE.Matrix4().compose(
 
-		// 		new THREE.Vector3(position[0], this.room.height / 2, position[1]), quat, new THREE.Vector3(1, 1, 1),
+		// 		new THREE.Vector3(position[0], this.room.height / 2, position[1]), quaternion, new THREE.Vector3(1, 1, 1),
 		// 	),
 		// );
 
@@ -202,7 +202,7 @@ export default class Wall extends Tileable {
 			'uv2', new THREE.BufferAttribute(plane_geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
 		);
 
-		this.mesh.quaternion.copy(this.quat);
+		this.mesh.quaternion.copy(this.quaternion);
 		this.mesh.position.copy(this.position);
 		this.mesh.updateMatrix();
 

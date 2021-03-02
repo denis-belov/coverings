@@ -7,7 +7,10 @@ import Wall from './wall';
 
 import {
 
-	scene1,
+	scene_floor,
+	scene_floor_segments,
+	scene_walls,
+	scene_wall_segments,
 	orbit_controls,
 	raycastable_meshes,
 } from './three';
@@ -115,7 +118,7 @@ export default class Room {
 
 		this.destroyContour();
 
-		this.floor = new Floor(this, 'FrontSide', 1);
+		this.floor = new Floor(this, 0);
 
 		this.height = height;
 
@@ -129,7 +132,7 @@ export default class Room {
 
 		this.points.forEach((point, index) => {
 
-			const wall = new Wall(this, 'BackSide', 1, points[index], points[index + 1] || points[0]);
+			const wall = new Wall(this, 2, points[index], points[index + 1] || points[0]);
 
 			this.walls.push(wall);
 
@@ -146,18 +149,25 @@ export default class Room {
 
 		this.floor.setTile(this.floor_tile_default);
 		this.floor.updateGeometry();
+
+		// this.walls.forEach((wall) => LOG(wall.mesh));
 	}
 
 	destroyContour () {
 
 		raycastable_meshes.length = 0;
 
-		if (this.floor) {
+		// if (this.floor) {
 
-			scene1.remove(this.floor.mesh);
-		}
+		// 	scene_floor.remove(this.floor.mesh);
+		// }
 
-		this.walls.forEach((wall) => scene1.remove(wall.mesh));
+		scene_floor.children.filter((_object) => _object.userData.parent).forEach((mesh) => scene_floor.remove(mesh));
+		scene_floor_segments.children.filter((_object) => _object.tileable).forEach((mesh) => scene_floor_segments.remove(mesh));
+		scene_walls.children.filter((_object) => _object.userData.parent).forEach((mesh) => scene_walls.remove(mesh));
+		scene_wall_segments.children.filter((_object) => _object.tileable).forEach((mesh) => scene_wall_segments.remove(mesh));
+
+		this.walls.forEach((wall) => scene_walls.remove(wall.mesh));
 
 		this.points.forEach((point) => {
 

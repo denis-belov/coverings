@@ -13,6 +13,18 @@ import {
 
 export default class Floor extends Tileable {
 
+	constructor (room, scene) {
+
+		super(room, scene);
+
+		// this.type = 'floor';
+
+		this.quaternion
+			.copy(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0)))
+			.multiply(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 1)))
+			.multiply(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, -1, 0)));
+	}
+
 	updateGeometry () {
 
 		const index_data_floor = [];
@@ -28,19 +40,19 @@ export default class Floor extends Tileable {
 			scene_coordinates.push(point.scene_x, point.scene_z);
 		});
 
-		index_data_floor.push(...earcut(scene_coordinates).reverse());
+		index_data_floor.push(...earcut(scene_coordinates));
 
 		index_data_floor.forEach((index) => {
 
 			if (!position_data_floor[index * ATTRIBUTE_SIZE_3]) {
 
-				position_data_floor[(index * ATTRIBUTE_SIZE_3) + 0] = this.room.points[index].scene_x;
-				position_data_floor[(index * ATTRIBUTE_SIZE_3) + 1] = 0;
-				position_data_floor[(index * ATTRIBUTE_SIZE_3) + 2] = this.room.points[index].scene_z;
+				position_data_floor[(index * ATTRIBUTE_SIZE_3) + 0] = -this.room.points[index].scene_x;
+				position_data_floor[(index * ATTRIBUTE_SIZE_3) + 1] = -this.room.points[index].scene_z;
+				position_data_floor[(index * ATTRIBUTE_SIZE_3) + 2] = 0;
 
 				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 0] = 0;
-				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 1] = 1;
-				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 2] = 0;
+				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 1] = 0;
+				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 2] = 1;
 
 				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 0] = this.room.points[index].scene_x / this.tile.sizes[0];
 				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 1] = this.room.points[index].scene_z / this.tile.sizes[1];
@@ -66,6 +78,10 @@ export default class Floor extends Tileable {
 
 			'uv2', new THREE.BufferAttribute(this.mesh.geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
 		);
+
+		this.mesh.quaternion.copy(this.quaternion);
+		this.mesh.position.copy(this.position);
+		this.mesh.updateMatrix();
 
 		this.mesh.geometry.computeBoundingSphere();
 	}

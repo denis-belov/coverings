@@ -4,10 +4,12 @@ import { transparent_IMG } from './dom';
 
 import {
 
-	scene1,
-	scene2,
+	scene_floor,
+	scene_floor_segments,
+	scene_walls,
+	scene_wall_segments,
 	WEBGL_MAXIMUM_ANISOTROPY,
-	raycastable_meshes,
+	// raycastable_meshes,
 	MATERIAL_WIREFRAME,
 	ATTRIBUTE_SIZE_1,
 	ATTRIBUTE_SIZE_2,
@@ -18,15 +20,15 @@ import {
 
 export default class Tileable {
 
-	constructor (room, side, scene) {
-
-		this.room = room;
+	constructor (room, scene) {
 
 		this.tile = null;
 
 		// for using with walls
-		this.quat = new THREE.Quaternion();
+		this.quaternion = new THREE.Quaternion();
 		this.position = new THREE.Vector3();
+
+		this.segments = [];
 
 		// rename to children ?
 		this.z_index = 0;
@@ -79,23 +81,78 @@ export default class Tileable {
 			aoMap: ao_map,
 			roughnessMap: roughness_map,
 			metalnessMap: metalness_map,
-			side: THREE[side],
+			side: THREE.DoubleSide,
 			wireframe: MATERIAL_WIREFRAME,
 		});
 
 		this.material2 = new THREE.MeshBasicMaterial({
 
 			map,
-			side: THREE[side],
+			side: THREE.BackSide,
 		});
+
+		// this.material3 = new THREE.MeshBasicMaterial({
+
+		// 	color: 'grey',
+		// 	side: THREE.BackSide,
+		// });
 
 		this.mesh = new THREE.Mesh(geometry, this.material);
 		this.mesh.matrixAutoUpdate = false;
+
+		// rename
 		this.mesh.userData.parent = this;
 
-		raycastable_meshes.push(this.mesh);
+		// tileable
+		if (room) {
 
-		(scene === 1 ? scene1 : scene2).add(this.mesh);
+			this.room = room;
+
+			// this.object3d = new THREE.Object3D();
+
+			// this.object3d.add(this.mesh);
+
+			// this.object3d.userData.parent = this;
+		}
+
+		// raycastable_meshes.push(this.mesh);
+
+		// (scene === 1 ? scene_floor : scene_floor_segments).add(this.mesh);
+
+		switch (scene) {
+
+		// floor
+		case 0:
+
+			scene_floor.add(this.mesh);
+
+			break;
+
+		// floor segment
+		case 1:
+
+			scene_floor_segments.add(this.mesh);
+
+			break;
+
+		// wall
+		case 2:
+
+			scene_walls.add(this.mesh);
+
+			break;
+
+		// wall segment
+		case 3:
+
+			scene_wall_segments.add(this.mesh);
+
+			break;
+
+		default:
+
+			break;
+		}
 	}
 
 	copy (tileable) {

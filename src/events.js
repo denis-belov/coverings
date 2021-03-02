@@ -31,8 +31,10 @@ import {
 
 	uploadModel,
 	plan_camera,
-	scene1,
-	scene2,
+	scene_floor,
+	scene_floor_segments,
+	scene_walls,
+	scene_wall_segments,
 	tileable_mesh,
 } from './three';
 
@@ -190,8 +192,7 @@ window.addEventListener('mousedown', (evt) => {
 
 mode_selection_BUTTON.addEventListener('click', () => {
 
-	// or parent.floor
-	if (tileable_mesh?._?.userData?.parent?.points && !tileable_mesh._.userData.parent.wall) {
+	if (!tileable_mesh._.userData.parent.tileable) {
 
 		const whole = tileable_mesh._.userData.parent;
 
@@ -201,109 +202,105 @@ mode_selection_BUTTON.addEventListener('click', () => {
 
 			mode_selection_BUTTON.classList.add('-pressed');
 
-			// whole.mesh.material = whole.material2;
-
-			scene1.children.forEach((mesh) => {
-
-				mesh.visible =
-					Boolean(
-
-						mesh === whole.mesh ||
-						mesh instanceof THREE.AmbientLight ||
-						mesh instanceof THREE.SpotLight,
-					);
-			});
-
-			scene2.children.forEach((mesh) => {
-
-				mesh.visible =
-					Boolean(
-
-						whole.segments.includes(mesh.userData.parent) ||
-						mesh instanceof THREE.AmbientLight ||
-						mesh instanceof THREE.SpotLight,
-					);
-			});
-
 			mode_selection_BUTTON.innerHTML = 'Selection mode';
 
 			selection_NODE.classList.remove('-hidden');
 
-			// wall
-			if (whole.points) {
+			scene_floor.children.forEach((mesh) => {
 
-				tileable_mesh._.quaternion.set(0, 0, 0, 1);
-				tileable_mesh._.position.set(0, 0, 0);
-				tileable_mesh._.updateMatrix();
+				mesh.visible = (mesh === whole.mesh);
+			});
 
-				whole.segments.forEach((segment) => {
+			scene_floor_segments.children.forEach((mesh) => {
 
-					segment.mesh.quaternion.set(0, 0, 0, 1);
-					segment.mesh.position.set(0, 0, 0);
-					segment.mesh.updateMatrix();
-				});
+				mesh.visible = whole.segments.includes(whole.mesh.userData.parent);
+			});
 
-				plan_camera.rotation.set(0, Math.PI, 0);
-				plan_camera.position.set(0, 0, 0);
-				plan_camera.translateZ(1);
-			}
-			// // floor
-			// else {
+			// LOG(scene_walls.children)
 
-			// 	plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
-			// }
+			scene_walls.children.forEach((mesh) => {
 
-			// plan_camera.position.set(0, 0, 0);
-			// plan_camera.translateZ(1);
+				// LOG(mesh === whole.mesh)
+
+				mesh.visible = (mesh === whole.mesh);
+			});
+
+			scene_wall_segments.children.forEach((mesh) => {
+
+				mesh.visible = whole.segments.includes(whole.mesh.userData.parent);
+			});
+
+			plan_camera.rotation.set(0, Math.PI, 0);
+			plan_camera.position.set(0, 0, 0);
+			plan_camera.translateZ(1);
+
+			whole.mesh.material = whole.material2;
+
+			whole.mesh.quaternion.set(0, 0, 0, 1);
+			whole.mesh.position.set(0, 0, 0);
+			whole.mesh.updateMatrix();
+
+			whole.segments.forEach((segment) => {
+
+				segment.mesh.material = segment.material2;
+
+				segment.mesh.quaternion.set(0, 0, 0, 1);
+				segment.mesh.position.set(0, 0, 0);
+				segment.mesh.updateMatrix();
+			});
 
 			modes.orbit_mode = 0;
 		}
 		else {
 
-			// LOG(888);
-
 			mode_selection_BUTTON.classList.remove('-pressed');
 
 			apply_segment_BUTTON.style.display = 'none';
-
-			// whole.mesh.material = whole.material;
-
-			scene1.children.forEach((mesh) => {
-
-				mesh.visible = true;
-			});
-
-			scene2.children.forEach((mesh) => {
-
-				mesh.visible = true;
-			});
 
 			mode_selection_BUTTON.innerHTML = 'Tile mode';
 
 			selection_NODE.classList.add('-hidden');
 
-			// wall
-			if (whole.points) {
+			scene_floor.children.forEach((mesh) => {
 
-				tileable_mesh._.quaternion.copy(whole.quat);
-				tileable_mesh._.position.copy(whole.position);
-				tileable_mesh._.updateMatrix();
+				mesh.visible = true;
+			});
 
-				whole.segments.forEach((segment) => {
+			scene_floor_segments.children.forEach((mesh) => {
 
-					LOG(segment)
+				mesh.visible = true;
+			});
 
-					segment.mesh.quaternion.copy(whole.quat);
-					segment.mesh.position.copy(whole.position);
-					segment.mesh.updateMatrix();
+			scene_walls.children.forEach((mesh) => {
 
-					// segment.mesh.geometry.computeBoundingSphere();
-				});
+				mesh.visible = true;
+			});
 
-				plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
-				plan_camera.position.set(0, 0, 0);
-				plan_camera.translateZ(1);
-			}
+			scene_wall_segments.children.forEach((mesh) => {
+
+				mesh.visible = true;
+			});
+
+			plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
+			plan_camera.position.set(0, 0, 0);
+			plan_camera.translateZ(1);
+
+			whole.mesh.material = whole.material;
+
+			whole.mesh.quaternion.copy(whole.quaternion);
+			whole.mesh.position.copy(whole.position);
+			whole.mesh.updateMatrix();
+
+			whole.segments.forEach((segment) => {
+
+				segment.mesh.material = segment.material;
+
+				segment.mesh.quaternion.copy(whole.quaternion);
+				segment.mesh.position.copy(whole.position);
+				segment.mesh.updateMatrix();
+
+				// segment.mesh.geometry.computeBoundingSphere();
+			});
 
 			document.body.contains(selection_area_div) &&
 
@@ -316,17 +313,15 @@ mode_selection_BUTTON.addEventListener('click', () => {
 
 apply_segment_BUTTON.addEventListener('click', () => {
 
-	// or parent.floor
-	if (tileable_mesh?._?.userData?.parent?.points && !tileable_mesh._.userData.parent.wall) {
+	if (!tileable_mesh._.userData.parent.tileable) {
 
 		const whole = tileable_mesh._.userData.parent;
 
 		const segment =
 			new Segment(
 
-				whole.room,
-				'BackSide',
-				2,
+				null,
+				whole.points ? 3 : 1,
 				whole,
 				width * cast.PIXELS_TO_METERS,
 				height * cast.PIXELS_TO_METERS,
@@ -334,13 +329,15 @@ apply_segment_BUTTON.addEventListener('click', () => {
 				(top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS,
 			);
 
+		segment.mesh.material = segment.material2;
+
 		whole.segments.push(segment);
+
+		// whole.mesh.visible = false;
 
 		segment.setTile(whole.tile);
 
 		segment.updateGeometry();
-
-		LOG(123)
 	}
 
 	apply_segment_BUTTON.style.display = 'none';

@@ -70,71 +70,41 @@ export const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.physicallyCorrectLights = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(CLEAR_COLOR);
-renderer.autoClearColor = false;
+renderer.autoClear = false;
 renderer.clearColor();
 
 
 
 export const WEBGL_MAXIMUM_ANISOTROPY = renderer.capabilities.getMaxAnisotropy();
 
-// floor and walls, no depth test
-export const scene1 = new THREE.Scene();
-
-// segments, no depth test
-export const scene2 = new THREE.Scene();
+// no depth test
+export const scene_floor = new THREE.Scene();
+export const scene_floor_segments = new THREE.Scene();
+export const scene_walls = new THREE.Scene();
+export const scene_wall_segments = new THREE.Scene();
 
 // draggable units, depth test enabled
-export const scene3 = new THREE.Scene();
+export const scene_draggable = new THREE.Scene();
 
 
 
-const ambient_light1 = new THREE.AmbientLight(0xFFFFFF);
-const ambient_light2 = ambient_light1.clone();
-const ambient_light3 = ambient_light1.clone();
+const ambient_floor = new THREE.AmbientLight(0xFFFFFF);
+const ambient_floor_segments = ambient_floor.clone();
+const ambient_walls = ambient_floor.clone();
+const ambient_wall_segments = ambient_floor.clone();
+const ambient_draggable = ambient_floor.clone();
 
 // ambient_light.updateMatrix();
 // ambient_light.updateMatrixWorld();
 // ambient_light.intensity = 2;
 
-scene1.add(ambient_light1);
-scene2.add(ambient_light2);
-scene3.add(ambient_light3);
+scene_floor.add(ambient_floor);
+scene_floor_segments.add(ambient_floor_segments);
+scene_walls.add(ambient_walls);
+scene_wall_segments.add(ambient_wall_segments);
+scene_draggable.add(ambient_draggable);
 
-// export const spot_lights = [];
 
-// [
-// 	[ 1.5, 3, 1.5 ],
-// 	[ 1.5, 3, -1.5 ],
-// 	[ -1.5, 3, -1.5 ],
-// 	[ -1.5, 3, 1.5 ],
-// ]
-// 	.forEach((spot_light_position) => {
-
-// 		const spot_light = new THREE.SpotLight(0xFFFFFF);
-// 		spot_light.intensity = 10;
-// 		spot_light.distance = 0;
-// 		spot_light.penumbra = 0.5;
-// 		spot_light.decay = 2;
-// 		spot_light.angle = Math.PI * 0.5;
-// 		spot_light.position.set(...spot_light_position);
-// 		scene1.add(spot_light);
-// 		spot_light.target.position.set(...spot_light_position);
-// 		spot_light.target.position.y = 0;
-// 		scene1.add(spot_light.target);
-
-// 		// spot_lights.push(spot_light);
-
-// 		// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
-// 		// scene1.add(spot_light_helper);
-// 	});
-
-// const rect_light = new THREE.RectAreaLight(0xffffff, 1, 2, 2);
-// rect_light.position.set(0, 1.5, -2.99);
-// rect_light.lookAt(0, 1.5, 0);
-// scene1.add(rect_light);
-
-// const rect_light_helper = new RectAreaLightHelper(rect_light);
-// rect_light.add(rect_light_helper);
 
 export const plan_camera = new THREE.OrthographicCamera(...getOrthographicCameraAttributes());
 plan_camera.zoom = cast.METERS_TO_PIXELS;
@@ -142,7 +112,7 @@ plan_camera.updateProjectionMatrix();
 
 plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
 plan_camera.translateZ(1);
-plan_camera.lookAt(scene1.position);
+// plan_camera.lookAt(newscene_floor.position);
 
 export const orbit_camera = new THREE.PerspectiveCamera(...getPerspectiveCameraAttributes());
 orbit_camera.position.y = 12;
@@ -174,7 +144,7 @@ export const uploadModel = (evt) => {
 
 			const meshes = [];
 
-			gltf.scene1.traverse((elm) => {
+			gltf.scene.traverse((elm) => {
 
 				if (elm.isMesh) {
 
@@ -184,9 +154,9 @@ export const uploadModel = (evt) => {
 				}
 			});
 
-			draggable_gltf_scenes.push(gltf.scene1);
+			draggable_gltf_scenes.push(gltf.scene);
 
-			gltf.scene1.traverse((elm) => {
+			gltf.scene.traverse((elm) => {
 
 				if (elm.isMesh) {
 
@@ -195,33 +165,33 @@ export const uploadModel = (evt) => {
 				}
 			});
 
-			scene3.add(...draggable_gltf_scenes);
+			scene_draggable.add(gltf.scene);
 		},
 	);
 };
 
 
 
-// const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
+const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
 
-// transform_controls.addEventListener('change', () => {
+transform_controls.addEventListener('change', () => {
 
-// 	if (transform_controls_attached_mesh) {
+	if (transform_controls_attached_mesh) {
 
-// 		if (transform_controls_attached_mesh._meshes) {
+		if (transform_controls_attached_mesh._meshes) {
 
-// 			transform_controls_attached_mesh._meshes.forEach((elm) => {
+			transform_controls_attached_mesh._meshes.forEach((elm) => {
 
-// 				elm.position.copy(transform_controls_attached_mesh.position);
-// 				elm.rotation.copy(transform_controls_attached_mesh.rotation);
-// 			});
-// 		}
-// 	}
-// });
+				elm.position.copy(transform_controls_attached_mesh.position);
+				elm.rotation.copy(transform_controls_attached_mesh.rotation);
+			});
+		}
+	}
+});
 
-// transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
+transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
 
-// scene2.add(transform_controls);
+scene_draggable.add(transform_controls);
 
 
 
@@ -240,29 +210,145 @@ canvas.addEventListener('mousemove', (evt) => {
 
 		raycaster.setFromCamera(mouse, orbit_camera);
 
-		let _intersects = raycaster.intersectObjects(scene2.children);
 
-		if (_intersects.length) {
 
-			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+		// let _intersects = raycaster.intersectObjects(raycastable_meshes);
 
-			raycasted_mesh = nearest.object;
+		// if (_intersects.length) {
 
-			raycasted_mesh.material.color.set(0xADD8E6);
-		}
-		else {
+		// 	const [ nearest ] = _intersects.sort((a, b) => (b.distance - a.distance));
 
-			_intersects = raycaster.intersectObjects(scene1.children);
+		// 	raycasted_mesh = nearest.object;
 
-			if (_intersects.length) {
+		// 	raycasted_mesh.material.color.set(0xADD8E6);
 
-				const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+		// 	return;
+		// }
 
-				raycasted_mesh = nearest.object;
 
-				raycasted_mesh.material.color.set(0xADD8E6);
-			}
-		}
+
+		// _intersects = raycaster.intersectObjects(scene_wall_segments.children, true);
+
+		// if (_intersects.length) {
+
+		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+		// 	raycasted_mesh = nearest.object;
+
+		// 	raycasted_mesh.material.color.set(0xADD8E6);
+
+		// 	return;
+		// }
+
+
+
+		// _intersects = raycaster.intersectObjects(scene_walls.children, true);
+
+		// if (_intersects.length) {
+
+		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+		// 	raycasted_mesh = nearest.object;
+
+		// 	raycasted_mesh.material.color.set(0xADD8E6);
+
+		// 	return;
+		// }
+
+
+
+		// _intersects = raycaster.intersectObjects(scene_floor_segments.children, true);
+
+		// if (_intersects.length) {
+
+		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+		// 	raycasted_mesh = nearest.object;
+
+		// 	raycasted_mesh.material.color.set(0xADD8E6);
+
+		// 	return;
+		// }
+
+
+
+		// _intersects = raycaster.intersectObjects(scene_floor.children, true);
+
+		// if (_intersects.length) {
+
+		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+		// 	raycasted_mesh = nearest.object;
+
+		// 	raycasted_mesh.material.color.set(0xADD8E6);
+
+		// 	return;
+		// }
+
+
+
+		// let _intersects = raycaster.intersectObjects(raycastable_meshes);
+
+		// if (_intersects.length) {
+
+		// 	const [ nearest ] = _intersects.sort((a, b) => (b.distance - a.distance));
+
+		// 	raycasted_mesh = nearest.object;
+
+		// 	raycasted_mesh.material.color.set(0xADD8E6);
+		// }
+		// else {
+
+		// 	_intersects = raycaster.intersectObjects(scene_floor_segments.children);
+
+		// 	if (_intersects.length) {
+
+		// 		const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+		// 		raycasted_mesh = nearest.object;
+
+		// 		raycasted_mesh.material.color.set(0xADD8E6);
+		// 	}
+		// 	else {
+
+		// 		let _intersects = raycaster.intersectObjects(scene_floor.children);
+
+		// 		if (_intersects.length) {
+
+		// 			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+		// 			raycasted_mesh = nearest.object;
+
+		// 			raycasted_mesh.material.color.set(0xADD8E6);
+		// 		}
+		// 	}
+		// }
+
+
+
+		// let _intersects = raycaster.intersectObjects(scene_floor_segments.children);
+
+		// if (_intersects.length) {
+
+		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+		// 	raycasted_mesh = nearest.object;
+
+		// 	raycasted_mesh.material.color.set(0xADD8E6);
+		// }
+		// else {
+
+		// 	_intersects = raycaster.intersectObjects(scene_floor.children);
+
+		// 	if (_intersects.length) {
+
+		// 		const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+		// 		raycasted_mesh = nearest.object;
+
+		// 		raycasted_mesh.material.color.set(0xADD8E6);
+		// 	}
+		// }
 	}
 
 	// 	const _intersects = raycaster.intersectObjects(raycastable_meshes);
@@ -335,28 +421,73 @@ canvas.addEventListener('dblclick', (evt) => {
 
 	if (modes.orbit_mode) {
 
-		LOG(raycasted_mesh);
+		// LOG(raycasted_mesh);
 
 		if (raycasted_mesh) {
 
-			tileable_mesh._ = raycasted_mesh;
+			if (draggable_meshes.includes(raycasted_mesh)) {
 
-			// or parent.floor
-			if (tileable_mesh._.userData.parent.wall) {
+				transform_controls_attached_mesh = raycasted_mesh;
+
+				transform_controls.attach(transform_controls_attached_mesh);
 
 				mode_selection_BUTTON.style.display = 'none';
 			}
 			else {
 
-				mode_selection_BUTTON.style.display = 'inline-block';
+				transform_controls_attached_mesh = null;
+
+				transform_controls.detach();
+
+				tileable_mesh._ = raycasted_mesh;
+
+				LOG(tileable_mesh._)
+
+				if (tileable_mesh._.userData.parent.tileable) {
+
+					mode_selection_BUTTON.style.display = 'none';
+				}
+				else {
+
+					mode_selection_BUTTON.style.display = 'inline-block';
+				}
 			}
 		}
 		else {
+
+			transform_controls_attached_mesh = null;
+
+			transform_controls.detach();
 
 			tileable_mesh._ = null;
 
 			mode_selection_BUTTON.style.display = 'none';
 		}
+
+		// if (raycasted_mesh) {
+
+		// 	tileable_mesh._ = raycasted_mesh;
+
+		// 	// or parent.floor
+		// 	if (tileable_mesh._.userData.parent.wall) {
+
+		// 		mode_selection_BUTTON.style.display = 'none';
+		// 	}
+		// 	else {
+
+		// 		mode_selection_BUTTON.style.display = 'inline-block';
+		// 	}
+		// }
+		// else {
+
+		// 	transform_controls_attached_mesh = null;
+
+		// 	transform_controls.detach();
+
+		// 	tileable_mesh._ = null;
+
+		// 	mode_selection_BUTTON.style.display = 'none';
+		// }
 
 		// mouse.x = ((evt.clientX / window.innerWidth) * 2) - 1;
 		// mouse.y = (-(evt.clientY / window.innerHeight) * 2) + 1;
@@ -378,7 +509,7 @@ canvas.addEventListener('dblclick', (evt) => {
 
 		// tileable_mesh._.material = tileable_mesh._.userData.parent.material2;
 
-		// scene1.children.forEach((child) => {
+		// scene_floor.children.forEach((child) => {
 
 		// 	child.visible = Boolean(child === tileable_mesh._ || child instanceof THREE.AmbientLight);
 		// });
@@ -414,7 +545,7 @@ canvas.addEventListener('dblclick', (evt) => {
 
 		// plan_camera.position.set(0, 0, 0);
 		// plan_camera.translateZ(1);
-		// // plan_camera.lookAt(scene1.position);
+		// // plan_camera.lookAt(scene_floor.position);
 
 		// modes.orbit_mode = 0;
 
