@@ -7,6 +7,7 @@ max-statements,
 
 
 import * as THREE from 'three';
+import polybooljs from 'polybooljs';
 
 import modes from './modes';
 import cast from './cast';
@@ -36,6 +37,9 @@ import {
 	scene_walls,
 	scene_wall_segments,
 	tileable_mesh,
+	// ATTRIBUTE_SIZE_1,
+	ATTRIBUTE_SIZE_2,
+	ATTRIBUTE_SIZE_3,
 } from './three';
 
 
@@ -145,7 +149,7 @@ const mouseup_selection_area_function = () => {
 	window.removeEventListener('mousemove', mousemove_selection_area_function);
 	window.removeEventListener('mouseup', mouseup_selection_area_function);
 
-	LOG(width, height)
+	// LOG(width, height)
 
 	if (width > 0 && height > 0) {
 
@@ -315,30 +319,202 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 	if (!tileable_mesh._.userData.parent.tileable) {
 
+		const selection_area_meter_width = width * cast.PIXELS_TO_METERS;
+		const selection_area_meter_height = height * cast.PIXELS_TO_METERS;
+		const selection_area_meter_left = (left + (width * 0.5) - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS;
+		const selection_area_meter_top = (top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS;
+
+
+
 		const whole = tileable_mesh._.userData.parent;
 
-		const segment =
-			new Segment(
 
-				null,
-				whole.points ? 3 : 1,
-				whole,
-				width * cast.PIXELS_TO_METERS,
-				height * cast.PIXELS_TO_METERS,
-				(left + (width * 0.5) - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS,
-				(top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS,
-				// 1,
+
+		const segment_geometry = new THREE.PlaneBufferGeometry(selection_area_meter_width, selection_area_meter_height);
+
+
+
+		const segment_polygons = { regions: [] };
+
+		for (let i = 0; i < segment_geometry.index.array.length; i += 3) {
+
+			const index1 = segment_geometry.index.array[i + 0] * 3;
+			const index2 = segment_geometry.index.array[i + 1] * 3;
+			const index3 = segment_geometry.index.array[i + 2] * 3;
+
+			segment_polygons.regions.push(
+
+				[
+					[
+						segment_geometry.attributes.position.array[index1 + 0] - selection_area_meter_left,
+						segment_geometry.attributes.position.array[index1 + 1] - selection_area_meter_top,
+					],
+
+					[
+						segment_geometry.attributes.position.array[index2 + 0] - selection_area_meter_left,
+						segment_geometry.attributes.position.array[index2 + 1] - selection_area_meter_top,
+					],
+
+					[
+						segment_geometry.attributes.position.array[index3 + 0] - selection_area_meter_left,
+						segment_geometry.attributes.position.array[index3 + 1] - selection_area_meter_top,
+					],
+				],
 			);
 
-		segment.mesh.material = segment.material2;
+			// segment_polygons.inverted = true;
+		}
 
-		whole.segments.push(segment);
 
-		// whole.mesh.visible = false;
 
-		segment.setTile(whole.tile);
+		const whole_polygons = { regions: [] };
 
-		segment.updateGeometry();
+		for (let i = 0; i < whole.mesh.geometry.index.array.length; i += 3) {
+
+			const index1 = whole.mesh.geometry.index.array[i + 0] * 3;
+			const index2 = whole.mesh.geometry.index.array[i + 1] * 3;
+			const index3 = whole.mesh.geometry.index.array[i + 2] * 3;
+
+			whole_polygons.regions.push(
+
+				[
+					[
+						whole.mesh.geometry.attributes.position.array[index1 + 0],
+						whole.mesh.geometry.attributes.position.array[index1 + 1],
+					],
+
+					[
+						whole.mesh.geometry.attributes.position.array[index2 + 0],
+						whole.mesh.geometry.attributes.position.array[index2 + 1],
+					],
+
+					[
+						whole.mesh.geometry.attributes.position.array[index3 + 0],
+						whole.mesh.geometry.attributes.position.array[index3 + 1],
+					],
+				],
+			);
+
+			// whole_polygons.inverted = true;
+		}
+
+
+
+		if (whole.segments.length) {
+
+			whole.segments.forEach((_segment) => {
+
+				const _segment_polygons = { regions: [] };
+
+				for (let i = 0; i < _segment.mesh.geometry.index.array.length; i += 3) {
+
+					const index1 = _segment.mesh.geometry.index.array[i + 0] * 3;
+					const index2 = _segment.mesh.geometry.index.array[i + 1] * 3;
+					const index3 = _segment.mesh.geometry.index.array[i + 2] * 3;
+
+					_segment_polygons.regions.push(
+
+						[
+							[
+								_segment.mesh.geometry.attributes.position.array[index1 + 0],
+								_segment.mesh.geometry.attributes.position.array[index1 + 1],
+							],
+
+							[
+								_segment.mesh.geometry.attributes.position.array[index2 + 0],
+								_segment.mesh.geometry.attributes.position.array[index2 + 1],
+							],
+
+							[
+								_segment.mesh.geometry.attributes.position.array[index3 + 0],
+								_segment.mesh.geometry.attributes.position.array[index3 + 1],
+							],
+						],
+					);
+
+					// whole_polygons.inverted = true;
+				}
+
+
+
+				const difference_polygons = polybooljs.differenceRev(segment_polygons, _segment_polygons);
+
+				difference_polygons?.regions &&
+
+					difference_polygons.regions.forEach((region) => {
+
+						const segment =
+							new Segment(
+
+								null,
+								whole.points ? 3 : 1,
+								whole,
+							);
+
+						segment.mesh.material = segment.material2;
+
+						whole.segments.push(segment);
+
+						segment.setTile(whole.tile);
+
+						segment.updateGeometry(region);
+					});
+			});
+		}
+		else {
+
+			const difference_polygons = polybooljs.differenceRev(segment_polygons, whole_polygons);
+
+			difference_polygons?.regions &&
+
+				difference_polygons.regions.forEach((region) => {
+
+					const segment =
+						new Segment(
+
+							null,
+							whole.points ? 3 : 1,
+							whole,
+						);
+
+					segment.mesh.material = segment.material2;
+
+					whole.segments.push(segment);
+
+					segment.setTile(whole.tile);
+
+					segment.updateGeometry(region);
+				});
+		}
+
+
+
+		const intersection_polygons = polybooljs.intersect(segment_polygons, whole_polygons);
+
+		intersection_polygons?.regions &&
+
+			intersection_polygons.regions.forEach((region) => {
+
+				const segment =
+					new Segment(
+
+						null,
+						whole.points ? 3 : 1,
+						whole,
+					);
+
+				segment.mesh.material = segment.material2;
+
+				whole.segments.push(segment);
+
+				segment.setTile(whole.tile);
+
+				segment.updateGeometry(region);
+			});
+
+
+
+		scene_walls.remove(whole.mesh);
 	}
 
 	apply_segment_BUTTON.style.display = 'none';

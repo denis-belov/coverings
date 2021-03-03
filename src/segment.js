@@ -8,8 +8,6 @@ max-params,
 
 import * as THREE from 'three';
 import earcut from 'earcut';
-// import polygon_clipping from 'polygon-clipping';
-import polybooljs from 'polybooljs';
 
 import {
 
@@ -27,174 +25,48 @@ import Tileable from './tileable';
 export default class Segment extends Tileable {
 
 	// change tileable to something
-	constructor (room, scene, tileable, meter_width, meter_height, meter_left, meter_top) {
+	constructor (room, scene, tileable) {
 
 		super(room, scene);
 
-		// LOG(tileable.mesh.userData.parent.type)
-
-		// tileable.object3d.add(this.mesh);
-
 		this.tileable = tileable;
 
-		this.meter_width = meter_width;
-		this.meter_height = meter_height;
-
-		this.meter_left = meter_left;
-		this.meter_top = meter_top;
-
 		this.z_index = this.tileable.z_index++;
-
-		// this.material.depthWrite = false;
-		// this.material.depthTest = false;
-		// this.material.needsUpdate = true;
-
-		// this.mesh.renderOrder = this.z_index;
 	}
 
-	updateGeometry () {
+	updateGeometry (region) {
 
+		const scene_coordinates = [];
 		const index_data = [];
 		const position_data = [];
 		const normal_data = [];
 		const uv_data = [];
-		const scene_coordinates = [];
 
-		const segment_geometry = new THREE.PlaneBufferGeometry(this.meter_width, this.meter_height);
+		region.forEach((coordinates) => scene_coordinates.push(...coordinates));
 
-		const segment_polygons = { regions: [] };
+		const qwe = (position_data.length / 3);
 
-		for (let i = 0; i < segment_geometry.index.array.length; i += 3) {
+		const _index_data = [ ...earcut(scene_coordinates).map((elm) => elm + qwe) ];
 
-			const index1 = segment_geometry.index.array[i + 0] * 3;
-			const index2 = segment_geometry.index.array[i + 1] * 3;
-			const index3 = segment_geometry.index.array[i + 2] * 3;
+		index_data.push(..._index_data);
 
-			segment_polygons.regions.push(
+		_index_data.forEach((_index) => {
 
-				[
-					[
-						segment_geometry.attributes.position.array[index1 + 0] - this.meter_left,
-						segment_geometry.attributes.position.array[index1 + 1] - this.meter_top,
-					],
+			if (!position_data[_index * ATTRIBUTE_SIZE_3]) {
 
-					[
-						segment_geometry.attributes.position.array[index2 + 0] - this.meter_left,
-						segment_geometry.attributes.position.array[index2 + 1] - this.meter_top,
-					],
+				position_data[(_index * ATTRIBUTE_SIZE_3) + 0] = scene_coordinates[((_index - qwe) * 2) + 0];
+				position_data[(_index * ATTRIBUTE_SIZE_3) + 1] = scene_coordinates[((_index - qwe) * 2) + 1];
+				position_data[(_index * ATTRIBUTE_SIZE_3) + 2] = 0;
 
-					[
-						segment_geometry.attributes.position.array[index3 + 0] - this.meter_left,
-						segment_geometry.attributes.position.array[index3 + 1] - this.meter_top,
-					],
-				],
-			);
+				normal_data[(_index * ATTRIBUTE_SIZE_3) + 0] = 0;
+				normal_data[(_index * ATTRIBUTE_SIZE_3) + 1] = 0;
+				normal_data[(_index * ATTRIBUTE_SIZE_3) + 2] = 1;
 
-			// segment_polygons.inverted = true;
-		}
+				uv_data[(_index * ATTRIBUTE_SIZE_2) + 0] = scene_coordinates[((_index - qwe) * 2) + 0] / this.tile.sizes[0];
+				uv_data[(_index * ATTRIBUTE_SIZE_2) + 1] = scene_coordinates[((_index - qwe) * 2) + 1] / this.tile.sizes[1];
+			}
+		});
 
-
-
-		const tileable_polygons = { regions: [] };
-
-		const tileable_geometry = this.tileable.mesh.geometry;
-
-		for (let i = 0; i < tileable_geometry.index.array.length; i += 3) {
-
-			const index1 = tileable_geometry.index.array[i + 0] * 3;
-			const index2 = tileable_geometry.index.array[i + 1] * 3;
-			const index3 = tileable_geometry.index.array[i + 2] * 3;
-
-			tileable_polygons.regions.push(
-
-				[
-					[
-						tileable_geometry.attributes.position.array[index1 + 0],
-						tileable_geometry.attributes.position.array[index1 + 1],
-					],
-
-					[
-						tileable_geometry.attributes.position.array[index2 + 0],
-						tileable_geometry.attributes.position.array[index2 + 1],
-					],
-
-					[
-						tileable_geometry.attributes.position.array[index3 + 0],
-						tileable_geometry.attributes.position.array[index3 + 1],
-					],
-				],
-			);
-
-			// tileable_polygons.inverted = true;
-		}
-
-
-
-		// const intersection_polygons = polybooljs.intersect(segment_polygons, tileable_polygons);
-		const intersection_polygons = polybooljs.differenceRev(segment_polygons, tileable_polygons);
-
-		LOG(intersection_polygons?.regions);
-
-		intersection_polygons?.regions &&
-
-			intersection_polygons.regions.forEach((region) => {
-
-				scene_coordinates.length = 0;
-
-				// LOG(index, position_data.length / 3)
-
-				region.forEach((coordinates) => scene_coordinates.push(...coordinates));
-
-				const qwe = (position_data.length / 3);
-
-				const _index_data = [ ...earcut(scene_coordinates).map((elm) => elm + qwe) ];
-
-				index_data.push(..._index_data);
-
-				LOG(index_data)
-
-				_index_data.forEach((_index) => {
-
-					// const _index = index - qwe;
-
-					LOG(_index)
-
-					if (!position_data[_index * ATTRIBUTE_SIZE_3]) {
-
-						position_data[(_index * ATTRIBUTE_SIZE_3) + 0] = scene_coordinates[((_index - qwe) * 2) + 0];
-						position_data[(_index * ATTRIBUTE_SIZE_3) + 1] = scene_coordinates[((_index - qwe) * 2) + 1];
-						position_data[(_index * ATTRIBUTE_SIZE_3) + 2] = 0;
-
-						normal_data[(_index * ATTRIBUTE_SIZE_3) + 0] = 0;
-						normal_data[(_index * ATTRIBUTE_SIZE_3) + 1] = 0;
-						normal_data[(_index * ATTRIBUTE_SIZE_3) + 2] = 1;
-
-						uv_data[(_index * ATTRIBUTE_SIZE_2) + 0] = scene_coordinates[((_index - qwe) * 2) + 0] / this.tile.sizes[0];
-						uv_data[(_index * ATTRIBUTE_SIZE_2) + 1] = scene_coordinates[((_index - qwe) * 2) + 1] / this.tile.sizes[1];
-					}
-				});
-			});
-
-			LOG(position_data)
-
-			// index_data.push(...earcut(scene_coordinates).map((elm) => elm));
-
-			// index_data.forEach((_index) => {
-
-			// 	if (!position_data[_index * ATTRIBUTE_SIZE_3]) {
-
-			// 		position_data[(_index * ATTRIBUTE_SIZE_3) + 0] = scene_coordinates[(_index * 2) + 0];
-			// 		position_data[(_index * ATTRIBUTE_SIZE_3) + 1] = scene_coordinates[(_index * 2) + 1];
-			// 		position_data[(_index * ATTRIBUTE_SIZE_3) + 2] = 0;
-
-			// 		normal_data[(_index * ATTRIBUTE_SIZE_3) + 0] = 0;
-			// 		normal_data[(_index * ATTRIBUTE_SIZE_3) + 1] = 0;
-			// 		normal_data[(_index * ATTRIBUTE_SIZE_3) + 2] = 1;
-
-			// 		uv_data[(_index * ATTRIBUTE_SIZE_2) + 0] = scene_coordinates[(_index * 2) + 0] / this.tile.sizes[0];
-			// 		uv_data[(_index * ATTRIBUTE_SIZE_2) + 1] = scene_coordinates[(_index * 2) + 1] / this.tile.sizes[1];
-			// 	}
-			// });
 
 
 		this.mesh.geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(index_data), 1));
@@ -214,14 +86,6 @@ export default class Segment extends Tileable {
 
 			'uv2', new THREE.BufferAttribute(this.mesh.geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
 		);
-		// this.tileable.mesh2.geometry.setAttribute(
-
-		// 	'uv', new THREE.BufferAttribute(new Float32Array(uv_data), ATTRIBUTE_SIZE_2),
-		// );
-		// this.tileable.mesh2.geometry.setAttribute(
-
-		// 	'uv2', new THREE.BufferAttribute(this.mesh.geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
-		// );
 
 		// this.tileable.mesh2.quaternion.copy(this.quaternion);
 		// this.tileable.mesh2.position.copy(this.position);
@@ -235,6 +99,6 @@ export default class Segment extends Tileable {
 
 		// this.mesh.geometry.computeBoundingSphere();
 
-		this.tileable.mesh.visible = false;
+		// this.tileable.mesh.visible = false;
 	}
 }

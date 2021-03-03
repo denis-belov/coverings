@@ -119,40 +119,42 @@ export default class Tileable {
 
 		// (scene === 1 ? scene_floor : scene_floor_segments).add(this.mesh);
 
-		switch (scene) {
+		// switch (scene) {
 
-		// // floor
-		// case 0:
+		// // // floor
+		// // case 0:
 
-		// 	scene_floor.add(this.mesh);
+		// // 	scene_floor.add(this.mesh);
+
+		// // 	break;
+
+		// // // floor segment
+		// // case 1:
+
+		// // 	scene_floor_segments.add(this.mesh);
+
+		// // 	break;
+
+		// // wall
+		// case 2:
+
+		// 	scene_walls.add(this.mesh);
 
 		// 	break;
 
-		// // floor segment
-		// case 1:
+		// // wall segment
+		// case 3:
 
-		// 	scene_floor_segments.add(this.mesh);
+		// 	scene_wall_segments.add(this.mesh);
 
 		// 	break;
 
-		// wall
-		case 2:
+		// default:
 
-			scene_walls.add(this.mesh);
+		// 	break;
+		// }
 
-			break;
-
-		// wall segment
-		case 3:
-
-			scene_wall_segments.add(this.mesh);
-
-			break;
-
-		default:
-
-			break;
-		}
+		scene_walls.add(this.mesh);
 	}
 
 	copy (tileable) {
