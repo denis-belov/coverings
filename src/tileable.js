@@ -81,7 +81,7 @@ export default class Tileable {
 			aoMap: ao_map,
 			roughnessMap: roughness_map,
 			metalnessMap: metalness_map,
-			side: THREE.DoubleSide,
+			side: THREE.BackSide,
 			wireframe: MATERIAL_WIREFRAME,
 		});
 
@@ -121,19 +121,19 @@ export default class Tileable {
 
 		switch (scene) {
 
-		// floor
-		case 0:
+		// // floor
+		// case 0:
 
-			scene_floor.add(this.mesh);
+		// 	scene_floor.add(this.mesh);
 
-			break;
+		// 	break;
 
-		// floor segment
-		case 1:
+		// // floor segment
+		// case 1:
 
-			scene_floor_segments.add(this.mesh);
+		// 	scene_floor_segments.add(this.mesh);
 
-			break;
+		// 	break;
 
 		// wall
 		case 2:

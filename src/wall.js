@@ -46,6 +46,8 @@ export default class Wall extends Tileable {
 
 		// this.type = 'wall';
 
+		this.mesh2 = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
+
 		// rename to related_points
 		this.points = [ point1, point2 ];
 
@@ -149,6 +151,8 @@ export default class Wall extends Tileable {
 				// height
 				this.room.height,
 			);
+
+		// LOG(plane_geometry.attributes.position.array)
 
 		const vv1 = new THREE.Vector3(1, 0, 0);
 

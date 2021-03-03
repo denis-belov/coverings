@@ -327,6 +327,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 				height * cast.PIXELS_TO_METERS,
 				(left + (width * 0.5) - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS,
 				(top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS,
+				// 1,
 			);
 
 		segment.mesh.material = segment.material2;

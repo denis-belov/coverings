@@ -17,6 +17,7 @@ import {
 	// selection_NODE,
 	mode_selection_BUTTON,
 	canvas,
+	canvas2,
 } from './dom';
 
 
@@ -68,10 +69,18 @@ export const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 // renderer.outputEncoding = THREE.sRGBEncoding;
 // renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.physicallyCorrectLights = true;
+// renderer.logarithmicDepthBuffer = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(CLEAR_COLOR);
 renderer.autoClear = false;
 renderer.clearColor();
+
+export const renderer2 = new THREE.WebGLRenderer({ canvas: canvas2, antialias: true, alpha: true });
+renderer2.physicallyCorrectLights = true;
+renderer2.setSize(window.innerWidth, window.innerHeight);
+renderer2.setClearColor(0xff0000, 0);
+renderer2.autoClear = false;
+renderer2.clearColor();
 
 
 
@@ -119,7 +128,7 @@ orbit_camera.position.y = 12;
 
 
 
-export const orbit_controls = new OrbitControls(orbit_camera, canvas);
+export const orbit_controls = new OrbitControls(orbit_camera, canvas.parentNode);
 orbit_controls.enableZoom = true;
 orbit_controls.enableDamping = true;
 orbit_controls.dumpingFactor = 10;
@@ -195,7 +204,7 @@ scene_draggable.add(transform_controls);
 
 
 
-canvas.addEventListener('mousemove', (evt) => {
+canvas.parentNode.addEventListener('mousemove', (evt) => {
 
 	if (modes.orbit_mode) {
 
@@ -212,78 +221,78 @@ canvas.addEventListener('mousemove', (evt) => {
 
 
 
-		// let _intersects = raycaster.intersectObjects(raycastable_meshes);
+		let _intersects = raycaster.intersectObjects(raycastable_meshes);
 
-		// if (_intersects.length) {
+		if (_intersects.length) {
 
-		// 	const [ nearest ] = _intersects.sort((a, b) => (b.distance - a.distance));
+			const [ nearest ] = _intersects.sort((a, b) => (b.distance - a.distance));
 
-		// 	raycasted_mesh = nearest.object;
+			raycasted_mesh = nearest.object;
 
-		// 	raycasted_mesh.material.color.set(0xADD8E6);
+			raycasted_mesh.material.color.set(0xADD8E6);
 
-		// 	return;
-		// }
-
-
-
-		// _intersects = raycaster.intersectObjects(scene_wall_segments.children, true);
-
-		// if (_intersects.length) {
-
-		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-		// 	raycasted_mesh = nearest.object;
-
-		// 	raycasted_mesh.material.color.set(0xADD8E6);
-
-		// 	return;
-		// }
+			return;
+		}
 
 
 
-		// _intersects = raycaster.intersectObjects(scene_walls.children, true);
+		_intersects = raycaster.intersectObjects(scene_wall_segments.children, true);
 
-		// if (_intersects.length) {
+		if (_intersects.length) {
 
-		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
 
-		// 	raycasted_mesh = nearest.object;
+			raycasted_mesh = nearest.object;
 
-		// 	raycasted_mesh.material.color.set(0xADD8E6);
+			raycasted_mesh.material.color.set(0xADD8E6);
 
-		// 	return;
-		// }
-
-
-
-		// _intersects = raycaster.intersectObjects(scene_floor_segments.children, true);
-
-		// if (_intersects.length) {
-
-		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-		// 	raycasted_mesh = nearest.object;
-
-		// 	raycasted_mesh.material.color.set(0xADD8E6);
-
-		// 	return;
-		// }
+			return;
+		}
 
 
 
-		// _intersects = raycaster.intersectObjects(scene_floor.children, true);
+		_intersects = raycaster.intersectObjects(scene_walls.children, true);
 
-		// if (_intersects.length) {
+		if (_intersects.length) {
 
-		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
 
-		// 	raycasted_mesh = nearest.object;
+			raycasted_mesh = nearest.object;
 
-		// 	raycasted_mesh.material.color.set(0xADD8E6);
+			raycasted_mesh.material.color.set(0xADD8E6);
 
-		// 	return;
-		// }
+			return;
+		}
+
+
+
+		_intersects = raycaster.intersectObjects(scene_floor_segments.children, true);
+
+		if (_intersects.length) {
+
+			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+			raycasted_mesh = nearest.object;
+
+			raycasted_mesh.material.color.set(0xADD8E6);
+
+			return;
+		}
+
+
+
+		_intersects = raycaster.intersectObjects(scene_floor.children, true);
+
+		if (_intersects.length) {
+
+			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
+
+			raycasted_mesh = nearest.object;
+
+			raycasted_mesh.material.color.set(0xADD8E6);
+
+			return;
+		}
 
 
 
@@ -417,7 +426,7 @@ canvas.addEventListener('mousemove', (evt) => {
 	// }
 });
 
-canvas.addEventListener('dblclick', (evt) => {
+canvas.parentNode.addEventListener('dblclick', (evt) => {
 
 	if (modes.orbit_mode) {
 

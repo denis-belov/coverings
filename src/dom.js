@@ -13,7 +13,9 @@ export const [
 	apply_segment_BUTTON,
 ] = document.getElementsByClassName('coverings-actions')[0].children;
 
-export const [ canvas ] = document.getElementsByTagName('canvas');
+export const [ canvas, canvas2 ] = document.getElementsByClassName('coverings-canvases')[0].children;
+
+// LOG(canvas, canvas2)
 
 export const material_BUTTONS = [ 1, 2, 3, 4 ].map((elm) => {
 

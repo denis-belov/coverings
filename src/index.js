@@ -29,6 +29,7 @@ import {
 import {
 
 	renderer,
+	renderer2,
 	scene_floor,
 	scene_floor_segments,
 	scene_walls,
@@ -346,61 +347,97 @@ const background_material = new THREE.MeshBasicMaterial({
 
 
 
-const raycaster = new THREE.Raycaster();
+// const raycaster = new THREE.Raycaster();
 
 
 
-window.addEventListener('keypress', (evt) => {
+// window.addEventListener('keypress', (evt) => {
 
-	if (evt.code === 'KeyG') {
+// 	if (evt.code === 'KeyG') {
 
-		room.walls.forEach((wall, index) => {
+// 		room.walls.forEach((wall, index) => {
 
-			const position_projection =
-				new THREE.Vector3()
-					.copy(wall.mesh.position)
-					.project(orbit_camera);
+// 			// LOG(
 
-			const indicator = wall.indicator || document.createElement('div');
+// 			// 	new THREE.Vector3(
 
-			Object.assign(
+// 			// 		wall.mesh.geometry.attributes.position.array[0],
+// 			// 		wall.mesh.geometry.attributes.position.array[1],
+// 			// 		wall.mesh.geometry.attributes.position.array[2],
+// 			// 	)
+// 			// 		.applyQuaternion(wall.quaternion)
+// 			// 		.add(wall.position)
+// 			// 		.project(orbit_camera),
 
-				indicator.style,
+// 			// 	new THREE.Vector3(
 
-				{
-					position: 'absolute',
-					width: 20,
-					height: 20,
-					marginLeft: -10,
-					marginTop: -10,
-					backgroundColor: 'black',
-					color: 'white',
-					left: ((position_projection.x * 0.5) + 0.5) * window.innerWidth,
-					top: window.innerHeight - (((position_projection.y * 0.5) + 0.5) * window.innerHeight),
-				},
-			);
+// 			// 		wall.mesh.geometry.attributes.position.array[3],
+// 			// 		wall.mesh.geometry.attributes.position.array[4],
+// 			// 		wall.mesh.geometry.attributes.position.array[5],
+// 			// 	)
+// 			// 		.applyQuaternion(wall.quaternion)
+// 			// 		.add(wall.position)
+// 			// 		.project(orbit_camera),
 
-			indicator.innerHTML = `${ index },${ wall.mesh.renderOrder },,${ wall.test }\n${ wall.test2 }`;
+// 			// 	new THREE.Vector3(
 
-			wall.indicator = indicator;
+// 			// 		wall.mesh.geometry.attributes.position.array[6],
+// 			// 		wall.mesh.geometry.attributes.position.array[7],
+// 			// 		wall.mesh.geometry.attributes.position.array[8],
+// 			// 	)
+// 			// 		.applyQuaternion(wall.quaternion)
+// 			// 		.add(wall.position)
+// 			// 		.project(orbit_camera),
 
-			document.body.appendChild(indicator);
-		});
-	}
-});
+// 			// 	new THREE.Vector3(
+
+// 			// 		wall.mesh.geometry.attributes.position.array[9],
+// 			// 		wall.mesh.geometry.attributes.position.array[10],
+// 			// 		wall.mesh.geometry.attributes.position.array[11],
+// 			// 	)
+// 			// 		.applyQuaternion(wall.quaternion)
+// 			// 		.add(wall.position)
+// 			// 		.project(orbit_camera),
+// 			// );
+
+// 			const position_projection =
+// 				new THREE.Vector3()
+// 					.copy(wall.mesh.position)
+// 					.project(orbit_camera);
+
+// 			const indicator = wall.indicator || document.createElement('div');
+
+// 			Object.assign(
+
+// 				indicator.style,
+
+// 				{
+// 					position: 'absolute',
+// 					// width: 'min-content',
+// 					width: 20,
+// 					height: 20,
+// 					marginLeft: -10,
+// 					marginTop: -10,
+// 					backgroundColor: 'black',
+// 					color: 'white',
+// 					left: ((position_projection.x * 0.5) + 0.5) * window.innerWidth,
+// 					top: window.innerHeight - (((position_projection.y * 0.5) + 0.5) * window.innerHeight),
+// 				},
+// 			);
+
+// 			// indicator.innerHTML = `${ index } - ${ wall.mesh.renderOrder } - ${ wall.test }\n${ wall.test2.join('\n') }`;
+// 			indicator.innerHTML = `${ index } - ${ wall.mesh.renderOrder }`;
+
+// 			wall.indicator = indicator;
+
+// 			document.body.appendChild(indicator);
+// 		});
+// 	}
+// });
 
 
 
-const plane = new THREE.Plane();
-
-window.addEventListener('keypress', (evt) => {
-
-	if (evt.code === 'KeyG') {
-
-		const helper = new THREE.PlaneHelper(plane);
-		scene_walls.add(helper);
-	}
-});
+// const plane = new THREE.Plane();
 
 
 
@@ -408,9 +445,8 @@ const animate = () => {
 
 	requestAnimationFrame(animate);
 
-	// helpers.forEach((helper) => helper.update());
-
 	renderer.clear();
+	renderer2.clear();
 
 	if (modes.orbit_mode) {
 
@@ -418,260 +454,382 @@ const animate = () => {
 
 
 
-		gl.disable(gl.DEPTH_TEST);
+		// gl.disable(gl.DEPTH_TEST);
 
-		renderer.render(scene_floor, orbit_camera);
-		renderer.render(scene_floor_segments, orbit_camera);
+		// renderer.render(scene_floor, orbit_camera);
+		// renderer.render(scene_floor_segments, orbit_camera);
 
 		// room.walls.forEach((wall) => (wall.mesh.renderOrder = 0));
 
-		orbit_camera.updateMatrixWorld();
-
-		room.walls.forEach((wall) => {
-
-			wall.mesh.updateMatrixWorld();
-
-			wall.mesh.renderOrder = 0;
-			wall.test = [];
-			wall.test2 = [];
-
-			const a =
-				new THREE.Vector3(
+		// orbit_camera.updateMatrixWorld();
 
-					wall.mesh.geometry.attributes.position.array[0],
-					wall.mesh.geometry.attributes.position.array[1],
-					wall.mesh.geometry.attributes.position.array[2],
-				)
-					// .applyMatrix4(wall.mesh.matrixWorld);
-					.applyQuaternion(wall.quaternion)
-					.add(wall.position);
+		// const test = [];
 
-			const b =
-				new THREE.Vector3(
+		// room.walls.forEach((wall) => {
 
-					wall.mesh.geometry.attributes.position.array[3],
-					wall.mesh.geometry.attributes.position.array[4],
-					wall.mesh.geometry.attributes.position.array[5],
-				)
-			// .applyMatrix4(wall.mesh.matrixWorld);
-			.applyQuaternion(wall.quaternion)
-			.add(wall.position);
+		// 	const a =
+		// 		new THREE.Vector3(
 
-			const c =
-				new THREE.Vector3(
+		// 			wall.mesh.geometry.attributes.position.array[0] * 0.99,
+		// 			wall.mesh.geometry.attributes.position.array[1] * 0.99,
+		// 			wall.mesh.geometry.attributes.position.array[2],
+		// 		)
+		// 			.applyQuaternion(wall.quaternion)
+		// 			.add(wall.position)
+		// 			.project(orbit_camera);
 
-					wall.mesh.geometry.attributes.position.array[6],
-					wall.mesh.geometry.attributes.position.array[7],
-					wall.mesh.geometry.attributes.position.array[8],
-				)
-			// .applyMatrix4(wall.mesh.matrixWorld);
-			.applyQuaternion(wall.quaternion)
-			.add(wall.position);
+		// 	const b =
+		// 		new THREE.Vector3(
 
-			const d =
-				new THREE.Vector3(
+		// 			wall.mesh.geometry.attributes.position.array[3] * 0.99,
+		// 			wall.mesh.geometry.attributes.position.array[4] * 0.99,
+		// 			wall.mesh.geometry.attributes.position.array[5],
+		// 		)
+		// 			.applyQuaternion(wall.quaternion)
+		// 			.add(wall.position)
+		// 			.project(orbit_camera);
 
-					wall.mesh.geometry.attributes.position.array[9],
-					wall.mesh.geometry.attributes.position.array[10],
-					wall.mesh.geometry.attributes.position.array[11],
-				)
-			// .applyMatrix4(wall.mesh.matrixWorld);
-			.applyQuaternion(wall.quaternion)
-			.add(wall.position);
+		// 	const c =
+		// 		new THREE.Vector3(
 
+		// 			wall.mesh.geometry.attributes.position.array[6] * 0.99,
+		// 			wall.mesh.geometry.attributes.position.array[7] * 0.99,
+		// 			wall.mesh.geometry.attributes.position.array[8],
+		// 		)
+		// 			.applyQuaternion(wall.quaternion)
+		// 			.add(wall.position)
+		// 			.project(orbit_camera);
 
+		// 	const d =
+		// 		new THREE.Vector3(
 
-			const line_a = new THREE.Line3(orbit_camera.position, a);
-			const line_b = new THREE.Line3(orbit_camera.position, b);
-			const line_c = new THREE.Line3(orbit_camera.position, c);
-			const line_d = new THREE.Line3(orbit_camera.position, d);
+		// 			wall.mesh.geometry.attributes.position.array[9] * 0.99,
+		// 			wall.mesh.geometry.attributes.position.array[10] * 0.99,
+		// 			wall.mesh.geometry.attributes.position.array[11],
+		// 		)
+		// 			.applyQuaternion(wall.quaternion)
+		// 			.add(wall.position)
+		// 			.project(orbit_camera);
 
-			room.walls.forEach((_wall, _index) => {
+		// 	// LOG(
 
-				if (_wall !== wall) {
+		// 	// 	Math.min(
 
-					// const a =
-					// 	new THREE.Vector3(
+		// 	// 		Math.min(a.z, b.z),
 
-					// 		_wall.mesh.geometry.attributes.position.array[0],
-					// 		_wall.mesh.geometry.attributes.position.array[1],
-					// 		_wall.mesh.geometry.attributes.position.array[2],
-					// 	)
-					// 		.applyQuaternion(_wall.quaternion)
-					// 		.add(_wall.position);
+		// 	// 		Math.min(c.z, d.z)
+		// 	// 	),
+		// 	// )
 
-					// const b =
-					// 	new THREE.Vector3(
+		// 	test.push(
 
-					// 		_wall.mesh.geometry.attributes.position.array[3],
-					// 		_wall.mesh.geometry.attributes.position.array[4],
-					// 		_wall.mesh.geometry.attributes.position.array[5],
-					// 	)
-					// 		.applyQuaternion(_wall.quaternion)
-					// 		.add(_wall.position);
+		// 		{
+		// 			wall,
 
-					// const c =
-					// 	new THREE.Vector3(
+		// 			depth: Math.min(
 
-					// 		_wall.mesh.geometry.attributes.position.array[6],
-					// 		_wall.mesh.geometry.attributes.position.array[7],
-					// 		_wall.mesh.geometry.attributes.position.array[8],
-					// 	)
-					// 		.applyQuaternion(_wall.quaternion)
-					// 		.add(_wall.position);
+		// 				Math.min(a.z, b.z),
 
-					// const d =
-					// 	new THREE.Vector3(
+		// 				Math.min(c.z, d.z),
+		// 			),
+		// 		},
+		// 	);
+		// });
 
-					// 		_wall.mesh.geometry.attributes.position.array[9],
-					// 		_wall.mesh.geometry.attributes.position.array[10],
-					// 		_wall.mesh.geometry.attributes.position.array[11],
-					// 	)
-					// 		.applyQuaternion(_wall.quaternion)
-					// 		.add(_wall.position);
+		// const test2 = test.sort((a, b) => (b.depth - a.depth));
 
+		// test2.forEach((elm, index) => (elm.wall.mesh.renderOrder = index));
 
+		// room.walls.forEach((wall) => {
 
-					// raycaster
-					// 	.set(orbit_camera.position, new THREE.Vector3().copy(a).sub(orbit_camera.position).normalize());
+		// 	wall.mesh.updateMatrixWorld();
 
-					// const [ da ] = raycaster
-					// 	.intersectObject(_wall.mesh);
+		// 	// plane
+		// 	// 	.setFromNormalAndCoplanarPoint(
 
-					// raycaster
-					// 	.set(orbit_camera.position, new THREE.Vector3().copy(b).sub(orbit_camera.position).normalize());
+		// 	// 		new THREE.Vector3(
 
-					// const [ db ] = raycaster
-					// 	.intersectObject(_wall.mesh);
+		// 	// 			wall.mesh.geometry.attributes.normal.array[0],
+		// 	// 			wall.mesh.geometry.attributes.normal.array[1],
+		// 	// 			wall.mesh.geometry.attributes.normal.array[2],
+		// 	// 		)
+		// 	// 			.applyQuaternion(wall.quaternion),
 
-					// raycaster
-					// 	.set(orbit_camera.position, new THREE.Vector3().copy(c).sub(orbit_camera.position).normalize());
+		// 	// 		wall.position,
+		// 	// 	);
 
-					// const [ dc ] = raycaster
-					// 	.intersectObject(_wall.mesh);
+		// 	const aa =
+		// 		new THREE.Vector3(
 
-					// raycaster
-					// 	.set(orbit_camera.position, new THREE.Vector3().copy(d).sub(orbit_camera.position).normalize());
+		// 			wall.mesh.geometry.attributes.position.array[0],
+		// 			wall.mesh.geometry.attributes.position.array[1],
+		// 			wall.mesh.geometry.attributes.position.array[2],
+		// 		)
+		// 			.applyQuaternion(wall.quaternion)
+		// 			.add(wall.position);
+
+		// 	const bb =
+		// 		new THREE.Vector3(
+
+		// 			wall.mesh.geometry.attributes.position.array[3],
+		// 			wall.mesh.geometry.attributes.position.array[4],
+		// 			wall.mesh.geometry.attributes.position.array[5],
+		// 		)
+		// 			.applyQuaternion(wall.quaternion)
+		// 			.add(wall.position);
+
+		// 	const cc =
+		// 		new THREE.Vector3(
+
+		// 			wall.mesh.geometry.attributes.position.array[6],
+		// 			wall.mesh.geometry.attributes.position.array[7],
+		// 			wall.mesh.geometry.attributes.position.array[8],
+		// 		)
+		// 			.applyQuaternion(wall.quaternion)
+		// 			.add(wall.position);
+
+		// 	const dd =
+		// 		new THREE.Vector3(
+
+		// 			wall.mesh.geometry.attributes.position.array[9],
+		// 			wall.mesh.geometry.attributes.position.array[10],
+		// 			wall.mesh.geometry.attributes.position.array[11],
+		// 		)
+		// 			.applyQuaternion(wall.quaternion)
+		// 			.add(wall.position);
+
+		// 	let test = 0;
+
+		// 	room.walls.forEach((_wall) => {
+
+		// 		if (_wall !== wall) {
+
+		// 			const a =
+		// 				new THREE.Vector3(
+
+		// 					_wall.mesh.geometry.attributes.position.array[0] * 0.99,
+		// 					_wall.mesh.geometry.attributes.position.array[1] * 0.99,
+		// 					_wall.mesh.geometry.attributes.position.array[2],
+		// 				)
+		// 					.applyQuaternion(_wall.quaternion)
+		// 					.add(_wall.position);
 
-					// const [ dd ] = raycaster
-					// 	.intersectObject(_wall.mesh);
+		// 			const b =
+		// 				new THREE.Vector3(
 
-
-
-					// orbit_camera.updateMatrixWorld();
-
-
-
-					plane
-						.setFromNormalAndCoplanarPoint(
-
-							new THREE.Vector3(
-
-								_wall.mesh.geometry.attributes.normal.array[0],
-								_wall.mesh.geometry.attributes.normal.array[1],
-								_wall.mesh.geometry.attributes.normal.array[2],
-							)
-								.applyQuaternion(_wall.quaternion),
-
-							_wall.position,
-						);
-					// LOG(plane.constant)
-					// helper.updateMatrixWorld();
-
-					const intersection_a = new THREE.Vector3();
-					const intersection_b = new THREE.Vector3();
-					const intersection_c = new THREE.Vector3();
-					const intersection_d = new THREE.Vector3();
-
-					plane.intersectLine(line_a, intersection_a);
-					plane.intersectLine(line_b, intersection_b);
-					plane.intersectLine(line_c, intersection_c);
-					plane.intersectLine(line_d, intersection_d);
-
-					// const camera_direction = new THREE.Vector3();
-
-					// orbit_camera.getWorldDirection(camera_direction);
-
-
-					// LOG(Math.abs(orbit_camera.position.distanceTo(intersection_a) - orbit_camera.position.distanceTo(a)))
-
-
-
-					if (
-
-						// orbit_camera.position.distanceTo(_wall.position) > orbit_camera.position.distanceTo(wall.position) &&
-
-						(
-							orbit_camera.position.distanceTo(intersection_a) > orbit_camera.position.distanceTo(a) &&
-							new THREE.Vector3().copy(a).sub(orbit_camera.position).dot(new THREE.Vector3().copy(a).sub(intersection_a)) < 0 &&
-							Math.abs(orbit_camera.position.distanceTo(intersection_a) - orbit_camera.position.distanceTo(a)) > 0.1
-						) ||
-
-						(
-							orbit_camera.position.distanceTo(intersection_b) > orbit_camera.position.distanceTo(b) &&
-							new THREE.Vector3().copy(b).sub(orbit_camera.position).dot(new THREE.Vector3().copy(b).sub(intersection_b)) < 0 &&
-							Math.abs(orbit_camera.position.distanceTo(intersection_b) - orbit_camera.position.distanceTo(b)) > 0.1
-						) ||
-
-						(
-							orbit_camera.position.distanceTo(intersection_c) > orbit_camera.position.distanceTo(c) &&
-							new THREE.Vector3().copy(c).sub(orbit_camera.position).dot(new THREE.Vector3().copy(c).sub(intersection_c)) < 0 &&
-							Math.abs(orbit_camera.position.distanceTo(intersection_c) - orbit_camera.position.distanceTo(c)) > 0.1
-						) ||
-
-						(
-							orbit_camera.position.distanceTo(intersection_d) > orbit_camera.position.distanceTo(d) &&
-							new THREE.Vector3().copy(d).sub(orbit_camera.position).dot(new THREE.Vector3().copy(d).sub(intersection_d)) < 0 &&
-							Math.abs(orbit_camera.position.distanceTo(intersection_d) - orbit_camera.position.distanceTo(d)) > 0.1
-						)
-
-						// (da && da.distance < orbit_camera.position.distanceTo(a)) ||
-						// (db && db.distance < orbit_camera.position.distanceTo(b)) ||
-						// (dc && dc.distance < orbit_camera.position.distanceTo(c)) ||
-						// (dd && dd.distance < orbit_camera.position.distanceTo(d))
-					) {
-
-						wall.test.push(_index);
-
-						wall.test2.push(
-
-							[ intersection_a.x.toFixed(2), intersection_a.y.toFixed(2), intersection_a.z.toFixed(2) ],
-							[ intersection_b.x.toFixed(2), intersection_b.y.toFixed(2), intersection_b.z.toFixed(2) ],
-							[ intersection_c.x.toFixed(2), intersection_c.y.toFixed(2), intersection_c.z.toFixed(2) ],
-							[ intersection_d.x.toFixed(2), intersection_d.y.toFixed(2), intersection_d.z.toFixed(2) ],
-						);
-
-						++wall.mesh.renderOrder;
-						// --_wall.mesh.renderOrder;
-					}
-					// else {
-
-					// 	--_wall.mesh.renderOrder;
-					// }
-				}
-			});
-		});
-
-		renderer.render(scene_walls, orbit_camera);
-		renderer.render(scene_wall_segments, orbit_camera);
+		// 					_wall.mesh.geometry.attributes.position.array[3] * 0.99,
+		// 					_wall.mesh.geometry.attributes.position.array[4] * 0.99,
+		// 					_wall.mesh.geometry.attributes.position.array[5],
+		// 				)
+		// 					.applyQuaternion(_wall.quaternion)
+		// 					.add(_wall.position);
+
+		// 			const c =
+		// 				new THREE.Vector3(
+
+		// 					_wall.mesh.geometry.attributes.position.array[6] * 0.99,
+		// 					_wall.mesh.geometry.attributes.position.array[7] * 0.99,
+		// 					_wall.mesh.geometry.attributes.position.array[8],
+		// 				)
+		// 					.applyQuaternion(_wall.quaternion)
+		// 					.add(_wall.position);
+
+		// 			const d =
+		// 				new THREE.Vector3(
+
+		// 					_wall.mesh.geometry.attributes.position.array[9] * 0.99,
+		// 					_wall.mesh.geometry.attributes.position.array[10] * 0.99,
+		// 					_wall.mesh.geometry.attributes.position.array[11],
+		// 				)
+		// 					.applyQuaternion(_wall.quaternion)
+		// 					.add(_wall.position);
+
+		// 			const ray_a = new THREE.Ray(a, a.clone().sub(orbit_camera.position).normalize());
+		// 			const ray_b = new THREE.Ray(b, b.clone().sub(orbit_camera.position).normalize());
+		// 			const ray_c = new THREE.Ray(c, c.clone().sub(orbit_camera.position).normalize());
+		// 			const ray_d = new THREE.Ray(d, d.clone().sub(orbit_camera.position).normalize());
+
+		// 			const intersection_a = new THREE.Vector3();
+		// 			const intersection_b = new THREE.Vector3();
+		// 			const intersection_c = new THREE.Vector3();
+		// 			const intersection_d = new THREE.Vector3();
+
+		// 			if (
+
+		// 				// !ray_a.intersectPlane(plane, intersection_a) &&
+		// 				// !ray_b.intersectPlane(plane, intersection_b) &&
+		// 				// !ray_c.intersectPlane(plane, intersection_c) &&
+		// 				// !ray_d.intersectPlane(plane, intersection_d)
+
+		// 				!ray_a.intersectTriangle(aa, bb, cc, false, intersection_a) && !ray_a.intersectTriangle(cc, bb, dd, false, intersection_a) &&
+		// 				!ray_b.intersectTriangle(aa, bb, cc, false, intersection_b) && !ray_b.intersectTriangle(cc, bb, dd, false, intersection_b) &&
+		// 				!ray_c.intersectTriangle(aa, bb, cc, false, intersection_c) && !ray_c.intersectTriangle(cc, bb, dd, false, intersection_c) &&
+		// 				!ray_d.intersectTriangle(aa, bb, cc, false, intersection_d) && !ray_d.intersectTriangle(cc, bb, dd, false, intersection_d)
+		// 			) {
+
+		// 				++test;
+		// 				// wall.mesh.renderOrder;
+		// 				// _wall.mesh.renerOrder = wall.mesh.renderOrder - 1;
+		// 			}
+		// 			// else {
+
+		// 			// 	++wall.mesh.renderOrder;
+		// 			// }
+		// 		}
+		// 	});
+
+		// 	if (test === room.walls.length - 1) {
+
+		// 		wall.mesh.renderOrder = test;
+		// 	}
+		// });
+
+		// room.walls.forEach((wall) => (wall.mesh.renderOrder = 0));
+
+		// orbit_camera.updateMatrixWorld();
+
+		// room.walls.forEach((wall) => {
+
+		// 	if (wall.mesh.renderOrder === 1110) {
+
+		// 		wall.mesh.updateMatrixWorld();
+
+		// 		plane
+		// 			.setFromNormalAndCoplanarPoint(
+
+		// 				new THREE.Vector3(
+
+		// 					wall.mesh.geometry.attributes.normal.array[0],
+		// 					wall.mesh.geometry.attributes.normal.array[1],
+		// 					wall.mesh.geometry.attributes.normal.array[2],
+		// 				)
+		// 					.applyQuaternion(wall.quaternion),
+
+		// 				wall.position,
+		// 			);
+
+		// 		room.walls.forEach((_wall) => {
+
+		// 			if (_wall !== wall) {
+
+		// 				const a =
+		// 					new THREE.Vector3(
+
+		// 						_wall.mesh.geometry.attributes.position.array[0] * 0.99,
+		// 						_wall.mesh.geometry.attributes.position.array[1] * 0.99,
+		// 						_wall.mesh.geometry.attributes.position.array[2],
+		// 					)
+		// 						.applyQuaternion(_wall.quaternion)
+		// 						.add(_wall.position);
+
+		// 				const b =
+		// 					new THREE.Vector3(
+
+		// 						_wall.mesh.geometry.attributes.position.array[3] * 0.99,
+		// 						_wall.mesh.geometry.attributes.position.array[4] * 0.99,
+		// 						_wall.mesh.geometry.attributes.position.array[5],
+		// 					)
+		// 						.applyQuaternion(_wall.quaternion)
+		// 						.add(_wall.position);
+
+		// 				const c =
+		// 					new THREE.Vector3(
+
+		// 						_wall.mesh.geometry.attributes.position.array[6] * 0.99,
+		// 						_wall.mesh.geometry.attributes.position.array[7] * 0.99,
+		// 						_wall.mesh.geometry.attributes.position.array[8],
+		// 					)
+		// 						.applyQuaternion(_wall.quaternion)
+		// 						.add(_wall.position);
+
+		// 				const d =
+		// 					new THREE.Vector3(
+
+		// 						_wall.mesh.geometry.attributes.position.array[9] * 0.99,
+		// 						_wall.mesh.geometry.attributes.position.array[10] * 0.99,
+		// 						_wall.mesh.geometry.attributes.position.array[11],
+		// 					)
+		// 						.applyQuaternion(_wall.quaternion)
+		// 						.add(_wall.position);
+
+		// 				const ray_a = new THREE.Ray(a, a.clone().sub(orbit_camera.position).normalize());
+		// 				const ray_b = new THREE.Ray(b, b.clone().sub(orbit_camera.position).normalize());
+		// 				const ray_c = new THREE.Ray(c, c.clone().sub(orbit_camera.position).normalize());
+		// 				const ray_d = new THREE.Ray(d, d.clone().sub(orbit_camera.position).normalize());
+
+		// 				const intersection_a = new THREE.Vector3();
+		// 				const intersection_b = new THREE.Vector3();
+		// 				const intersection_c = new THREE.Vector3();
+		// 				const intersection_d = new THREE.Vector3();
+
+		// 				if (
+
+		// 					!ray_a.intersectPlane(plane, intersection_a) &&
+		// 					!ray_b.intersectPlane(plane, intersection_b) &&
+		// 					!ray_c.intersectPlane(plane, intersection_c) &&
+		// 					!ray_d.intersectPlane(plane, intersection_d)
+		// 				) {
+
+		// 					++wall.mesh.renderOrder;
+		// 				}
+		// 			}
+		// 		});
+		// 	}
+		// });
+
+		// renderer.render(scene_walls, orbit_camera);
+		// renderer.render(scene_wall_segments, orbit_camera);
 
 
 
 		gl.enable(gl.DEPTH_TEST);
 
-		scene_floor.overrideMaterial = background_material;
 
-		renderer.render(scene_floor, orbit_camera);
 
-		scene_floor.overrideMaterial = null;
+		// renderer.render(scene_floor, orbit_camera);
+		// renderer.render(scene_walls, orbit_camera);
 
-		scene_walls.overrideMaterial = background_material;
+
+
+		// scene_floor.overrideMaterial = background_material;
+		// scene_walls.overrideMaterial = background_material;
+
+		// renderer.render(scene_floor, orbit_camera);
+		// renderer.render(scene_walls, orbit_camera);
+
+		// scene_floor.overrideMaterial = null;
+		// scene_walls.overrideMaterial = null;
+
+		// gl.disable(gl.DEPTH_TEST);
+
+		// renderer.render(scene_floor, orbit_camera);
+		// renderer2.render(scene_floor_segments, orbit_camera);
 
 		renderer.render(scene_walls, orbit_camera);
 
+		// scene_floor.overrideMaterial = background_material;
+		scene_walls.overrideMaterial = background_material;
+
+		// renderer2.render(scene_floor, orbit_camera);
+		// room.walls.forEach((wall) => {
+
+		// 	// wall.mesh.quaternion.multiply(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(1, 0, 0)));
+		// 	wall.mesh.rotateY(Math.PI);
+		// 	wall.mesh.updateMatrix();
+		// });
+		renderer2.render(scene_walls, orbit_camera);
+		// room.walls.forEach((wall) => {
+
+		// 	wall.mesh.rotateY(-Math.PI);
+		// 	wall.mesh.updateMatrix();
+		// });
+
+		// scene_floor.overrideMaterial = null;
 		scene_walls.overrideMaterial = null;
 
-		renderer.render(scene_draggable, orbit_camera);
+		renderer2.render(scene_wall_segments, orbit_camera);
+
+		// renderer.render(scene_draggable, orbit_camera);
 
 		// gl.disable(gl.BLEND);
 		// gl.enable(gl.DEPTH_TEST);
