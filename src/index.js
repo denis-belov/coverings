@@ -9,7 +9,6 @@ import '@babel/polyfill';
 import Loader from 'external-data-loader';
 
 import modes from './modes';
-// import cast from './cast';
 
 import Point from './point';
 import Room from './room';
@@ -29,12 +28,7 @@ import {
 import {
 
 	renderer,
-	renderer2,
-	scene_floor,
-	scene_floor_segments,
-	scene_walls,
-	scene_wall_segments,
-	scene_draggable,
+	scene,
 	plan_camera,
 	orbit_camera,
 	orbit_controls,
@@ -145,7 +139,7 @@ material_BUTTONS.forEach((BUTTON) => {
 
 			loader.content = {};
 
-			tileable_mesh._.userData.parent.updateGeometry();
+			tileable_mesh._.userData.parent.updateGeometry(tileable_mesh._.userData.parent.regions);
 		}
 	});
 });
@@ -158,49 +152,6 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 	const length = parseFloat(length_INPUT.value);
 	const height = parseFloat(height_INPUT.value);
 
-	[
-		[ 1.5, height, 1.5 ],
-		[ 1.5, height, -1.5 ],
-		[ -1.5, height, -1.5 ],
-		[ -1.5, height, 1.5 ],
-	]
-		.forEach((spot_light_position) => {
-
-			const spot_light_floor = new THREE.SpotLight(0xFFFFFF);
-			spot_light_floor.intensity = 10;
-			spot_light_floor.distance = 0;
-			spot_light_floor.penumbra = 1;
-			spot_light_floor.decay = 2;
-			spot_light_floor.angle = Math.PI * 0.5;
-			spot_light_floor.position.set(...spot_light_position);
-
-			spot_light_floor.target.position.y = 0;
-			spot_light_floor.target.position.set(...spot_light_position);
-
-			const spot_light_floor_segments = spot_light_floor.clone();
-			const spot_light_walls = spot_light_floor.clone();
-			const spot_light_wall_segments = spot_light_floor.clone();
-			const spot_light_draggable = spot_light_floor.clone();
-
-			scene_floor.add(spot_light_floor);
-			scene_floor.add(spot_light_floor.target);
-
-			scene_floor_segments.add(spot_light_floor_segments);
-			scene_floor_segments.add(spot_light_floor_segments.target);
-
-			scene_walls.add(spot_light_walls);
-			scene_walls.add(spot_light_walls.target);
-
-			scene_wall_segments.add(spot_light_wall_segments);
-			scene_wall_segments.add(spot_light_wall_segments.target);
-
-			scene_draggable.add(spot_light_draggable);
-			scene_draggable.add(spot_light_draggable.target);
-
-			// const spot_light_helper = new THREE.SpotLightHelper(spot_light);
-			// helpers.push(spot_light_helper);
-			// scene_floor.add(spot_light_helper);
-		});
 
 
 	room.makeContour(
@@ -217,6 +168,31 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 			new Point(length / 2, -width / 2),
 		],
 	);
+
+
+
+	[
+		[ 1.5, height, 1.5 ],
+		[ 1.5, height, -1.5 ],
+		[ -1.5, height, -1.5 ],
+		[ -1.5, height, 1.5 ],
+	]
+		.forEach((spot_light_position) => {
+
+			const spot_light = new THREE.SpotLight(0xFFFFFF);
+			spot_light.intensity = 10;
+			spot_light.distance = 0;
+			spot_light.penumbra = 1;
+			spot_light.decay = 2;
+			spot_light.angle = Math.PI * 0.5;
+			spot_light.position.set(...spot_light_position);
+
+			// spot_light.target.position.y = 0;
+			// spot_light.target.position.set(...spot_light_position);
+
+			scene.add(spot_light);
+			scene.add(spot_light.target);
+		});
 
 	modal.style.display = 'none';
 });
@@ -242,25 +218,17 @@ const animate = () => {
 	requestAnimationFrame(animate);
 
 	renderer.clear();
-	renderer2.clear();
 
 	if (modes.orbit_mode) {
 
 		orbit_controls.update();
 
-		renderer.render(scene_walls, orbit_camera);
+		renderer.render(scene, orbit_camera);
 
 	}
 	else {
 
-		gl.disable(gl.DEPTH_TEST);
-
-		// renderer.render(scene_floor, plan_camera);
-		// renderer.render(scene_floor_segments, plan_camera);
-		renderer.render(scene_walls, plan_camera);
-		// renderer.render(scene_wall_segments, plan_camera);
-
-		// gl.enable(gl.DEPTH_TEST);
+		renderer.render(scene, plan_camera);
 	}
 };
 

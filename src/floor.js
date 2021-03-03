@@ -13,9 +13,9 @@ import {
 
 export default class Floor extends Tileable {
 
-	constructor (room, scene) {
+	constructor (room) {
 
-		super(room, scene);
+		super(room);
 
 		this.mesh2 = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
 

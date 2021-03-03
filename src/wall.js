@@ -40,9 +40,9 @@ export default class Wall extends Tileable {
 
 
 
-	constructor (room, scene, point1, point2) {
+	constructor (room, point1, point2) {
 
-		super(room, scene);
+		super(room);
 
 		// this.type = 'wall';
 

@@ -4,12 +4,9 @@ import { transparent_IMG } from './dom';
 
 import {
 
-	scene_floor,
-	scene_floor_segments,
-	scene_walls,
-	scene_wall_segments,
+	scene,
+	raycastable_meshes,
 	WEBGL_MAXIMUM_ANISOTROPY,
-	// raycastable_meshes,
 	MATERIAL_WIREFRAME,
 	ATTRIBUTE_SIZE_1,
 	ATTRIBUTE_SIZE_2,
@@ -20,18 +17,14 @@ import {
 
 export default class Tileable {
 
-	constructor (room, scene) {
+	constructor (room) {
 
 		this.tile = null;
 
-		// for using with walls
 		this.quaternion = new THREE.Quaternion();
 		this.position = new THREE.Vector3();
 
 		this.segments = [];
-
-		// rename to children ?
-		this.z_index = 0;
 
 		const geometry = new THREE.BufferGeometry();
 		geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(), ATTRIBUTE_SIZE_1));
@@ -91,70 +84,22 @@ export default class Tileable {
 			side: THREE.BackSide,
 		});
 
-		// this.material3 = new THREE.MeshBasicMaterial({
-
-		// 	color: 'grey',
-		// 	side: THREE.BackSide,
-		// });
-
 		this.mesh = new THREE.Mesh(geometry, this.material);
+		// remove ?
 		this.mesh.matrixAutoUpdate = false;
 
 		// rename
 		this.mesh.userData.parent = this;
 
+		raycastable_meshes.push(this.mesh);
+
 		// tileable
 		if (room) {
 
 			this.room = room;
-
-			// this.object3d = new THREE.Object3D();
-
-			// this.object3d.add(this.mesh);
-
-			// this.object3d.userData.parent = this;
 		}
 
-		// raycastable_meshes.push(this.mesh);
-
-		// (scene === 1 ? scene_floor : scene_floor_segments).add(this.mesh);
-
-		// switch (scene) {
-
-		// // // floor
-		// // case 0:
-
-		// // 	scene_floor.add(this.mesh);
-
-		// // 	break;
-
-		// // // floor segment
-		// // case 1:
-
-		// // 	scene_floor_segments.add(this.mesh);
-
-		// // 	break;
-
-		// // wall
-		// case 2:
-
-		// 	scene_walls.add(this.mesh);
-
-		// 	break;
-
-		// // wall segment
-		// case 3:
-
-		// 	scene_wall_segments.add(this.mesh);
-
-		// 	break;
-
-		// default:
-
-		// 	break;
-		// }
-
-		scene_walls.add(this.mesh);
+		scene.add(this.mesh);
 	}
 
 	copy (tileable) {
@@ -189,5 +134,41 @@ export default class Tileable {
 		this.material2.map.needsUpdate = true;
 
 		this.material2.needsUpdate = true;
+	}
+
+	getPolygonsForSegmentation () {
+
+		const polygons = { regions: [] };
+
+		for (let i = 0; i < this.mesh.geometry.index.array.length; i += 3) {
+
+			const index1 = this.mesh.geometry.index.array[i + 0] * 3;
+			const index2 = this.mesh.geometry.index.array[i + 1] * 3;
+			const index3 = this.mesh.geometry.index.array[i + 2] * 3;
+
+			polygons.regions.push(
+
+				[
+					[
+						this.mesh.geometry.attributes.position.array[index1 + 0],
+						this.mesh.geometry.attributes.position.array[index1 + 1],
+					],
+
+					[
+						this.mesh.geometry.attributes.position.array[index2 + 0],
+						this.mesh.geometry.attributes.position.array[index2 + 1],
+					],
+
+					[
+						this.mesh.geometry.attributes.position.array[index3 + 0],
+						this.mesh.geometry.attributes.position.array[index3 + 1],
+					],
+				],
+			);
+
+			// polygons.inverted = true;
+		}
+
+		return polygons;
 	}
 }

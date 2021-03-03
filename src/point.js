@@ -32,8 +32,6 @@ export default class Point {
 
 			if (!modes.add_wall_mode) {
 
-				// console.log(this.circle.style.zIndex);
-
 				const last_z_index = this.circle.style.zIndex;
 
 				this.circle.style.zIndex = document.getElementsByClassName('coverings-plan-circle').length - 1 + 12;

@@ -1,0 +1,12 @@
+{
+  "sizes": [ 1.155, 1.155 ],
+
+  "textures": {
+
+    "map": "/textures/10/GrangeFloor2.jpg",
+    "ao_map": "/textures/10/GrangeFloor2_AO.jpg",
+    "normal_map": "/textures/10/GrangeFloor2_normal.jpg",
+    "roughness_map": "/textures/10/GrangeFloor2_normal.jpg",
+    "metalness_map": "/textures/10/GrangeFloor2_metalness.jpg"
+  }
+}

@@ -32,14 +32,8 @@ import {
 
 	uploadModel,
 	plan_camera,
-	scene_floor,
-	scene_floor_segments,
-	scene_walls,
-	scene_wall_segments,
+	scene,
 	tileable_mesh,
-	// ATTRIBUTE_SIZE_1,
-	ATTRIBUTE_SIZE_2,
-	ATTRIBUTE_SIZE_3,
 } from './three';
 
 
@@ -196,310 +190,312 @@ window.addEventListener('mousedown', (evt) => {
 
 mode_selection_BUTTON.addEventListener('click', () => {
 
-	if (!tileable_mesh._.userData.parent.tileable) {
+	// if (!tileable_mesh._.userData.parent.tileable) {
 
-		const whole = tileable_mesh._.userData.parent;
+	const whole =
+		tileable_mesh._.userData.parent.tileable ?
+			tileable_mesh._.userData.parent.tileable :
+			tileable_mesh._.userData.parent;
 
-		modes.selection_mode = 1 - modes.selection_mode;
+	modes.selection_mode = 1 - modes.selection_mode;
 
-		if (modes.selection_mode) {
+	if (modes.selection_mode) {
 
-			mode_selection_BUTTON.classList.add('-pressed');
+		mode_selection_BUTTON.classList.add('-pressed');
 
-			mode_selection_BUTTON.innerHTML = 'Selection mode';
+		mode_selection_BUTTON.innerHTML = 'Selection mode';
 
-			selection_NODE.classList.remove('-hidden');
+		selection_NODE.classList.remove('-hidden');
 
-			scene_floor.children.forEach((mesh) => {
+		scene.children.forEach((mesh) => {
 
-				mesh.visible = (mesh === whole.mesh);
-			});
+			mesh.visible = (
 
-			scene_floor_segments.children.forEach((mesh) => {
+				mesh === whole.mesh ||
 
-				mesh.visible = whole.segments.includes(whole.mesh.userData.parent);
-			});
+				whole.segments.includes(mesh.userData.parent)
+			);
+		});
 
-			// LOG(scene_walls.children)
+		plan_camera.rotation.set(0, Math.PI, 0);
+		plan_camera.position.set(0, 0, 0);
+		plan_camera.translateZ(1);
 
-			scene_walls.children.forEach((mesh) => {
+		whole.mesh.material = whole.material2;
 
-				// LOG(mesh === whole.mesh)
+		whole.mesh.quaternion.set(0, 0, 0, 1);
+		whole.mesh.position.set(0, 0, 0);
+		whole.mesh.updateMatrix();
 
-				mesh.visible = (mesh === whole.mesh);
-			});
+		whole.segments.forEach((segment) => {
 
-			scene_wall_segments.children.forEach((mesh) => {
+			segment.mesh.material = segment.material2;
 
-				mesh.visible = whole.segments.includes(whole.mesh.userData.parent);
-			});
+			segment.mesh.quaternion.set(0, 0, 0, 1);
+			segment.mesh.position.set(0, 0, 0);
+			segment.mesh.updateMatrix();
+		});
 
-			plan_camera.rotation.set(0, Math.PI, 0);
-			plan_camera.position.set(0, 0, 0);
-			plan_camera.translateZ(1);
-
-			whole.mesh.material = whole.material2;
-
-			whole.mesh.quaternion.set(0, 0, 0, 1);
-			whole.mesh.position.set(0, 0, 0);
-			whole.mesh.updateMatrix();
-
-			whole.segments.forEach((segment) => {
-
-				segment.mesh.material = segment.material2;
-
-				segment.mesh.quaternion.set(0, 0, 0, 1);
-				segment.mesh.position.set(0, 0, 0);
-				segment.mesh.updateMatrix();
-			});
-
-			modes.orbit_mode = 0;
-		}
-		else {
-
-			mode_selection_BUTTON.classList.remove('-pressed');
-
-			apply_segment_BUTTON.style.display = 'none';
-
-			mode_selection_BUTTON.innerHTML = 'Tile mode';
-
-			selection_NODE.classList.add('-hidden');
-
-			scene_floor.children.forEach((mesh) => {
-
-				mesh.visible = true;
-			});
-
-			scene_floor_segments.children.forEach((mesh) => {
-
-				mesh.visible = true;
-			});
-
-			scene_walls.children.forEach((mesh) => {
-
-				mesh.visible = true;
-			});
-
-			scene_wall_segments.children.forEach((mesh) => {
-
-				mesh.visible = true;
-			});
-
-			plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
-			plan_camera.position.set(0, 0, 0);
-			plan_camera.translateZ(1);
-
-			whole.mesh.material = whole.material;
-
-			whole.mesh.quaternion.copy(whole.quaternion);
-			whole.mesh.position.copy(whole.position);
-			whole.mesh.updateMatrix();
-
-			whole.segments.forEach((segment) => {
-
-				segment.mesh.material = segment.material;
-
-				segment.mesh.quaternion.copy(whole.quaternion);
-				segment.mesh.position.copy(whole.position);
-				segment.mesh.updateMatrix();
-
-				// segment.mesh.geometry.computeBoundingSphere();
-			});
-
-			document.body.contains(selection_area_div) &&
-
-				document.body.removeChild(selection_area_div);
-
-			modes.orbit_mode = 1;
-		}
+		modes.orbit_mode = 0;
 	}
+	else {
+
+		mode_selection_BUTTON.classList.remove('-pressed');
+
+		apply_segment_BUTTON.style.display = 'none';
+
+		mode_selection_BUTTON.innerHTML = 'Tile mode';
+
+		selection_NODE.classList.add('-hidden');
+
+		scene.children.forEach((mesh) => {
+
+			mesh.visible = true;
+		});
+
+		plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
+		plan_camera.position.set(0, 0, 0);
+		plan_camera.translateZ(1);
+
+		whole.mesh.material = whole.material;
+
+		whole.mesh.quaternion.copy(whole.quaternion);
+		whole.mesh.position.copy(whole.position);
+		whole.mesh.updateMatrix();
+
+		whole.segments.forEach((segment) => {
+
+			segment.mesh.material = segment.material;
+
+			segment.mesh.quaternion.copy(whole.quaternion);
+			segment.mesh.position.copy(whole.position);
+			segment.mesh.updateMatrix();
+
+			// segment.mesh.geometry.computeBoundingSphere();
+		});
+
+		document.body.contains(selection_area_div) &&
+
+			document.body.removeChild(selection_area_div);
+
+		modes.orbit_mode = 1;
+	}
+	// }
 });
 
 apply_segment_BUTTON.addEventListener('click', () => {
 
-	if (!tileable_mesh._.userData.parent.tileable) {
+	// if (!tileable_mesh._.userData.parent.tileable) {
 
-		const selection_area_meter_width = width * cast.PIXELS_TO_METERS;
-		const selection_area_meter_height = height * cast.PIXELS_TO_METERS;
-		const selection_area_meter_left = (left + (width * 0.5) - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS;
-		const selection_area_meter_top = (top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS;
-
-
-
-		const whole = tileable_mesh._.userData.parent;
+	const selection_area_meter_width = width * cast.PIXELS_TO_METERS;
+	const selection_area_meter_height = height * cast.PIXELS_TO_METERS;
+	const selection_area_meter_left = (left + (width * 0.5) - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS;
+	const selection_area_meter_top = (top + (height * 0.5) - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS;
 
 
 
-		const segment_geometry = new THREE.PlaneBufferGeometry(selection_area_meter_width, selection_area_meter_height);
+	const whole =
+		tileable_mesh._.userData.parent.tileable ?
+			tileable_mesh._.userData.parent.tileable :
+			tileable_mesh._.userData.parent;
 
 
 
-		const segment_polygons = { regions: [] };
+	const segment_geometry = new THREE.PlaneBufferGeometry(selection_area_meter_width, selection_area_meter_height);
 
-		for (let i = 0; i < segment_geometry.index.array.length; i += 3) {
 
-			const index1 = segment_geometry.index.array[i + 0] * 3;
-			const index2 = segment_geometry.index.array[i + 1] * 3;
-			const index3 = segment_geometry.index.array[i + 2] * 3;
 
-			segment_polygons.regions.push(
+	const segment_polygons = { regions: [] };
+
+	for (let i = 0; i < segment_geometry.index.array.length; i += 3) {
+
+		const index1 = segment_geometry.index.array[i + 0] * 3;
+		const index2 = segment_geometry.index.array[i + 1] * 3;
+		const index3 = segment_geometry.index.array[i + 2] * 3;
+
+		segment_polygons.regions.push(
+
+			[
+				[
+					segment_geometry.attributes.position.array[index1 + 0] - selection_area_meter_left,
+					segment_geometry.attributes.position.array[index1 + 1] - selection_area_meter_top,
+				],
 
 				[
-					[
-						segment_geometry.attributes.position.array[index1 + 0] - selection_area_meter_left,
-						segment_geometry.attributes.position.array[index1 + 1] - selection_area_meter_top,
-					],
-
-					[
-						segment_geometry.attributes.position.array[index2 + 0] - selection_area_meter_left,
-						segment_geometry.attributes.position.array[index2 + 1] - selection_area_meter_top,
-					],
-
-					[
-						segment_geometry.attributes.position.array[index3 + 0] - selection_area_meter_left,
-						segment_geometry.attributes.position.array[index3 + 1] - selection_area_meter_top,
-					],
+					segment_geometry.attributes.position.array[index2 + 0] - selection_area_meter_left,
+					segment_geometry.attributes.position.array[index2 + 1] - selection_area_meter_top,
 				],
-			);
-
-			// segment_polygons.inverted = true;
-		}
-
-
-
-		const whole_polygons = { regions: [] };
-
-		for (let i = 0; i < whole.mesh.geometry.index.array.length; i += 3) {
-
-			const index1 = whole.mesh.geometry.index.array[i + 0] * 3;
-			const index2 = whole.mesh.geometry.index.array[i + 1] * 3;
-			const index3 = whole.mesh.geometry.index.array[i + 2] * 3;
-
-			whole_polygons.regions.push(
 
 				[
-					[
-						whole.mesh.geometry.attributes.position.array[index1 + 0],
-						whole.mesh.geometry.attributes.position.array[index1 + 1],
-					],
-
-					[
-						whole.mesh.geometry.attributes.position.array[index2 + 0],
-						whole.mesh.geometry.attributes.position.array[index2 + 1],
-					],
-
-					[
-						whole.mesh.geometry.attributes.position.array[index3 + 0],
-						whole.mesh.geometry.attributes.position.array[index3 + 1],
-					],
+					segment_geometry.attributes.position.array[index3 + 0] - selection_area_meter_left,
+					segment_geometry.attributes.position.array[index3 + 1] - selection_area_meter_top,
 				],
-			);
+			],
+		);
 
-			// whole_polygons.inverted = true;
-		}
-
-
-
-		if (whole.segments.length) {
-
-			whole.segments.forEach((_segment) => {
-
-				const _segment_polygons = { regions: [] };
-
-				for (let i = 0; i < _segment.mesh.geometry.index.array.length; i += 3) {
-
-					const index1 = _segment.mesh.geometry.index.array[i + 0] * 3;
-					const index2 = _segment.mesh.geometry.index.array[i + 1] * 3;
-					const index3 = _segment.mesh.geometry.index.array[i + 2] * 3;
-
-					_segment_polygons.regions.push(
-
-						[
-							[
-								_segment.mesh.geometry.attributes.position.array[index1 + 0],
-								_segment.mesh.geometry.attributes.position.array[index1 + 1],
-							],
-
-							[
-								_segment.mesh.geometry.attributes.position.array[index2 + 0],
-								_segment.mesh.geometry.attributes.position.array[index2 + 1],
-							],
-
-							[
-								_segment.mesh.geometry.attributes.position.array[index3 + 0],
-								_segment.mesh.geometry.attributes.position.array[index3 + 1],
-							],
-						],
-					);
-
-					// whole_polygons.inverted = true;
-				}
+		// segment_polygons.inverted = true;
+	}
 
 
 
-				const difference_polygons = polybooljs.differenceRev(segment_polygons, _segment_polygons);
+	if (whole.segments.length) {
 
-				difference_polygons?.regions &&
+		const segments = whole.segments.slice();
 
-					difference_polygons.regions.forEach((region) => {
+		// whole.segments.forEach((segment) => scene.remove(segment));
 
-						const segment =
-							new Segment(
+		whole.segments.length = 0;
 
-								null,
-								whole.points ? 3 : 1,
-								whole,
-							);
+		LOG(segments.length)
 
-						segment.mesh.material = segment.material2;
+		segments.forEach((_segment) => {
 
-						whole.segments.push(segment);
+			const _segment_polygons = _segment.getPolygonsForSegmentation();
 
-						segment.setTile(whole.tile);
+			const object_polygons = segment_polygons;
+			const subject_polygons = _segment_polygons;
 
-						segment.updateGeometry(region);
-					});
-			});
-		}
-		else {
+			// // swap obj and subj order
+			// const intersection_polygons = polybooljs.intersect(subject_polygons, object_polygons);
 
-			const difference_polygons = polybooljs.differenceRev(segment_polygons, whole_polygons);
+			// intersection_polygons?.regions &&
 
-			difference_polygons?.regions &&
+			// 	intersection_polygons.regions.forEach((region) => {
 
-				difference_polygons.regions.forEach((region) => {
+			// 		const segment =
+			// 			new Segment(
 
-					const segment =
-						new Segment(
+			// 				null,
+			// 				whole,
+			// 			);
 
-							null,
-							whole.points ? 3 : 1,
-							whole,
-						);
+			// 		segment.mesh.material = segment.material2;
 
-					segment.mesh.material = segment.material2;
+			// 		whole.segments.push(segment);
 
-					whole.segments.push(segment);
+			// 		segment.setTile(whole.tile);
 
-					segment.setTile(whole.tile);
-
-					segment.updateGeometry(region);
-				});
-		}
+			// 		segment.updateGeometry(region);
+			// 	});
 
 
 
-		const intersection_polygons = polybooljs.intersect(segment_polygons, whole_polygons);
+			const xor = polybooljs.xor(subject_polygons, object_polygons);
 
-		intersection_polygons?.regions &&
+			if (
 
-			intersection_polygons.regions.forEach((region) => {
+				xor?.regions?.[0]?.length === 4 ||
+				xor?.regions?.[1]?.length === 4
+			) {
+
+				LOG(123)
+
+				// rename
+				const ppp = [];
+
+				// rename
+				let xx = 0;
+				let yy = 0;
+				let ii = 0;
+
+				object_polygons.regions.forEach(
+
+					(region) =>
+						region.forEach((coordinate) => {
+
+							xx += coordinate[0];
+							yy += coordinate[1];
+
+							++ii;
+						}),
+				);
+
+				xx /= ii;
+				yy /= ii;
+
+				object_polygons.regions.forEach(
+
+					(region) =>
+						region.forEach((coordinate) => {
+
+							coordinate[0] -= xx;
+							coordinate[0] *= 1000;
+						}),
+				);
+
+				const difference_polygons1 = polybooljs.difference(subject_polygons, object_polygons);
+
+				object_polygons.regions.forEach(
+
+					(region) =>
+						region.forEach((coordinate) => {
+
+							coordinate[0] /= 1000;
+							coordinate[0] += xx;
+
+							coordinate[1] -= yy;
+							coordinate[1] *= 1000;
+						}),
+				);
+
+				const difference_polygons2 = polybooljs.difference(subject_polygons, object_polygons);
+
+
+
+				const difference_polygons3 = polybooljs.intersect(difference_polygons1, difference_polygons2);
+
+				difference_polygons3.regions.forEach((region) => ppp.push(region));
+
+				const difference_polygons4 = polybooljs.xor(difference_polygons1, difference_polygons2);
+
+				difference_polygons4.regions.forEach((region) => ppp.push(region));
+
+
+
+				// difference_polygons3?.regions &&
+
+				// 	difference_polygons3.regions.forEach((region) => {
+
+				// 		const segment =
+				// 			new Segment(
+
+				// 				null,
+				// 				whole,
+				// 			);
+
+				// 		segment.mesh.material = segment.material2;
+
+				// 		whole.segments.push(segment);
+
+				// 		segment.setTile(whole.tile);
+
+				// 		segment.updateGeometry(region);
+				// 	});
+
+				// difference_polygons4?.regions &&
+
+				// 	difference_polygons4.regions.forEach((region) => {
+
+				// 		const segment =
+				// 			new Segment(
+
+				// 				null,
+				// 				whole,
+				// 			);
+
+				// 		segment.mesh.material = segment.material2;
+
+				// 		whole.segments.push(segment);
+
+				// 		segment.setTile(whole.tile);
+
+				// 		segment.updateGeometry(region);
+				// 	});
 
 				const segment =
 					new Segment(
 
 						null,
-						whole.points ? 3 : 1,
 						whole,
 					);
 
@@ -509,13 +505,279 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 				segment.setTile(whole.tile);
 
-				segment.updateGeometry(region);
+				segment.updateGeometry(ppp);
+			}
+			else {
+
+				LOG(333)
+
+				const difference_polygons = polybooljs.difference(subject_polygons, object_polygons);
+
+				LOG(difference_polygons)
+
+				difference_polygons?.regions &&
+
+					difference_polygons.regions.forEach((region) => {
+
+						const segment =
+							new Segment(
+
+								null,
+								whole,
+							);
+
+						segment.mesh.material = segment.material2;
+
+						whole.segments.push(segment);
+
+						segment.setTile(whole.tile);
+
+						segment.updateGeometry([ region ]);
+					});
+			}
+
+			scene.remove(_segment.mesh);
+
+			// LOG(123)
+		});
+	}
+	else {
+
+		const whole_polygons = whole.getPolygonsForSegmentation();
+
+		const object_polygons = segment_polygons;
+		const subject_polygons = whole_polygons;
+
+
+
+		// swap obj and subj order
+		const intersection_polygons = polybooljs.intersect(subject_polygons, object_polygons);
+
+		intersection_polygons?.regions &&
+
+			intersection_polygons.regions.forEach((region) => {
+
+				const segment =
+					new Segment(
+
+						null,
+						whole,
+					);
+
+				segment.mesh.material = segment.material2;
+
+				whole.segments.push(segment);
+
+				segment.setTile(whole.tile);
+
+				segment.updateGeometry([ region ]);
 			});
 
 
 
-		scene_walls.remove(whole.mesh);
+		const xor = polybooljs.xor(subject_polygons, object_polygons);
+
+		if (
+
+			xor?.regions?.[0]?.length === 4 ||
+			xor?.regions?.[1]?.length === 4
+		) {
+
+			// rename
+			const ppp = [];
+
+			// rename
+			let xx = 0;
+			let yy = 0;
+			let ii = 0;
+
+			object_polygons.regions.forEach(
+
+				(region) =>
+					region.forEach((coordinate) => {
+
+						xx += coordinate[0];
+						yy += coordinate[1];
+
+						++ii;
+					}),
+			);
+
+			xx /= ii;
+			yy /= ii;
+
+			object_polygons.regions.forEach(
+
+				(region) =>
+					region.forEach((coordinate) => {
+
+						coordinate[0] -= xx;
+						coordinate[0] *= 1000;
+					}),
+			);
+
+			const difference_polygons1 = polybooljs.difference(subject_polygons, object_polygons);
+
+
+			object_polygons.regions.forEach(
+
+				(region) =>
+					region.forEach((coordinate) => {
+
+						coordinate[0] /= 1000;
+						coordinate[0] += xx;
+
+						coordinate[1] -= yy;
+						coordinate[1] *= 1000;
+					}),
+			);
+
+			const difference_polygons2 = polybooljs.difference(subject_polygons, object_polygons);
+
+
+
+			const difference_polygons3 = polybooljs.intersect(difference_polygons1, difference_polygons2);
+
+			difference_polygons3.regions.forEach((region) => ppp.push(region));
+
+			const difference_polygons4 = polybooljs.xor(difference_polygons1, difference_polygons2);
+
+			difference_polygons4.regions.forEach((region) => ppp.push(region));
+
+
+
+			// difference_polygons3?.regions &&
+
+			// 	difference_polygons3.regions.forEach((region) => {
+
+			// 		const segment =
+			// 			new Segment(
+
+			// 				null,
+			// 				whole,
+			// 			);
+
+			// 		segment.mesh.material = segment.material2;
+
+			// 		whole.segments.push(segment);
+
+			// 		segment.setTile(whole.tile);
+
+			// 		segment.updateGeometry(region);
+			// 	});
+
+			// difference_polygons4?.regions &&
+
+			// 	difference_polygons4.regions.forEach((region) => {
+
+			// 		const segment =
+			// 			new Segment(
+
+			// 				null,
+			// 				whole,
+			// 			);
+
+			// 		segment.mesh.material = segment.material2;
+
+			// 		whole.segments.push(segment);
+
+			// 		segment.setTile(whole.tile);
+
+			// 		segment.updateGeometry(region);
+			// 	});
+
+
+
+			const segment =
+				new Segment(
+
+					null,
+					whole,
+				);
+
+			segment.mesh.material = segment.material2;
+
+			whole.segments.push(segment);
+
+			segment.setTile(whole.tile);
+
+			segment.updateGeometry(ppp);
+
+
+
+			// difference_polygons1?.regions &&
+
+			// 	difference_polygons1.regions.forEach((region) => {
+
+			// 		const segment =
+			// 			new Segment(
+
+			// 				null,
+			// 				whole,
+			// 			);
+
+			// 		segment.mesh.material = segment.material2;
+
+			// 		whole.segments.push(segment);
+
+			// 		segment.setTile(whole.tile);
+
+			// 		segment.updateGeometry(region);
+			// 	});
+		}
+		else {
+
+			const difference_polygons = polybooljs.difference(subject_polygons, object_polygons);
+
+			difference_polygons?.regions &&
+
+				difference_polygons.regions.forEach((region) => {
+
+					const segment =
+						new Segment(
+
+							null,
+							whole,
+						);
+
+					segment.mesh.material = segment.material2;
+
+					whole.segments.push(segment);
+
+					segment.setTile(whole.tile);
+
+					segment.updateGeometry([ region ]);
+				});
+		}
+
+		scene.remove(whole.mesh);
 	}
+
+
+
+	// const intersection_polygons = polybooljs.intersect(segment_polygons, whole_polygons);
+
+	// intersection_polygons?.regions &&
+
+	// 	intersection_polygons.regions.forEach((region) => {
+
+	// 		const segment =
+	// 			new Segment(
+
+	// 				null,
+	// 				whole.points ? 3 : 1,
+	// 				whole,
+	// 			);
+
+	// 		segment.mesh.material = segment.material2;
+
+	// 		whole.segments.push(segment);
+
+	// 		segment.setTile(whole.tile);
+
+	// 		segment.updateGeometry(region);
+	// 	});
+	// }
 
 	apply_segment_BUTTON.style.display = 'none';
 });

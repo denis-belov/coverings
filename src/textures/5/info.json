@@ -1,0 +1,12 @@
+{
+  "sizes": [ 1.2, 1.2 ],
+
+  "textures": {
+
+    "map": "/textures/5/GrangeOblitsovochnaya1.jpg",
+    "ao_map": "/textures/5/GrangeOblitsovochnaya1_AO.jpg",
+    "normal_map": "/textures/5/GrangeOblitsovochnaya1_normal.jpg",
+    "roughness_map": "/textures/5/GrangeOblitsovochnaya1_normal.jpg",
+    "metalness_map": "/textures/5/GrangeOblitsovochnaya1_metalness.jpg"
+  }
+}

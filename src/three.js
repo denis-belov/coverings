@@ -11,13 +11,8 @@ import modes from './modes';
 
 import {
 
-	// mode_toggle_BUTTON,
-	// coverings_plan_NODE,
-	// mode_selection_BUTTON,
-	// selection_NODE,
 	mode_selection_BUTTON,
 	canvas,
-	canvas2,
 } from './dom';
 
 
@@ -69,49 +64,23 @@ export const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 // renderer.outputEncoding = THREE.sRGBEncoding;
 // renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.physicallyCorrectLights = true;
-// renderer.logarithmicDepthBuffer = true;
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor(CLEAR_COLOR);
 renderer.autoClear = false;
 renderer.clearColor();
 
-export const renderer2 = new THREE.WebGLRenderer({ canvas: canvas2, antialias: true, alpha: true });
-renderer2.physicallyCorrectLights = true;
-renderer2.setSize(window.innerWidth, window.innerHeight);
-renderer2.setClearColor(0xff0000, 0);
-renderer2.autoClear = false;
-renderer2.clearColor();
-
 
 
 export const WEBGL_MAXIMUM_ANISOTROPY = renderer.capabilities.getMaxAnisotropy();
 
-// no depth test
-export const scene_floor = new THREE.Scene();
-export const scene_floor_segments = new THREE.Scene();
-export const scene_walls = new THREE.Scene();
-export const scene_wall_segments = new THREE.Scene();
-
-// draggable units, depth test enabled
-export const scene_draggable = new THREE.Scene();
+export const scene = new THREE.Scene();
 
 
 
-const ambient_floor = new THREE.AmbientLight(0xFFFFFF);
-const ambient_floor_segments = ambient_floor.clone();
-const ambient_walls = ambient_floor.clone();
-const ambient_wall_segments = ambient_floor.clone();
-const ambient_draggable = ambient_floor.clone();
-
-// ambient_light.updateMatrix();
-// ambient_light.updateMatrixWorld();
+const ambient_light = new THREE.AmbientLight(0xFFFFFF);
 // ambient_light.intensity = 2;
 
-scene_floor.add(ambient_floor);
-scene_floor_segments.add(ambient_floor_segments);
-scene_walls.add(ambient_walls);
-scene_wall_segments.add(ambient_wall_segments);
-scene_draggable.add(ambient_draggable);
+scene.add(ambient_light);
 
 
 
@@ -128,7 +97,7 @@ orbit_camera.position.y = 12;
 
 
 
-export const orbit_controls = new OrbitControls(orbit_camera, canvas.parentNode);
+export const orbit_controls = new OrbitControls(orbit_camera, canvas);
 orbit_controls.enableZoom = true;
 orbit_controls.enableDamping = true;
 orbit_controls.dumpingFactor = 10;
@@ -174,7 +143,7 @@ export const uploadModel = (evt) => {
 				}
 			});
 
-			scene_draggable.add(gltf.scene);
+			scene.add(gltf.scene);
 		},
 	);
 };
@@ -200,11 +169,29 @@ transform_controls.addEventListener('change', () => {
 
 transform_controls.addEventListener('dragging-changed', (evt) => (orbit_controls.enabled = !evt.value));
 
-scene_draggable.add(transform_controls);
+scene.add(transform_controls);
 
 
 
-canvas.parentNode.addEventListener('mousemove', (evt) => {
+window.addEventListener('keypress', (evt) => {
+
+	if (evt.code === 'KeyR') {
+
+		evt.preventDefault();
+
+		transform_controls.setMode('rotate');
+	}
+	else if (evt.code === 'KeyT') {
+
+		evt.preventDefault();
+
+		transform_controls.setMode('translate');
+	}
+});
+
+
+
+canvas.addEventListener('mousemove', (evt) => {
 
 	if (modes.orbit_mode) {
 
@@ -223,9 +210,11 @@ canvas.parentNode.addEventListener('mousemove', (evt) => {
 
 		let _intersects = raycaster.intersectObjects(raycastable_meshes);
 
+		// LOG(_intersects)
+
 		if (_intersects.length) {
 
-			const [ nearest ] = _intersects.sort((a, b) => (b.distance - a.distance));
+			const [ nearest ] = _intersects.sort((a, b) => (a.distance - b.distance));
 
 			raycasted_mesh = nearest.object;
 
@@ -236,67 +225,9 @@ canvas.parentNode.addEventListener('mousemove', (evt) => {
 
 
 
-		_intersects = raycaster.intersectObjects(scene_wall_segments.children, true);
+		// _intersects = raycaster.intersectObjects(scene.children, true);
 
-		if (_intersects.length) {
-
-			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-			raycasted_mesh = nearest.object;
-
-			raycasted_mesh.material.color.set(0xADD8E6);
-
-			return;
-		}
-
-
-
-		_intersects = raycaster.intersectObjects(scene_walls.children, true);
-
-		if (_intersects.length) {
-
-			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-			raycasted_mesh = nearest.object;
-
-			raycasted_mesh.material.color.set(0xADD8E6);
-
-			return;
-		}
-
-
-
-		_intersects = raycaster.intersectObjects(scene_floor_segments.children, true);
-
-		if (_intersects.length) {
-
-			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-			raycasted_mesh = nearest.object;
-
-			raycasted_mesh.material.color.set(0xADD8E6);
-
-			return;
-		}
-
-
-
-		_intersects = raycaster.intersectObjects(scene_floor.children, true);
-
-		if (_intersects.length) {
-
-			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-			raycasted_mesh = nearest.object;
-
-			raycasted_mesh.material.color.set(0xADD8E6);
-
-			return;
-		}
-
-
-
-		// let _intersects = raycaster.intersectObjects(raycastable_meshes);
+		// LOG(_intersects)
 
 		// if (_intersects.length) {
 
@@ -305,58 +236,8 @@ canvas.parentNode.addEventListener('mousemove', (evt) => {
 		// 	raycasted_mesh = nearest.object;
 
 		// 	raycasted_mesh.material.color.set(0xADD8E6);
-		// }
-		// else {
 
-		// 	_intersects = raycaster.intersectObjects(scene_floor_segments.children);
-
-		// 	if (_intersects.length) {
-
-		// 		const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-		// 		raycasted_mesh = nearest.object;
-
-		// 		raycasted_mesh.material.color.set(0xADD8E6);
-		// 	}
-		// 	else {
-
-		// 		let _intersects = raycaster.intersectObjects(scene_floor.children);
-
-		// 		if (_intersects.length) {
-
-		// 			const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-		// 			raycasted_mesh = nearest.object;
-
-		// 			raycasted_mesh.material.color.set(0xADD8E6);
-		// 		}
-		// 	}
-		// }
-
-
-
-		// let _intersects = raycaster.intersectObjects(scene_floor_segments.children);
-
-		// if (_intersects.length) {
-
-		// 	const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-		// 	raycasted_mesh = nearest.object;
-
-		// 	raycasted_mesh.material.color.set(0xADD8E6);
-		// }
-		// else {
-
-		// 	_intersects = raycaster.intersectObjects(scene_floor.children);
-
-		// 	if (_intersects.length) {
-
-		// 		const [ nearest ] = _intersects.sort((a, b) => (b.object.userData.parent.z_index - a.object.userData.parent.z_index));
-
-		// 		raycasted_mesh = nearest.object;
-
-		// 		raycasted_mesh.material.color.set(0xADD8E6);
-		// 	}
+		// 	return;
 		// }
 	}
 
@@ -426,15 +307,17 @@ canvas.parentNode.addEventListener('mousemove', (evt) => {
 	// }
 });
 
-canvas.parentNode.addEventListener('dblclick', (evt) => {
+canvas.addEventListener('dblclick', () => {
 
 	if (modes.orbit_mode) {
 
-		// LOG(raycasted_mesh);
+		LOG(raycasted_mesh)
 
 		if (raycasted_mesh) {
 
 			if (draggable_meshes.includes(raycasted_mesh)) {
+
+				LOG(123)
 
 				transform_controls_attached_mesh = raycasted_mesh;
 
@@ -450,19 +333,19 @@ canvas.parentNode.addEventListener('dblclick', (evt) => {
 
 				tileable_mesh._ = raycasted_mesh;
 
-				LOG(tileable_mesh._)
+				// if (tileable_mesh._.userData.parent) {
 
-				if (tileable_mesh._.userData.parent.tileable) {
+				mode_selection_BUTTON.style.display = 'inline-block';
+				// 	}
+				// 	else {
 
-					mode_selection_BUTTON.style.display = 'none';
-				}
-				else {
-
-					mode_selection_BUTTON.style.display = 'inline-block';
-				}
+				// 		mode_selection_BUTTON.style.display = 'none';
+				// 	}
 			}
 		}
 		else {
+
+			LOG(77)
 
 			transform_controls_attached_mesh = null;
 
