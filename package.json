@@ -36,7 +36,12 @@
     "three": "^0.125.2",
     "external-data-loader": "0.0.26",
     "file-saver": "^2.0.5",
-    "polybooljs": "1.2.0"
+    "polybooljs": "1.2.0",
+    "csg": "1.0.1",
+    "csg2d": "0.1.2",
+    "@flatten-js/boolean-op": "1.1.4",
+    "@flatten-js/core": "1.2.20",
+    "@hi-level/three-csg": "1.0.6"
   },
   "scripts": {
     "start": "webpack-dev-server --env=development ",

@@ -138,15 +138,20 @@ export default class Tileable {
 
 	getPolygonsForSegmentation () {
 
-		const polygons = { regions: [] };
+		const items = [];
+
+		// const polygons = { regions: [] };
 
 		for (let i = 0; i < this.mesh.geometry.index.array.length; i += 3) {
+		// for (let i = 0; i < 3; i += 3) {
+
+			items.push({ regions: [] });
 
 			const index1 = this.mesh.geometry.index.array[i + 0] * 3;
 			const index2 = this.mesh.geometry.index.array[i + 1] * 3;
 			const index3 = this.mesh.geometry.index.array[i + 2] * 3;
 
-			polygons.regions.push(
+			items[items.length - 1].regions.push(
 
 				[
 					[
@@ -167,6 +172,25 @@ export default class Tileable {
 			);
 
 			// polygons.inverted = true;
+		}
+
+		// return polygons;
+		return items;
+	}
+
+	getPolygonsForSegmentation2 () {
+
+		const polygons = [];
+
+		// LOG(this.mesh.geometry.attributes.position.array)
+
+		for (let i = 0; i < this.mesh.geometry.attributes.position.array.length; i += 3) {
+
+			polygons.push(
+
+				this.mesh.geometry.attributes.position.array[i + 0],
+				this.mesh.geometry.attributes.position.array[i + 1],
+			);
 		}
 
 		return polygons;

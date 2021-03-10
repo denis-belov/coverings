@@ -150,7 +150,7 @@ export const uploadModel = (evt) => {
 
 
 
-const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
+export const transform_controls = new TransformControls(orbit_camera, renderer.domElement);
 
 transform_controls.addEventListener('change', () => {
 
@@ -311,13 +311,13 @@ canvas.addEventListener('dblclick', () => {
 
 	if (modes.orbit_mode) {
 
-		LOG(raycasted_mesh)
+		// LOG(raycasted_mesh)
 
 		if (raycasted_mesh) {
 
 			if (draggable_meshes.includes(raycasted_mesh)) {
 
-				LOG(123)
+				// LOG(raycasted_mesh, draggable_meshes)
 
 				transform_controls_attached_mesh = raycasted_mesh;
 
@@ -345,7 +345,7 @@ canvas.addEventListener('dblclick', () => {
 		}
 		else {
 
-			LOG(77)
+			// LOG(77)
 
 			transform_controls_attached_mesh = null;
 
