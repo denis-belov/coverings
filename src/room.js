@@ -133,9 +133,13 @@ export default class Room {
 
 			this.walls.push(wall);
 
+			// LOG(index, wall)
+
 			point.z_index = index;
 
-			point.walls.push(wall);
+			!point.walls.includes(wall) &&
+
+				point.walls.push(wall);
 
 			coverings_plan_NODE.appendChild(point.circle);
 		});

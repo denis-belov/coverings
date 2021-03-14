@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 import modes from './modes';
 import cast from './cast';
 
@@ -7,9 +9,9 @@ export default class Point {
 
 	static selected = null;
 
-	static move ({ movementX, movementY }) {
+	static move ({ clientX, clientY }) {
 
-		Point.selected.move(movementX, movementY);
+		Point.selected.move(clientX, clientY);
 	}
 
 
@@ -25,6 +27,9 @@ export default class Point {
 
 		this.circle = document.createElement('div');
 		this.circle.className = 'coverings-plan-circle';
+
+		this.x = 0;
+		this.y = 0;
 
 		this.circle.addEventListener('mousedown', (evt) => {
 
@@ -45,6 +50,10 @@ export default class Point {
 				});
 
 				this.circle.classList.add('-mousedown');
+
+				this.x = (evt.offsetX - 30) * 0.5;
+				this.y = (evt.offsetY - 30) * 0.5;
+				// LOG(this.x, this.y)
 
 				window.addEventListener('mousemove', Point.move);
 
@@ -104,7 +113,117 @@ export default class Point {
 	// 	this.doPositionDependentActions();
 	// }
 
-	move (movement_x = 0, movement_y = 0) {
+	move (client_x, client_y) {
+
+		const pixel_x = client_x - this.x;
+		const pixel_y = client_y - this.y;
+
+
+
+		const [ p2 ] = this.walls[0].points.filter((point) => point !== this);
+
+		const this_point = new THREE.Vector3(pixel_x, pixel_y, 0);
+		const projected_point_x = new THREE.Vector3();
+		const projected_point_y = new THREE.Vector3();
+
+		const plane_x =
+			new THREE.Plane()
+				.setFromNormalAndCoplanarPoint(
+
+					new THREE.Vector3(1, 0, 0),
+
+					new THREE.Vector3(p2.pixel_x, p2.pixel_y, 0),
+				);
+
+		plane_x.projectPoint(this_point, projected_point_x);
+
+		if (projected_point_x.distanceTo(this_point) < 20) {
+
+			this.pixel_x = projected_point_x.x;
+		}
+		else {
+
+			this.pixel_x = pixel_x;
+		}
+
+		const plane_y =
+			new THREE.Plane()
+				.setFromNormalAndCoplanarPoint(
+
+					new THREE.Vector3(0, 1, 0),
+
+					new THREE.Vector3(p2.pixel_x, p2.pixel_y, 0),
+				);
+
+		plane_y.projectPoint(this_point, projected_point_y);
+
+		if (projected_point_y.distanceTo(this_point) < 20) {
+
+			this.pixel_y = projected_point_y.y;
+		}
+		else {
+
+			this.pixel_y = pixel_y;
+		}
+
+
+
+		const [ p3 ] = this.walls[1].points.filter((point) => point !== this);
+
+		// LOG(p2, p3, this.walls)
+
+		const _plane_x =
+			new THREE.Plane()
+				.setFromNormalAndCoplanarPoint(
+
+					new THREE.Vector3(1, 0, 0),
+
+					new THREE.Vector3(p3.pixel_x, p3.pixel_y, 0),
+				);
+
+		_plane_x.projectPoint(this_point, projected_point_x);
+
+		if (projected_point_x.distanceTo(this_point) < 20) {
+
+			// LOG(11)
+
+			this.pixel_x = projected_point_x.x;
+		}
+		// else {
+
+		// 	this.pixel_x = pixel_x;
+		// }
+
+		const _plane_y =
+			new THREE.Plane()
+				.setFromNormalAndCoplanarPoint(
+
+					new THREE.Vector3(0, 1, 0),
+
+					new THREE.Vector3(p3.pixel_x, p3.pixel_y, 0),
+				);
+
+		_plane_y.projectPoint(this_point, projected_point_y);
+
+		if (projected_point_y.distanceTo(this_point) < 20) {
+
+			LOG(22)
+
+			this.pixel_y = projected_point_y.y;
+		}
+		// else {
+
+		// 	this.pixel_y = pixel_y;
+		// }
+
+
+
+		this.updateStyles();
+
+		this.walls[0].room.floor.updateGeometry();
+	}
+
+	move2 (movement_x = 0, movement_y = 0) {
 
 		this.pixel_x += movement_x;
 		this.pixel_y += movement_y;
@@ -149,6 +268,8 @@ export default class Point {
 
 				angle = -Math.abs(angle);
 			}
+
+			// LOG(angle)
 
 			if (wall.points.indexOf(this) === 0) {
 

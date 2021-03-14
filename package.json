@@ -44,7 +44,7 @@
     "@hi-level/three-csg": "1.0.6"
   },
   "scripts": {
-    "start": "webpack-dev-server --env=development ",
+    "start": "webpack-dev-server --env=development",
     "build": "webpack --env=development",
     "prod": "webpack --env=production"
   }

@@ -138,6 +138,13 @@ canvas {
         line-height: 18px;
       }
 
+      &-inner2 {
+
+        // display: inline-block;
+        // font-family: monospace;
+        // line-height: 18px;
+      }
+
       &.-selected {
 
         background-color: rgba(0, 255, 0, 0.10);;
@@ -167,7 +174,7 @@ canvas {
       background-color: rgba(0, 0, 0, 0.25);
       cursor: move;
       border-radius: 100%;
-      border: 10px solid grey;
+      // border: 10px solid grey;
       // filter: blur(0.5px);
       transform: scale(0.5);
       transition: transform 0.25s;
@@ -177,12 +184,12 @@ canvas {
 
       &:hover {
 
-        transform: scale(0.625);
+        // transform: scale(0.625);
       }
 
       &.-mousedown {
 
-        transform: scale(0.75);
+        // transform: scale(0.75);
       }
     }
   }

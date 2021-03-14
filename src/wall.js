@@ -34,8 +34,8 @@ export default class Wall extends Tileable {
 
 		const [ point1, point2 ] = Wall.selected.points;
 
-		point1.move(evt.movementX, evt.movementY);
-		point2.move(evt.movementX, evt.movementY);
+		point1.move2(evt.movementX, evt.movementY);
+		point2.move2(evt.movementX, evt.movementY);
 	}
 
 
@@ -77,55 +77,71 @@ export default class Wall extends Tileable {
 
 				this.rect.classList.add('-selected');
 
-				Wall.walls_to_add_new.push(this);
+				// Wall.walls_to_add_new.push(this);
 
-				if (Wall.walls_to_add_new.length >= 2) {
+				// if (Wall.walls_to_add_new.length >= 2) {
+				// if (Wall.walls_to_add_new.length === 1) {
 
-					modes.add_wall_mode = 0;
+				modes.add_wall_mode = 0;
 
-					add_wall_mode_BUTTON.classList.remove('-pressed');
+				add_wall_mode_BUTTON.classList.remove('-pressed');
 
-					setTimeout(() => {
+				setTimeout(() => {
 
-						Wall.walls_to_add_new.forEach((wall) => wall.rect.classList.remove('-selected'));
+					// Wall.walls_to_add_new.forEach((wall) => wall.rect.classList.remove('-selected'));
 
-						const new_point1 =
-							Wall.walls_to_add_new[0].points[0].centerWith(Wall.walls_to_add_new[0].points[1]);
-						const new_point2 =
-							Wall.walls_to_add_new[1].points[0].centerWith(Wall.walls_to_add_new[1].points[1]);
+					// const new_point1 =
+					// 	Wall.walls_to_add_new[0].points[0].centerWith(Wall.walls_to_add_new[0].points[1]);
+					// const new_point2 =
+					// 	Wall.walls_to_add_new[1].points[0].centerWith(Wall.walls_to_add_new[1].points[1]);
 
-						const [ shared_point ] = [
 
-							...Wall.walls_to_add_new[0].points,
-							...Wall.walls_to_add_new[1].points,
-						]
-							.filter(
+					const new_point = this.points[0].centerWith(this.points[1]);
 
-								(point) =>
-									(
-										Wall.walls_to_add_new[0].points.includes(point) &&
-										Wall.walls_to_add_new[1].points.includes(point)
-									),
-							);
+					// const [ shared_point ] = [
 
-						const shared_index = this.room.points.indexOf(shared_point);
+					// 	...Wall.walls_to_add_new[0].points,
+					// 	...Wall.walls_to_add_new[1].points,
+					// ]
+					// 	.filter(
 
-						const new_points = this.room.points.slice();
+					// 		(point) =>
+					// 			(
+					// 				Wall.walls_to_add_new[0].points.includes(point) &&
+					// 				Wall.walls_to_add_new[1].points.includes(point)
+					// 			),
+					// 	);
 
-						if (Wall.walls_to_add_new[0].points[1] === Wall.walls_to_add_new[1].points[0]) {
+					// const shared_index = this.room.points.indexOf(shared_point);
 
-							new_points.splice(shared_index, 1, new_point1, new_point2);
-						}
-						else {
+					const p1i = this.room.points.indexOf(this.points[0]);
+					const p2i = this.room.points.indexOf(this.points[1]);
 
-							new_points.splice(shared_index, 1, new_point2, new_point1);
-						}
+					const new_points = this.room.points.slice();
 
-						this.room.makeContour(this.room.height, new_points);
+					new_points.splice(
 
-						Wall.walls_to_add_new.length = 0;
-					}, TIME_TO_WAIT_FOR_APPENDING_WALL);
-				}
+						Math.abs(p1i - p2i) === 1 ? Math.max(p1i, p2i) : Math.min(p1i, p2i),
+
+						0,
+
+						new_point,
+					);
+
+					// if (Wall.walls_to_add_new[0].points[1] === Wall.walls_to_add_new[1].points[0]) {
+
+					// 	new_points.splice(shared_index, 1, new_point1, new_point2);
+					// }
+					// else {
+
+					// 	new_points.splice(shared_index, 1, new_point2, new_point1);
+					// }
+
+					this.room.makeContour(this.room.height, new_points);
+
+					// Wall.walls_to_add_new.length = 0;
+				}, TIME_TO_WAIT_FOR_APPENDING_WALL);
+				// }
 			}
 		});
 
@@ -134,6 +150,12 @@ export default class Wall extends Tileable {
 		this.rect.inner.className = 'coverings-plan-rect-inner';
 
 		this.rect.appendChild(this.rect.inner);
+
+		this.rect.inner2 = document.createElement('div');
+
+		this.rect.inner2.className = 'coverings-plan-rect-inner2';
+
+		this.rect.appendChild(this.rect.inner2);
 
 		coverings_plan_NODE.appendChild(this.rect);
 	}
