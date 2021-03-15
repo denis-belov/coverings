@@ -56,8 +56,8 @@ export default class Floor extends Tileable {
 				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 1] = 0;
 				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 2] = 1;
 
-				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 0] = this.room.points[index].scene_x / this.tile.sizes[0];
-				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 1] = this.room.points[index].scene_z / this.tile.sizes[1];
+				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 0] = -this.room.points[index].scene_x / this.tile.sizes[0];
+				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 1] = -this.room.points[index].scene_z / this.tile.sizes[1];
 			}
 		});
 

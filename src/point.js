@@ -3,6 +3,12 @@ import * as THREE from 'three';
 import modes from './modes';
 import cast from './cast';
 
+import {
+
+	raycastable_meshes,
+	scene,
+} from './three';
+
 
 
 export default class Point {
@@ -10,6 +16,19 @@ export default class Point {
 	static selected = null;
 
 	static move ({ clientX, clientY }) {
+
+		if (Point.selected.walls[0].room.floor.segments.length > 0) {
+
+			Point.selected.walls[0].room.floor.segments.forEach((segment) => segment.remove());
+
+			Point.selected.walls[0].room.floor.segments.length = 0;
+
+			raycastable_meshes.push(Point.selected.walls[0].room.floor.mesh);
+
+			LOG(raycastable_meshes)
+
+			scene.add(Point.selected.walls[0].room.floor.mesh);
+		}
 
 		Point.selected.move(clientX, clientY);
 	}

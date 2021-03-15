@@ -10,6 +10,8 @@ import * as THREE from 'three';
 
 import {
 
+	raycastable_meshes,
+	scene,
 	ATTRIBUTE_SIZE_1,
 	ATTRIBUTE_SIZE_2,
 	ATTRIBUTE_SIZE_3,
@@ -21,7 +23,7 @@ import Tileable from './tileable';
 
 
 
-const TIME_TO_WAIT_FOR_APPENDING_WALL = 250;
+// const TIME_TO_WAIT_FOR_APPENDING_WALL = 250;
 
 
 
@@ -86,62 +88,58 @@ export default class Wall extends Tileable {
 
 				add_wall_mode_BUTTON.classList.remove('-pressed');
 
-				setTimeout(() => {
+				// Wall.walls_to_add_new.forEach((wall) => wall.rect.classList.remove('-selected'));
 
-					// Wall.walls_to_add_new.forEach((wall) => wall.rect.classList.remove('-selected'));
-
-					// const new_point1 =
-					// 	Wall.walls_to_add_new[0].points[0].centerWith(Wall.walls_to_add_new[0].points[1]);
-					// const new_point2 =
-					// 	Wall.walls_to_add_new[1].points[0].centerWith(Wall.walls_to_add_new[1].points[1]);
+				// const new_point1 =
+				// 	Wall.walls_to_add_new[0].points[0].centerWith(Wall.walls_to_add_new[0].points[1]);
+				// const new_point2 =
+				// 	Wall.walls_to_add_new[1].points[0].centerWith(Wall.walls_to_add_new[1].points[1]);
 
 
-					const new_point = this.points[0].centerWith(this.points[1]);
+				const new_point = this.points[0].centerWith(this.points[1]);
 
-					// const [ shared_point ] = [
+				// const [ shared_point ] = [
 
-					// 	...Wall.walls_to_add_new[0].points,
-					// 	...Wall.walls_to_add_new[1].points,
-					// ]
-					// 	.filter(
+				// 	...Wall.walls_to_add_new[0].points,
+				// 	...Wall.walls_to_add_new[1].points,
+				// ]
+				// 	.filter(
 
-					// 		(point) =>
-					// 			(
-					// 				Wall.walls_to_add_new[0].points.includes(point) &&
-					// 				Wall.walls_to_add_new[1].points.includes(point)
-					// 			),
-					// 	);
+				// 		(point) =>
+				// 			(
+				// 				Wall.walls_to_add_new[0].points.includes(point) &&
+				// 				Wall.walls_to_add_new[1].points.includes(point)
+				// 			),
+				// 	);
 
-					// const shared_index = this.room.points.indexOf(shared_point);
+				// const shared_index = this.room.points.indexOf(shared_point);
 
-					const p1i = this.room.points.indexOf(this.points[0]);
-					const p2i = this.room.points.indexOf(this.points[1]);
+				const p1i = this.room.points.indexOf(this.points[0]);
+				const p2i = this.room.points.indexOf(this.points[1]);
 
-					const new_points = this.room.points.slice();
+				// const new_points = this.room.points.slice();
 
-					new_points.splice(
+				this.room.points.splice(
 
-						Math.abs(p1i - p2i) === 1 ? Math.max(p1i, p2i) : Math.min(p1i, p2i),
+					Math.abs(p1i - p2i) === 1 ? Math.max(p1i, p2i) : Math.min(p1i, p2i),
 
-						0,
+					0,
 
-						new_point,
-					);
+					new_point,
+				);
 
-					// if (Wall.walls_to_add_new[0].points[1] === Wall.walls_to_add_new[1].points[0]) {
+				// if (Wall.walls_to_add_new[0].points[1] === Wall.walls_to_add_new[1].points[0]) {
 
-					// 	new_points.splice(shared_index, 1, new_point1, new_point2);
-					// }
-					// else {
-
-					// 	new_points.splice(shared_index, 1, new_point2, new_point1);
-					// }
-
-					this.room.makeContour(this.room.height, new_points);
-
-					// Wall.walls_to_add_new.length = 0;
-				}, TIME_TO_WAIT_FOR_APPENDING_WALL);
+				// 	new_points.splice(shared_index, 1, new_point1, new_point2);
 				// }
+				// else {
+
+				// 	new_points.splice(shared_index, 1, new_point2, new_point1);
+				// }
+
+				this.room.updateContour();
+
+				// Wall.walls_to_add_new.length = 0;
 			}
 		});
 
@@ -214,8 +212,11 @@ export default class Wall extends Tileable {
 
 		for (let i = 0; i < plane_geometry.attributes.uv.array.length; i += 2) {
 
-			plane_geometry.attributes.uv.array[i + 0] *= this.pixel_length * cast.PIXELS_TO_METERS / this.tile.sizes[0];
-			plane_geometry.attributes.uv.array[i + 1] *= this.room.height / this.tile.sizes[1];
+			// plane_geometry.attributes.uv.array[i + 0] *= this.pixel_length * cast.PIXELS_TO_METERS / this.tile.sizes[0];
+			// plane_geometry.attributes.uv.array[i + 1] *= this.room.height / this.tile.sizes[1];
+
+			plane_geometry.attributes.uv.array[i + 0] = plane_geometry.attributes.position.array[(i / 2 * 3) + 0] / this.tile.sizes[0];
+			plane_geometry.attributes.uv.array[i + 1] = plane_geometry.attributes.position.array[(i / 2 * 3) + 1] / this.tile.sizes[1];
 		}
 
 		this.mesh.geometry.setAttribute(
@@ -233,5 +234,16 @@ export default class Wall extends Tileable {
 		this.mesh.updateMatrix();
 
 		this.mesh.geometry.computeBoundingSphere();
+	}
+
+	remove () {
+
+		coverings_plan_NODE.removeChild(this.rect);
+
+		raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
+
+		this.segments.forEach((segment) => segment.remove());
+
+		scene.remove(this.mesh);
 	}
 }

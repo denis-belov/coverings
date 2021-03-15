@@ -161,8 +161,6 @@ const mouseup_selection_area_function = () => {
 	window.removeEventListener('mousemove', mousemove_selection_area_function);
 	window.removeEventListener('mouseup', mouseup_selection_area_function);
 
-	// LOG(width, height)
-
 	if (width > 0 && height > 0) {
 
 		apply_segment_BUTTON.style.display = 'inline-block';
@@ -178,9 +176,6 @@ window.addEventListener('mousedown', (evt) => {
 	if (modes.selection_mode) {
 
 		evt.stopPropagation();
-
-		// width = 0;
-		// height = 0;
 
 		x = evt.clientX;
 		y = evt.clientY;
@@ -208,12 +203,9 @@ window.addEventListener('mousedown', (evt) => {
 
 mode_selection_BUTTON.addEventListener('click', () => {
 
-	// if (!tileable_mesh._.userData.parent.tileable) {
-
 	const whole =
-		tileable_mesh._.userData.parent.tileable ?
-			tileable_mesh._.userData.parent.tileable :
-			tileable_mesh._.userData.parent;
+		tileable_mesh._.userData.parent.tileable ||
+		tileable_mesh._.userData.parent;
 
 	modes.selection_mode = 1 - modes.selection_mode;
 
@@ -298,7 +290,6 @@ mode_selection_BUTTON.addEventListener('click', () => {
 
 		modes.orbit_mode = 1;
 	}
-	// }
 
 
 
@@ -368,15 +359,13 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 		const segments = whole.segments.slice();
 
-		// whole.segments.length = 0;
-
 
 
 		const ppp3 = [];
 
 		segments.forEach((_segment) => {
 
-			const subject_polygons = _segment.getPolygonsForSegmentation();
+			const subject_polygons = _segment.getPolybooljsTriangles();
 
 
 
@@ -575,7 +564,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 	}
 	else {
 
-		const subject_polygons = whole.getPolygonsForSegmentation();
+		const subject_polygons = whole.getPolybooljsTriangles();
 
 
 

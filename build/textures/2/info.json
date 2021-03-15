@@ -1,0 +1,12 @@
+{
+  "sizes": [ 1.5, 1.5 ],
+
+  "textures": {
+
+    "map": "/textures/2/map.png",
+    "ao_map": "/textures/2/ao_map.png",
+    "normal_map": "/textures/2/normal_map.png",
+    "roughness_map": "/textures/2/roughness_map.png",
+    "metalness_map": "/textures/2/metalness_map.png"
+  }
+}

@@ -123,7 +123,7 @@ export default class Room {
 
 		this.points.push(...points);
 
-		this.prev_walls = this.walls.slice();
+		// this.prev_walls = this.walls.slice();
 
 		this.walls.length = 0;
 
@@ -132,8 +132,6 @@ export default class Room {
 			const wall = new Wall(this, points[index], points[index + 1] || points[0]);
 
 			this.walls.push(wall);
-
-			// LOG(index, wall)
 
 			point.z_index = index;
 
@@ -150,15 +148,76 @@ export default class Room {
 
 		this.floor.setTile(this.floor_tile_default);
 		this.floor.updateGeometry();
+	}
 
-		// LOG(scene)
+	updateContour () {
+
+		this.walls.length = 0;
+
+		this.points.forEach((point, index) => {
+
+			point.z_index = index;
+
+			if (!point.walls.length) {
+
+				const prev_point = this.points[index - 1] || this.points[this.points.length - 1];
+				const next_point = this.points[index + 1] || this.points[0];
+
+				const wall1 = new Wall(this, prev_point, point);
+				const wall2 = new Wall(this, point, next_point);
+
+				const [ removed_wall ] = prev_point.walls.filter((wall) => next_point.walls.includes(wall));
+
+				prev_point.walls.splice(
+
+					prev_point.walls.indexOf(removed_wall),
+
+					1,
+
+					wall1,
+				);
+
+				next_point.walls.splice(
+
+					next_point.walls.indexOf(removed_wall),
+
+					1,
+
+					wall2,
+				);
+
+				this.walls.push(wall1, wall2);
+
+				!point.walls.includes(wall1) &&
+
+					point.walls.push(wall1);
+
+				!point.walls.includes(wall2) &&
+
+					point.walls.push(wall2);
+
+				removed_wall.remove();
+
+				coverings_plan_NODE.appendChild(point.circle);
+			}
+		});
+
+		this.points.forEach((point) => point.updateStyles());
+
+		// this.floor.setTile(this.floor_tile_default);
+		this.floor.updateGeometry();
 	}
 
 	destroyContour () {
 
-		raycastable_meshes.length = 0;
+		scene.children
+			.filter((_object) => _object.userData.parent)
+			.forEach((mesh) => {
 
-		scene.children.filter((_object) => _object.userData.parent).forEach((mesh) => scene.remove(mesh));
+				raycastable_meshes.splice(raycastable_meshes.indexOf(mesh), 1);
+
+				scene.remove(mesh);
+			});
 
 		this.points.forEach((point) => {
 

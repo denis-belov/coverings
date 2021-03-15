@@ -136,22 +136,23 @@ export default class Tileable {
 		this.material2.needsUpdate = true;
 	}
 
-	getPolygonsForSegmentation () {
+	// Return polybooljs object (triangle) array that can be used as polybooljs boolean operation argument.
+	// Decided to split entire geometry into separate polybooljs triangle object with a single "regions" element
+	// and apply boolean operation to each of them
+	// because wrong operation results are being appeared with any other approaches.
+	getPolybooljsTriangles () {
 
-		const items = [];
-
-		// const polygons = { regions: [] };
+		const polybooljs_triangles = [];
 
 		for (let i = 0; i < this.mesh.geometry.index.array.length; i += 3) {
-		// for (let i = 0; i < 3; i += 3) {
 
-			items.push({ regions: [] });
+			const polybooljs_triangle = { regions: [] };
 
 			const index1 = this.mesh.geometry.index.array[i + 0] * 3;
 			const index2 = this.mesh.geometry.index.array[i + 1] * 3;
 			const index3 = this.mesh.geometry.index.array[i + 2] * 3;
 
-			items[items.length - 1].regions.push(
+			polybooljs_triangle.regions.push(
 
 				[
 					[
@@ -171,28 +172,9 @@ export default class Tileable {
 				],
 			);
 
-			// polygons.inverted = true;
+			polybooljs_triangles.push(polybooljs_triangle);
 		}
 
-		// return polygons;
-		return items;
-	}
-
-	getPolygonsForSegmentation2 () {
-
-		const polygons = [];
-
-		// LOG(this.mesh.geometry.attributes.position.array)
-
-		for (let i = 0; i < this.mesh.geometry.attributes.position.array.length; i += 3) {
-
-			polygons.push(
-
-				this.mesh.geometry.attributes.position.array[i + 0],
-				this.mesh.geometry.attributes.position.array[i + 1],
-			);
-		}
-
-		return polygons;
+		return polybooljs_triangles;
 	}
 }
