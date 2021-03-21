@@ -2,10 +2,11 @@ export const [ coverings_plan_NODE ] = document.getElementsByClassName('covering
 
 export const [ selection_NODE ] = document.getElementsByClassName('coverings-selection');
 
-export const [ transparent_IMG, upload_model_INPUT ] = document.getElementById('hidden').children;
+export const [ transparent_IMG, upload_model_INPUT, load_INPUT ] = document.getElementById('hidden').children;
 
 export const [
 
+	load_BUTTON,
 	upload_model_BUTTON,
 	add_wall_mode_BUTTON,
 	mode_toggle_BUTTON,

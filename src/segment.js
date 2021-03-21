@@ -29,6 +29,8 @@ export default class Segment extends Tileable {
 		super(room);
 
 		this.tileable = tileable;
+
+		this.regions = null;
 	}
 
 	updateGeometry (regions) {
@@ -38,7 +40,8 @@ export default class Segment extends Tileable {
 		const normal_data = [];
 		const uv_data = [];
 
-		// move to constructor
+
+
 		this.regions = regions;
 
 		regions.forEach((region) => {

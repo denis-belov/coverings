@@ -17,7 +17,7 @@ export default class Floor extends Tileable {
 
 		super(room);
 
-		this.mesh2 = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
+		// this.mesh2 = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
 
 		// this.type = 'floor';
 

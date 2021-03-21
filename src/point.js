@@ -25,7 +25,7 @@ export default class Point {
 
 			raycastable_meshes.push(Point.selected.walls[0].room.floor.mesh);
 
-			LOG(raycastable_meshes)
+			// LOG(raycastable_meshes)
 
 			scene.add(Point.selected.walls[0].room.floor.mesh);
 		}

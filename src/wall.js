@@ -23,10 +23,6 @@ import Tileable from './tileable';
 
 
 
-// const TIME_TO_WAIT_FOR_APPENDING_WALL = 250;
-
-
-
 export default class Wall extends Tileable {
 
 	static selected = null;
@@ -46,9 +42,7 @@ export default class Wall extends Tileable {
 
 		super(room);
 
-		// this.type = 'wall';
-
-		this.mesh2 = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
+		// this.mesh2 = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
 
 		// rename to related_points
 		this.points = [ point1, point2 ];
@@ -79,67 +73,30 @@ export default class Wall extends Tileable {
 
 				this.rect.classList.add('-selected');
 
-				// Wall.walls_to_add_new.push(this);
-
-				// if (Wall.walls_to_add_new.length >= 2) {
-				// if (Wall.walls_to_add_new.length === 1) {
-
 				modes.add_wall_mode = 0;
 
 				add_wall_mode_BUTTON.classList.remove('-pressed');
 
-				// Wall.walls_to_add_new.forEach((wall) => wall.rect.classList.remove('-selected'));
-
-				// const new_point1 =
-				// 	Wall.walls_to_add_new[0].points[0].centerWith(Wall.walls_to_add_new[0].points[1]);
-				// const new_point2 =
-				// 	Wall.walls_to_add_new[1].points[0].centerWith(Wall.walls_to_add_new[1].points[1]);
-
-
 				const new_point = this.points[0].centerWith(this.points[1]);
 
-				// const [ shared_point ] = [
+				const p1_index = this.room.points.indexOf(this.points[0]);
+				const p2_index = this.room.points.indexOf(this.points[1]);
 
-				// 	...Wall.walls_to_add_new[0].points,
-				// 	...Wall.walls_to_add_new[1].points,
-				// ]
-				// 	.filter(
+				const old_points = this.room.points.slice();
+				const new_points = this.room.points.slice();
 
-				// 		(point) =>
-				// 			(
-				// 				Wall.walls_to_add_new[0].points.includes(point) &&
-				// 				Wall.walls_to_add_new[1].points.includes(point)
-				// 			),
-				// 	);
+				new_points.splice(
 
-				// const shared_index = this.room.points.indexOf(shared_point);
-
-				const p1i = this.room.points.indexOf(this.points[0]);
-				const p2i = this.room.points.indexOf(this.points[1]);
-
-				// const new_points = this.room.points.slice();
-
-				this.room.points.splice(
-
-					Math.abs(p1i - p2i) === 1 ? Math.max(p1i, p2i) : Math.min(p1i, p2i),
+					Math.abs(p1_index - p2_index) === 1 ?
+						Math.max(p1_index, p2_index) :
+						Math.min(p1_index, p2_index),
 
 					0,
 
 					new_point,
 				);
 
-				// if (Wall.walls_to_add_new[0].points[1] === Wall.walls_to_add_new[1].points[0]) {
-
-				// 	new_points.splice(shared_index, 1, new_point1, new_point2);
-				// }
-				// else {
-
-				// 	new_points.splice(shared_index, 1, new_point2, new_point1);
-				// }
-
-				this.room.updateContour();
-
-				// Wall.walls_to_add_new.length = 0;
+				this.room.update(new_points);
 			}
 		});
 
@@ -172,8 +129,6 @@ export default class Wall extends Tileable {
 				this.room.height,
 			);
 
-		// LOG(plane_geometry.attributes.position.array)
-
 		const vv1 = new THREE.Vector3(1, 0, 0);
 
 		const vv2 =
@@ -186,14 +141,6 @@ export default class Wall extends Tileable {
 		const position = point.centerWith2(next_point);
 
 		this.position.set(position[0], this.room.height / 2, position[1]);
-
-		// plane_geometry.applyMatrix4(
-
-		// 	new THREE.Matrix4().compose(
-
-		// 		new THREE.Vector3(position[0], this.room.height / 2, position[1]), quaternion, new THREE.Vector3(1, 1, 1),
-		// 	),
-		// );
 
 		if (this.mesh.geometry.index.array.length === 0) {
 

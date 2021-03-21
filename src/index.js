@@ -2,6 +2,7 @@
 
 
 
+import FileSaver from 'file-saver';
 import * as THREE from 'three';
 import './index.scss';
 import '@babel/polyfill';
@@ -9,15 +10,18 @@ import '@babel/polyfill';
 import Loader from 'external-data-loader';
 
 import modes from './modes';
+import cast from './cast';
 
 import Point from './point';
-import Room from './room';
+import { Room, Plan } from './room';
 
 import {
 
+	load_BUTTON,
 	material_BUTTONS,
 	mode_toggle_BUTTON,
 	coverings_plan_NODE,
+	load_INPUT,
 	modal,
 	width_INPUT,
 	length_INPUT,
@@ -45,9 +49,7 @@ const loader = new Loader();
 
 const room = new Room();
 
-
-
-room.makeContour(
+room.make(
 
 	2.5,
 
@@ -64,6 +66,9 @@ room.makeContour(
 
 
 
+const plan = new Plan([ room ]);
+
+
 
 mode_toggle_BUTTON.addEventListener('click', () => {
 
@@ -77,13 +82,18 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 		coverings_plan_NODE.classList.add('-hidden');
 
-		room.walls.forEach((wall) => {
+		plan.rooms.forEach((_room) => {
 
-			wall.tile ||
+			LOG(plan.rooms, _room)
 
-				wall.setTile(room.wall_tile_default);
+			_room.walls.forEach((wall) => {
 
-			wall.updateGeometry();
+				wall.tile ||
+
+					wall.setTile(_room.wall_tile_default);
+
+				wall.updateGeometry();
+			});
 		});
 	}
 	else {
@@ -146,6 +156,60 @@ material_BUTTONS.forEach((BUTTON) => {
 
 
 
+const file_reader = new FileReader();
+
+file_reader.addEventListener('loadend', (evt) => {
+
+	plan.makeFromJson(JSON.parse(evt.target.result));
+
+	load_INPUT.value = null;
+});
+
+load_INPUT.addEventListener('change', (evt) => {
+
+	file_reader.readAsText(evt.target.files[0]);
+});
+
+load_BUTTON.addEventListener('click', () => {
+
+	const json = {};
+
+	json.rooms = [];
+
+	const room1 = {
+
+		name: 'room1',
+
+		height: plan.rooms[0].height,
+
+		points:
+
+			plan.rooms[0].points.map((elm) => ([ (elm.pixel_x - (window.innerWidth / 2)) * cast.PIXELS_TO_METERS, (elm.pixel_y - (window.innerHeight / 2)) * cast.PIXELS_TO_METERS ])),
+
+		walls:
+
+			plan.rooms[0].walls.map((elm) => {
+
+				return {
+
+					segments:
+
+						elm.segments.map((segment) => segment.regions),
+				};
+			}),
+	};
+
+	json.rooms.push(room1);
+
+	const blob = new Blob([ JSON.stringify(json) ], { type: 'text/plain;charset=utf-8' });
+
+	FileSaver.saveAs(blob, 'room.json');
+
+	load_INPUT.click();
+});
+
+
+
 apply_sizes_BUTTON.addEventListener('click', () => {
 
 	const width = parseFloat(width_INPUT.value);
@@ -154,7 +218,7 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 
 
 
-	room.makeContour(
+	plan.rooms[0].make(
 
 		height,
 
@@ -199,17 +263,17 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 
 
 
-window.addEventListener('keypress', (evt) => {
+// window.addEventListener('keypress', (evt) => {
 
-	if (evt.code === 'KeyD' && Point.selected) {
+// 	if (evt.code === 'KeyD' && Point.selected) {
 
-		const new_points = room.points.slice();
+// 		const new_points = room.points.slice();
 
-		new_points.splice(new_points.indexOf(Point.selected), 1);
+// 		new_points.splice(new_points.indexOf(Point.selected), 1);
 
-		room.makeContour(room.height, new_points);
-	}
-});
+// 		room.make(room.height, new_points);
+// 	}
+// });
 
 
 

@@ -718,22 +718,20 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 		if (ppp2.length > 0) {
 
-			// LOG(ppp2)
-
-			const segment =
+			const segment1 =
 				new Segment(
 
 					null,
 					whole,
 				);
 
-			segment.mesh.material = segment.material2;
+			segment1.mesh.material = segment1.material2;
 
-			whole.segments.push(segment);
+			whole.segments.push(segment1);
 
-			segment.setTile(whole.tile);
+			segment1.setTile(whole.tile);
 
-			segment.updateGeometry(ppp);
+			segment1.updateGeometry(ppp);
 
 
 

@@ -2,6 +2,7 @@ import Loader from 'external-data-loader';
 
 import { coverings_plan_NODE } from './dom';
 
+import Point from './point';
 import Floor from './floor';
 import Wall from './wall';
 
@@ -18,7 +19,7 @@ const loader = new Loader();
 
 
 
-export default class Room {
+export class Room {
 
 	constructor () {
 
@@ -106,14 +107,14 @@ export default class Room {
 		loader.content = {};
 	}
 
-	async makeContour (height, points) {
+	async make (height, points) {
 
 		if (!this.floor_tile_default || !this.wall_tile_default) {
 
 			await this.loadDefaultTextures();
 		}
 
-		this.destroyContour();
+		this.destroy();
 
 		this.floor = new Floor(this);
 
@@ -122,8 +123,6 @@ export default class Room {
 		this.points.length = 0;
 
 		this.points.push(...points);
-
-		// this.prev_walls = this.walls.slice();
 
 		this.walls.length = 0;
 
@@ -150,65 +149,70 @@ export default class Room {
 		this.floor.updateGeometry();
 	}
 
-	updateContour () {
+	update (new_points) {
 
-		this.walls.length = 0;
+		if (new_points.length > this.points.length) {
 
-		this.points.forEach((point, index) => {
+			this.points = new_points;
 
-			point.z_index = index;
+			this.walls.length = 0;
 
-			if (!point.walls.length) {
+			this.points.forEach((point, index) => {
 
-				const prev_point = this.points[index - 1] || this.points[this.points.length - 1];
-				const next_point = this.points[index + 1] || this.points[0];
+				point.z_index = index;
 
-				const wall1 = new Wall(this, prev_point, point);
-				const wall2 = new Wall(this, point, next_point);
+				if (!point.walls.length) {
 
-				const [ removed_wall ] = prev_point.walls.filter((wall) => next_point.walls.includes(wall));
+					const prev_point = this.points[index - 1] || this.points[this.points.length - 1];
+					const next_point = this.points[index + 1] || this.points[0];
 
-				prev_point.walls.splice(
+					const wall1 = new Wall(this, prev_point, point);
+					const wall2 = new Wall(this, point, next_point);
 
-					prev_point.walls.indexOf(removed_wall),
+					const [ removed_wall ] = prev_point.walls.filter((wall) => next_point.walls.includes(wall));
 
-					1,
+					prev_point.walls.splice(
 
-					wall1,
-				);
+						prev_point.walls.indexOf(removed_wall),
 
-				next_point.walls.splice(
+						1,
 
-					next_point.walls.indexOf(removed_wall),
+						wall1,
+					);
 
-					1,
+					next_point.walls.splice(
 
-					wall2,
-				);
+						next_point.walls.indexOf(removed_wall),
 
-				this.walls.push(wall1, wall2);
+						1,
 
-				!point.walls.includes(wall1) &&
+						wall2,
+					);
 
-					point.walls.push(wall1);
+					this.walls.push(wall1, wall2);
 
-				!point.walls.includes(wall2) &&
+					!point.walls.includes(wall1) &&
 
-					point.walls.push(wall2);
+						point.walls.push(wall1);
 
-				removed_wall.remove();
+					!point.walls.includes(wall2) &&
 
-				coverings_plan_NODE.appendChild(point.circle);
-			}
-		});
+						point.walls.push(wall2);
 
-		this.points.forEach((point) => point.updateStyles());
+					removed_wall.remove();
 
-		// this.floor.setTile(this.floor_tile_default);
-		this.floor.updateGeometry();
+					coverings_plan_NODE.appendChild(point.circle);
+				}
+			});
+
+			this.points.forEach((point) => point.updateStyles());
+
+			// this.floor.setTile(this.floor_tile_default);
+			this.floor.updateGeometry();
+		}
 	}
 
-	destroyContour () {
+	destroy () {
 
 		scene.children
 			.filter((_object) => _object.userData.parent)
@@ -228,5 +232,49 @@ export default class Room {
 		this.points.length = 0;
 
 		coverings_plan_NODE.innerHTML = '';
+	}
+}
+
+
+
+export class Plan {
+
+	constructor (rooms) {
+
+		this.rooms = rooms;
+	}
+
+	makeFromJson (json) {
+
+		this.destroy();
+
+		this.rooms.length = [];
+
+		LOG(json);
+
+		json.rooms &&
+
+			json.rooms.forEach((json_room) => {
+
+				const points = json_room.points.map((json_room_point) => new Point(...json_room_point));
+
+				LOG(points)
+
+				const room = new Room();
+
+				this.rooms.push(room);
+
+				room.make(
+
+					json_room.height,
+
+					points,
+				);
+			});
+	}
+
+	destroy () {
+
+		this.rooms.forEach((room) => room.destroy());
 	}
 }
