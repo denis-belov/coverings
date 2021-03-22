@@ -5,6 +5,8 @@ import Tileable from './tileable';
 
 import {
 
+	raycastable_meshes,
+	scene,
 	ATTRIBUTE_SIZE_2,
 	ATTRIBUTE_SIZE_3,
 } from './three';
@@ -86,5 +88,14 @@ export default class Floor extends Tileable {
 		this.mesh.updateMatrix();
 
 		this.mesh.geometry.computeBoundingSphere();
+	}
+
+	remove () {
+
+		raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
+
+		scene.remove(this.mesh);
+
+		this.segments.forEach((segment) => segment.remove());
 	}
 }

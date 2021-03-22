@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import modes from './modes';
 import cast from './cast';
 
+import { coverings_plan_NODE } from './dom';
+
 import {
 
 	raycastable_meshes,
@@ -14,8 +16,11 @@ import {
 export default class Point {
 
 	static selected = null;
+	// static moved = false;
 
 	static move ({ clientX, clientY }) {
+
+		// Point.moved = true;
 
 		if (Point.selected.walls[0].room.floor.segments.length > 0) {
 
@@ -24,8 +29,6 @@ export default class Point {
 			Point.selected.walls[0].room.floor.segments.length = 0;
 
 			raycastable_meshes.push(Point.selected.walls[0].room.floor.mesh);
-
-			// LOG(raycastable_meshes)
 
 			scene.add(Point.selected.walls[0].room.floor.mesh);
 		}
@@ -41,6 +44,9 @@ export default class Point {
 		this.pixel_x = (meter_x * cast.METERS_TO_PIXELS) + (window.innerWidth / 2);
 		this.pixel_y = (meter_y * cast.METERS_TO_PIXELS) + (window.innerHeight / 2);
 
+		this.prev_pixel_x = this.pixel_x;
+		this.prev_pixel_y = this.pixel_y;
+
 		this.scene_x = 0;
 		this.scene_z = 0;
 
@@ -49,6 +55,9 @@ export default class Point {
 
 		this.x = 0;
 		this.y = 0;
+
+		// rename to related_walls
+		this.walls = [];
 
 		this.circle.addEventListener('mousedown', (evt) => {
 
@@ -72,7 +81,6 @@ export default class Point {
 
 				this.x = (evt.offsetX - 30) * 0.5;
 				this.y = (evt.offsetY - 30) * 0.5;
-				// LOG(this.x, this.y)
 
 				window.addEventListener('mousemove', Point.move);
 
@@ -80,8 +88,7 @@ export default class Point {
 			}
 		});
 
-		// rename to related_walls
-		this.walls = [];
+		coverings_plan_NODE.appendChild(this.circle);
 	}
 
 	distanceTo (point) {
@@ -133,6 +140,9 @@ export default class Point {
 	// }
 
 	move (client_x, client_y) {
+
+		this.prev_pixel_x = this.pixel_x;
+		this.prev_pixel_y = this.pixel_y;
 
 		const pixel_x = client_x - this.x;
 		const pixel_y = client_y - this.y;
@@ -189,8 +199,6 @@ export default class Point {
 
 		const [ p3 ] = this.walls[1].points.filter((point) => point !== this);
 
-		// LOG(p2, p3, this.walls)
-
 		const _plane_x =
 			new THREE.Plane()
 				.setFromNormalAndCoplanarPoint(
@@ -203,8 +211,6 @@ export default class Point {
 		_plane_x.projectPoint(this_point, projected_point_x);
 
 		if (projected_point_x.distanceTo(this_point) < 20) {
-
-			// LOG(11)
 
 			this.pixel_x = projected_point_x.x;
 		}
@@ -226,8 +232,6 @@ export default class Point {
 
 		if (projected_point_y.distanceTo(this_point) < 20) {
 
-			LOG(22)
-
 			this.pixel_y = projected_point_y.y;
 		}
 		// else {
@@ -244,10 +248,15 @@ export default class Point {
 
 	move2 (movement_x = 0, movement_y = 0) {
 
+		this.prev_pixel_x = this.pixel_x;
+		this.prev_pixel_y = this.pixel_y;
+
 		this.pixel_x += movement_x;
 		this.pixel_y += movement_y;
 
 		this.updateStyles();
+
+		// LOG(this.walls[0].room)
 
 		this.walls[0].room.floor.updateGeometry();
 	}
@@ -288,8 +297,6 @@ export default class Point {
 				angle = -Math.abs(angle);
 			}
 
-			// LOG(angle)
-
 			if (wall.points.indexOf(this) === 0) {
 
 				if (this.pixel_x > conjugate_point.pixel_x) {
@@ -318,5 +325,10 @@ export default class Point {
 
 		this.scene_x = (this.pixel_x - (window.innerWidth * 0.5)) * cast.PIXELS_TO_METERS;
 		this.scene_z = (this.pixel_y - (window.innerHeight * 0.5)) * cast.PIXELS_TO_METERS;
+	}
+
+	remove () {
+
+		coverings_plan_NODE.removeChild(this.circle);
 	}
 }

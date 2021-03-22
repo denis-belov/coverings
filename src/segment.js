@@ -24,16 +24,20 @@ import Tileable from './tileable';
 export default class Segment extends Tileable {
 
 	// change tileable to something
-	constructor (room, tileable) {
+	constructor (room, tileable, polygons) {
 
 		super(room);
 
 		this.tileable = tileable;
 
-		this.regions = null;
+		this.polygons = polygons;
+
+		this.tileable.segments.push(this);
+
+		// LOG(this.polygons)
 	}
 
-	updateGeometry (regions) {
+	updateGeometry () {
 
 		const index_data = [];
 		const position_data = [];
@@ -42,13 +46,13 @@ export default class Segment extends Tileable {
 
 
 
-		this.regions = regions;
+		// this.polygons = polygons;
 
-		regions.forEach((region) => {
+		this.polygons.forEach((polygon) => {
 
 			const scene_coordinates = [];
 
-			region.forEach((coordinates) => scene_coordinates.push(...coordinates));
+			polygon.forEach((coordinates) => scene_coordinates.push(...coordinates));
 
 			const qwe = (position_data.length / 3);
 
@@ -99,7 +103,10 @@ export default class Segment extends Tileable {
 		);
 	}
 
+	// rename to destroy
 	remove () {
+
+		this.tileable.segments.splice(this.tileable.segments.indexOf(this), 1);
 
 		raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
 

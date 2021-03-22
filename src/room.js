@@ -1,10 +1,20 @@
+/*
+eslint-disable
+
+no-new,
+*/
+
+
+
 import Loader from 'external-data-loader';
 
-import { coverings_plan_NODE } from './dom';
+// import { coverings_plan_NODE } from './dom';
+import cast from './cast';
 
 import Point from './point';
 import Floor from './floor';
 import Wall from './wall';
+import Segment from './segment';
 
 import {
 
@@ -21,22 +31,10 @@ const loader = new Loader();
 
 export class Room {
 
-	constructor () {
+	static floor_tile_default = null;
+	static wall_tile_default = null;
 
-		this.points = [];
-
-		this.floor = null;
-
-		this.walls = [];
-
-		this.height = 0;
-
-		this.floor_tile_default = null;
-
-		this.wall_tile_default = null;
-	}
-
-	async loadDefaultTextures () {
+	static loadDefaultTextures = async () => {
 
 		const tile_floor = await fetch(
 
@@ -72,7 +70,7 @@ export class Room {
 			// progress: () => 0,
 		});
 
-		this.floor_tile_default = {
+		Room.floor_tile_default = {
 
 			sizes: tile_floor.sizes,
 
@@ -97,7 +95,7 @@ export class Room {
 			// progress: () => 0,
 		});
 
-		this.wall_tile_default = {
+		Room.wall_tile_default = {
 
 			sizes: tile_wall.sizes,
 
@@ -107,11 +105,22 @@ export class Room {
 		loader.content = {};
 	}
 
+	constructor () {
+
+		this.points = [];
+
+		this.floor = null;
+
+		this.walls = [];
+
+		this.height = 0;
+	}
+
 	async make (height, points) {
 
-		if (!this.floor_tile_default || !this.wall_tile_default) {
+		if (!Room.floor_tile_default || !Room.wall_tile_default) {
 
-			await this.loadDefaultTextures();
+			await Room.loadDefaultTextures();
 		}
 
 		this.destroy();
@@ -120,11 +129,7 @@ export class Room {
 
 		this.height = height;
 
-		this.points.length = 0;
-
 		this.points.push(...points);
-
-		this.walls.length = 0;
 
 		this.points.forEach((point, index) => {
 
@@ -133,41 +138,33 @@ export class Room {
 			this.walls.push(wall);
 
 			point.z_index = index;
-
-			!point.walls.includes(wall) &&
-
-				point.walls.push(wall);
-
-			coverings_plan_NODE.appendChild(point.circle);
 		});
 
 		orbit_controls.target.set(0, this.height / 2, 0);
 
 		this.points.forEach((point) => point.updateStyles());
 
-		this.floor.setTile(this.floor_tile_default);
+		this.floor.setTile(Room.floor_tile_default);
 		this.floor.updateGeometry();
 	}
 
 	update (new_points) {
 
+		this.walls.length = 0;
+
 		if (new_points.length > this.points.length) {
 
-			this.points = new_points;
-
-			this.walls.length = 0;
-
-			this.points.forEach((point, index) => {
+			new_points.forEach((point, index) => {
 
 				point.z_index = index;
 
-				if (!point.walls.length) {
+				if (!this.points.includes(point)) {
 
-					const prev_point = this.points[index - 1] || this.points[this.points.length - 1];
-					const next_point = this.points[index + 1] || this.points[0];
+					const prev_point = new_points[index - 1] || new_points[new_points.length - 1];
+					const next_point = new_points[index + 1] || new_points[0];
 
-					const wall1 = new Wall(this, prev_point, point);
-					const wall2 = new Wall(this, point, next_point);
+					new Wall(this, prev_point, point);
+					new Wall(this, point, next_point);
 
 					const [ removed_wall ] = prev_point.walls.filter((wall) => next_point.walls.includes(wall));
 
@@ -176,8 +173,6 @@ export class Room {
 						prev_point.walls.indexOf(removed_wall),
 
 						1,
-
-						wall1,
 					);
 
 					next_point.walls.splice(
@@ -185,53 +180,78 @@ export class Room {
 						next_point.walls.indexOf(removed_wall),
 
 						1,
-
-						wall2,
 					);
 
-					this.walls.push(wall1, wall2);
-
-					!point.walls.includes(wall1) &&
-
-						point.walls.push(wall1);
-
-					!point.walls.includes(wall2) &&
-
-						point.walls.push(wall2);
-
 					removed_wall.remove();
+				}
+			});
+		}
+		else {
 
-					coverings_plan_NODE.appendChild(point.circle);
+			let removed_point = null;
+
+			this.points.forEach((point, index) => {
+
+				// point.z_index = index;
+
+				if (!new_points.includes(point)) {
+
+					const prev_point = this.points[index - 1] || this.points[this.points.length - 1];
+					const next_point = this.points[index + 1] || this.points[0];
+
+					new Wall(this, prev_point, next_point);
+
+					prev_point.walls.splice(
+
+						prev_point.walls.indexOf(point.walls.filter((wall) => prev_point.walls.includes(wall))[0]),
+
+						1,
+					);
+
+					next_point.walls.splice(
+
+						next_point.walls.indexOf(point.walls.filter((wall) => next_point.walls.includes(wall))[0]),
+
+						1,
+					);
+
+					point.walls.forEach((wall) => wall.remove());
+
+					removed_point = point;
 				}
 			});
 
-			this.points.forEach((point) => point.updateStyles());
-
-			// this.floor.setTile(this.floor_tile_default);
-			this.floor.updateGeometry();
+			removed_point.remove();
 		}
+
+		this.points = new_points;
+
+		this.floor.updateGeometry();
+
+		this.points.forEach((point) => {
+
+			this.walls.push(point.walls[0]);
+
+			point.updateStyles();
+		});
 	}
 
 	destroy () {
 
-		scene.children
-			.filter((_object) => _object.userData.parent)
-			.forEach((mesh) => {
-
-				raycastable_meshes.splice(raycastable_meshes.indexOf(mesh), 1);
-
-				scene.remove(mesh);
-			});
-
-		this.points.forEach((point) => {
-
-			point.z_index = 0;
-			point.walls.length = 0;
-		});
+		this.points.forEach((point) => point.remove());
 
 		this.points.length = 0;
 
-		coverings_plan_NODE.innerHTML = '';
+		if (this.floor) {
+
+			this.floor.remove();
+
+			this.floor = null;
+		}
+
+		this.walls.forEach((wall) => wall.remove());
+
+		this.walls.length = 0;
 	}
 }
 
@@ -242,39 +262,125 @@ export class Plan {
 	constructor (rooms) {
 
 		this.rooms = rooms;
+
+		this.states = [];
+
+		this.state_index = -1;
+	}
+
+	pushState () {
+
+		const state = {};
+
+		state.rooms = [];
+
+		const room1 = {
+
+			name: 'room1',
+
+			height: this.rooms[0].height,
+
+			points:
+
+				this.rooms[0].points.map((elm) => ([ (elm.pixel_x - (window.innerWidth / 2)) * cast.PIXELS_TO_METERS, (elm.pixel_y - (window.innerHeight / 2)) * cast.PIXELS_TO_METERS ])),
+
+			walls:
+
+			this.rooms[0].walls.map((elm) => {
+
+					return {
+
+						segments:
+
+							elm.segments.map((segment) => segment.polygons),
+					};
+				}),
+		};
+
+		state.rooms.push(room1);
+
+		this.states = this.states.slice(0, this.state_index + 1);
+
+		this.states.push(state);
+
+		++this.state_index;
+
+		// LOG(this.states, this.state_index)
 	}
 
 	makeFromJson (json) {
 
-		this.destroy();
+		// this.destroy();
 
-		this.rooms.length = [];
-
-		LOG(json);
+		const new_rooms = [];
 
 		json.rooms &&
 
-			json.rooms.forEach((json_room) => {
+			json.rooms.forEach(async (json_room) => {
 
 				const points = json_room.points.map((json_room_point) => new Point(...json_room_point));
 
-				LOG(points)
-
 				const room = new Room();
 
-				this.rooms.push(room);
+				// this.rooms.push(room);
+				new_rooms.push(room);
 
-				room.make(
+				await room.make(json_room.height, points);
 
-					json_room.height,
+				json_room.walls.forEach((wall, wall_index) => {
 
-					points,
-				);
+					if (wall.segments.length > 0) {
+
+						wall.segments.map(
+
+							(json_room_wall_segment) =>
+								new Segment(
+
+									null,
+									room.walls[wall_index],
+									json_room_wall_segment,
+								),
+						);
+
+
+
+						raycastable_meshes.splice(
+
+							raycastable_meshes.indexOf(room.walls[wall_index].mesh),
+
+							1,
+						);
+
+						scene.remove(room.walls[wall_index].mesh);
+					}
+				});
 			});
+
+		this.destroy();
+
+		this.rooms = new_rooms;
+	}
+
+	undo () {
+
+		if (this.state_index > 0) {
+
+			this.makeFromJson(this.states[--this.state_index]);
+		}
+	}
+
+	redo () {
+
+		if (this.state_index < this.states.length - 1) {
+
+			this.makeFromJson(this.states[++this.state_index]);
+		}
 	}
 
 	destroy () {
 
 		this.rooms.forEach((room) => room.destroy());
+
+		this.rooms.length = 0;
 	}
 }

@@ -208,7 +208,7 @@ canvas.addEventListener('mousemove', (evt) => {
 
 
 
-		let _intersects = raycaster.intersectObjects(raycastable_meshes);
+		const _intersects = raycaster.intersectObjects(raycastable_meshes);
 
 		// LOG(_intersects)
 
@@ -220,7 +220,7 @@ canvas.addEventListener('mousemove', (evt) => {
 
 			raycasted_mesh.material.color.set(0xADD8E6);
 
-			return;
+			// return;
 		}
 
 

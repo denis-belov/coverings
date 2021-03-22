@@ -12,9 +12,11 @@ import polybooljs from 'polybooljs';
 import modes from './modes';
 import cast from './cast';
 
-import Point from './point';
-import Wall from './wall';
+// import Point from './point';
+// import Wall from './wall';
 import Segment from './segment';
+
+// import undo from './undo';
 
 import {
 
@@ -33,6 +35,7 @@ import {
 	uploadModel,
 	plan_camera,
 	scene,
+	raycastable_meshes,
 	tileable_mesh,
 	transform_controls,
 } from './three';
@@ -316,34 +319,37 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 
-	const segment_geometry = new THREE.PlaneBufferGeometry(selection_area_meter_width, selection_area_meter_height);
+	const selected_area_geometry =
+		new THREE.PlaneBufferGeometry(selection_area_meter_width, selection_area_meter_height);
 
 
 
-	const segment_polygons = { regions: [] };
+	const selected_area_polygons = { regions: [] };
 
-	for (let i = 0; i < segment_geometry.index.array.length; i += 3) {
 
-		const index1 = segment_geometry.index.array[i + 0] * 3;
-		const index2 = segment_geometry.index.array[i + 1] * 3;
-		const index3 = segment_geometry.index.array[i + 2] * 3;
 
-		segment_polygons.regions.push(
+	for (let i = 0; i < selected_area_geometry.index.array.length; i += 3) {
+
+		const index1 = selected_area_geometry.index.array[i + 0] * 3;
+		const index2 = selected_area_geometry.index.array[i + 1] * 3;
+		const index3 = selected_area_geometry.index.array[i + 2] * 3;
+
+		selected_area_polygons.regions.push(
 
 			[
 				[
-					segment_geometry.attributes.position.array[index1 + 0] - selection_area_meter_left,
-					segment_geometry.attributes.position.array[index1 + 1] - selection_area_meter_top,
+					selected_area_geometry.attributes.position.array[index1 + 0] - selection_area_meter_left,
+					selected_area_geometry.attributes.position.array[index1 + 1] - selection_area_meter_top,
 				],
 
 				[
-					segment_geometry.attributes.position.array[index2 + 0] - selection_area_meter_left,
-					segment_geometry.attributes.position.array[index2 + 1] - selection_area_meter_top,
+					selected_area_geometry.attributes.position.array[index2 + 0] - selection_area_meter_left,
+					selected_area_geometry.attributes.position.array[index2 + 1] - selection_area_meter_top,
 				],
 
 				[
-					segment_geometry.attributes.position.array[index3 + 0] - selection_area_meter_left,
-					segment_geometry.attributes.position.array[index3 + 1] - selection_area_meter_top,
+					selected_area_geometry.attributes.position.array[index3 + 0] - selection_area_meter_left,
+					selected_area_geometry.attributes.position.array[index3 + 1] - selection_area_meter_top,
 				],
 			],
 		);
@@ -351,7 +357,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 
-	const object_polygons = segment_polygons;
+	// const object_polygons = selected_area_polygons;
 
 
 
@@ -361,7 +367,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 
-		const ppp3 = [];
+		const all_segments_intersection_polygons = [];
 
 		segments.forEach((_segment) => {
 
@@ -370,8 +376,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 			// rename
-			const ppp = [];
-			const ppp2 = [];
+			const difference_polygons = [];
+			const intersection_polygons = [];
 
 
 
@@ -382,11 +388,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 			for (let k = 0; k < subject_polygons.length; ++k) {
 
 				// object part left after intersection
-				const intersection_polygons = polybooljs.intersect(subject_polygons[k], object_polygons);
-
-				intersection_polygons?.regions &&
-
-					ppp2.push(...intersection_polygons.regions);
+				intersection_polygons
+					.push(...polybooljs.intersect(subject_polygons[k], selected_area_polygons).regions);
 
 
 
@@ -395,14 +398,14 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 					!object_not_entirely_inside_any_subject_triangle &&
 
-					object_polygons.regions.filter(
+					selected_area_polygons.regions.filter(
 
 						(region) =>
 							region.filter(
 
 								(point) => testPointInsideTriangle(point, subject_polygons[k].regions),
 							).length === region.length,
-					).length === object_polygons.regions.length
+					).length === selected_area_polygons.regions.length
 				) {
 
 					// rename
@@ -410,7 +413,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 					let yy = 0;
 					let ii = 0;
 
-					object_polygons.regions.forEach(
+					selected_area_polygons.regions.forEach(
 
 						(region) =>
 							region.forEach((coordinate) => {
@@ -425,7 +428,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 					xx /= ii;
 					yy /= ii;
 
-					object_polygons.regions.forEach(
+					selected_area_polygons.regions.forEach(
 
 						(region) =>
 							region.forEach((coordinate) => {
@@ -435,9 +438,9 @@ apply_segment_BUTTON.addEventListener('click', () => {
 							}),
 					);
 
-					const difference_polygons1 = polybooljs.difference(subject_polygons[k], object_polygons);
+					const difference_polygons1 = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
-					object_polygons.regions.forEach(
+					selected_area_polygons.regions.forEach(
 
 						(region) =>
 							region.forEach((coordinate) => {
@@ -450,9 +453,9 @@ apply_segment_BUTTON.addEventListener('click', () => {
 							}),
 					);
 
-					const difference_polygons2 = polybooljs.difference(subject_polygons[k], object_polygons);
+					const difference_polygons2 = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
-					object_polygons.regions.forEach(
+					selected_area_polygons.regions.forEach(
 
 						(region) =>
 							region.forEach((coordinate) => {
@@ -466,11 +469,11 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 					const difference_polygons3 = polybooljs.intersect(difference_polygons1, difference_polygons2);
 
-					ppp.push(...difference_polygons3.regions);
+					difference_polygons.push(...difference_polygons3.regions);
 
 					const difference_polygons4 = polybooljs.xor(difference_polygons1, difference_polygons2);
 
-					ppp.push(...difference_polygons4.regions);
+					difference_polygons.push(...difference_polygons4.regions);
 
 
 
@@ -478,7 +481,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 						j !== k &&
 
-							ppp.push(subject_polygons[j].regions[0]);
+						difference_polygons.push(subject_polygons[j].regions[0]);
 					}
 
 
@@ -488,7 +491,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 				// object partially inside subject
 				else if (
 
-					object_polygons.regions.filter(
+					selected_area_polygons.regions.filter(
 
 						(region) =>
 							region.filter(
@@ -500,66 +503,72 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 					object_not_entirely_inside_any_subject_triangle = true;
 
-					const difference_polygons = polybooljs.difference(subject_polygons[k], object_polygons);
+					// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
-					difference_polygons.regions.forEach((region) => ppp.push(region));
+					polybooljs.difference(subject_polygons[k], selected_area_polygons).regions
+						.forEach((region) => difference_polygons.push(region));
 				}
 				// object entirely outside subject triangle
 				else {
 
-					const difference_polygons = polybooljs.difference(subject_polygons[k], object_polygons);
+					// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
-					difference_polygons.regions.forEach((region) => ppp.push(region));
+					polybooljs.difference(subject_polygons[k], selected_area_polygons).regions
+						.forEach((region) => difference_polygons.push(region));
 				}
 			}
 
 
 
-			if (ppp2.length > 0) {
+			if (intersection_polygons.length > 0) {
 
 				const segment =
 					new Segment(
 
 						null,
 						whole,
+						difference_polygons,
 					);
 
 				segment.mesh.material = segment.material2;
 
-				whole.segments.push(segment);
+				// whole.segments.push(segment);
 
 				segment.setTile(whole.tile);
 
-				segment.updateGeometry(ppp);
+				segment.updateGeometry();
 
 
 
-				ppp3.push(...ppp2);
+				all_segments_intersection_polygons.push(...intersection_polygons);
 
 
 
-				whole.segments.splice(whole.segments.indexOf(_segment), 1);
+				// whole.segments.splice(whole.segments.indexOf(_segment), 1);
 
-				scene.remove(_segment.mesh);
+				// scene.remove(_segment.mesh);
+
+				_segment.remove();
 			}
 		});
 
-		if (ppp3.length > 0) {
+		if (all_segments_intersection_polygons.length > 0) {
 
 			const segment =
 				new Segment(
 
 					null,
 					whole,
+					all_segments_intersection_polygons,
 				);
 
 			segment.mesh.material = segment.material2;
 
-			whole.segments.push(segment);
+			// whole.segments.push(segment);
 
 			segment.setTile(whole.tile);
 
-			segment.updateGeometry(ppp3);
+			segment.updateGeometry();
 		}
 	}
 	else {
@@ -569,8 +578,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 		// rename
-		const ppp = [];
-		const ppp2 = [];
+		const difference_polygons = [];
+		const intersection_polygons = [];
 
 
 
@@ -581,11 +590,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 		for (let k = 0; k < subject_polygons.length; ++k) {
 
 			// object part left after intersection
-			const intersection_polygons = polybooljs.intersect(subject_polygons[k], object_polygons);
-
-			intersection_polygons?.regions &&
-
-				ppp2.push(...intersection_polygons.regions);
+			intersection_polygons.push(...polybooljs.intersect(subject_polygons[k], selected_area_polygons).regions);
 
 
 
@@ -594,22 +599,24 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 				!object_not_entirely_inside_any_subject_triangle &&
 
-				object_polygons.regions.filter(
+				selected_area_polygons.regions.filter(
 
 					(region) =>
 						region.filter(
 
 							(point) => testPointInsideTriangle(point, subject_polygons[k].regions),
 						).length === region.length,
-				).length === object_polygons.regions.length
+				).length === selected_area_polygons.regions.length
 			) {
+
+				// LOG(12)
 
 				// rename
 				let xx = 0;
 				let yy = 0;
 				let ii = 0;
 
-				object_polygons.regions.forEach(
+				selected_area_polygons.regions.forEach(
 
 					(region) =>
 						region.forEach((coordinate) => {
@@ -624,7 +631,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 				xx /= ii;
 				yy /= ii;
 
-				object_polygons.regions.forEach(
+				selected_area_polygons.regions.forEach(
 
 					(region) =>
 						region.forEach((coordinate) => {
@@ -634,9 +641,9 @@ apply_segment_BUTTON.addEventListener('click', () => {
 						}),
 				);
 
-				const difference_polygons1 = polybooljs.difference(subject_polygons[k], object_polygons);
+				const difference_polygons1 = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
-				object_polygons.regions.forEach(
+				selected_area_polygons.regions.forEach(
 
 					(region) =>
 						region.forEach((coordinate) => {
@@ -649,9 +656,9 @@ apply_segment_BUTTON.addEventListener('click', () => {
 						}),
 				);
 
-				const difference_polygons2 = polybooljs.difference(subject_polygons[k], object_polygons);
+				const difference_polygons2 = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
-				object_polygons.regions.forEach(
+				selected_area_polygons.regions.forEach(
 
 					(region) =>
 						region.forEach((coordinate) => {
@@ -666,12 +673,12 @@ apply_segment_BUTTON.addEventListener('click', () => {
 				const difference_polygons3 = polybooljs.intersect(difference_polygons1, difference_polygons2);
 
 				// difference_polygons3.regions.forEach((region) => ppp.push(region));
-				ppp.push(...difference_polygons3.regions);
+				difference_polygons.push(...difference_polygons3.regions);
 
 				const difference_polygons4 = polybooljs.xor(difference_polygons1, difference_polygons2);
 
 				// difference_polygons4.regions.forEach((region) => ppp.push(region));
-				ppp.push(...difference_polygons4.regions);
+				difference_polygons.push(...difference_polygons4.regions);
 
 
 
@@ -679,8 +686,14 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 					j !== k &&
 
-						ppp.push(subject_polygons[j].regions[0]);
+						difference_polygons.push(subject_polygons[j].regions[0]);
 				}
+
+
+
+				// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
+
+				// difference_polygons.regions.forEach((region) => ppp.push(region));
 
 
 
@@ -689,7 +702,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 			// object partially inside subject
 			else if (
 
-				object_polygons.regions.filter(
+				selected_area_polygons.regions.filter(
 
 					(region) =>
 						region.filter(
@@ -699,39 +712,42 @@ apply_segment_BUTTON.addEventListener('click', () => {
 				).length > 0
 			) {
 
+				// LOG(14)
+
 				object_not_entirely_inside_any_subject_triangle = true;
 
-				const difference_polygons = polybooljs.difference(subject_polygons[k], object_polygons);
+				// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
-				difference_polygons.regions.forEach((region) => ppp.push(region));
+				polybooljs.difference(subject_polygons[k], selected_area_polygons).regions
+					.forEach((region) => difference_polygons.push(region));
 			}
 			// object entirely outside subject triangle
 			else {
 
-				const difference_polygons = polybooljs.difference(subject_polygons[k], object_polygons);
+				// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
-				difference_polygons.regions.forEach((region) => ppp.push(region));
+				polybooljs.difference(subject_polygons[k], selected_area_polygons).regions
+					.forEach((region) => difference_polygons.push(region));
 			}
 		}
 
 
 
-		if (ppp2.length > 0) {
+		if (intersection_polygons.length > 0) {
 
 			const segment1 =
 				new Segment(
 
 					null,
 					whole,
+					difference_polygons,
 				);
 
 			segment1.mesh.material = segment1.material2;
 
-			whole.segments.push(segment1);
-
 			segment1.setTile(whole.tile);
 
-			segment1.updateGeometry(ppp);
+			segment1.updateGeometry();
 
 
 
@@ -740,19 +756,27 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 					null,
 					whole,
+					intersection_polygons,
 				);
 
 			segment2.mesh.material = segment2.material2;
 
-			whole.segments.push(segment2);
-
 			segment2.setTile(whole.tile);
 
-			segment2.updateGeometry(ppp2);
+			segment2.updateGeometry();
 
 
+
+			raycastable_meshes.splice(
+
+				raycastable_meshes.indexOf(whole.mesh),
+
+				1,
+			);
 
 			scene.remove(whole.mesh);
+
+			// whole.mesh.visible = false;
 		}
 	}
 
@@ -783,17 +807,55 @@ apply_segment_BUTTON.addEventListener('click', () => {
 // 	}
 // });
 
-window.addEventListener('mouseup', () => {
+// window.addEventListener('mouseup', () => {
 
-	if (Point.selected) {
+// 	if (Point.selected) {
 
-		Point.selected.circle.classList.remove('-mousedown');
+// 		Point.selected.circle.classList.remove('-mousedown');
 
-		window.removeEventListener('mousemove', Point.move);
-	}
+// 		window.removeEventListener('mousemove', Point.move);
 
-	if (Wall.selected) {
+// 		if (Point.moved) {
 
-		window.removeEventListener('mousemove', Wall.move);
-	}
-});
+// 			Point.moved = false;
+
+// 			const json = {};
+
+// 			json.rooms = [];
+
+// 			const room1 = {
+
+// 				name: 'room1',
+
+// 				height: plan.rooms[0].height,
+
+// 				points:
+
+// 					plan.rooms[0].points.map((elm) => ([ (elm.pixel_x - (window.innerWidth / 2)) * cast.PIXELS_TO_METERS, (elm.pixel_y - (window.innerHeight / 2)) * cast.PIXELS_TO_METERS ])),
+
+// 				walls:
+
+// 					plan.rooms[0].walls.map((elm) => {
+
+// 						return {
+
+// 							segments:
+
+// 								elm.segments.map((segment) => segment.polygons),
+// 						};
+// 					}),
+// 			};
+
+// 			json.rooms.push(room1);
+
+// 			undo.push(json);
+
+// 			LOG(undo)
+// 		}
+// 	}
+
+// 	if (Wall.selected) {
+
+// 		window.removeEventListener('mousemove', Wall.move);
+// 	}
+// });

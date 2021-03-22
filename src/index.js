@@ -10,9 +10,10 @@ import '@babel/polyfill';
 import Loader from 'external-data-loader';
 
 import modes from './modes';
-import cast from './cast';
+// import cast from './cast';
 
 import Point from './point';
+import Wall from './wall';
 import { Room, Plan } from './room';
 
 import {
@@ -84,15 +85,28 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 		plan.rooms.forEach((_room) => {
 
-			LOG(plan.rooms, _room)
-
 			_room.walls.forEach((wall) => {
 
 				wall.tile ||
 
-					wall.setTile(_room.wall_tile_default);
+					wall.setTile(Room.wall_tile_default);
 
 				wall.updateGeometry();
+
+				wall.segments.forEach((segment) => {
+
+					segment.mesh.quaternion.copy(wall.quaternion);
+					segment.mesh.position.copy(wall.position);
+					segment.mesh.updateMatrix();
+
+					segment.tile ||
+
+						segment.setTile(Room.wall_tile_default);
+
+					segment.updateGeometry();
+
+					segment.mesh.geometry.computeBoundingSphere();
+				});
 			});
 		});
 	}
@@ -172,38 +186,38 @@ load_INPUT.addEventListener('change', (evt) => {
 
 load_BUTTON.addEventListener('click', () => {
 
-	const json = {};
+	// const json = {};
 
-	json.rooms = [];
+	// json.rooms = [];
 
-	const room1 = {
+	// const room1 = {
 
-		name: 'room1',
+	// 	name: 'room1',
 
-		height: plan.rooms[0].height,
+	// 	height: plan.rooms[0].height,
 
-		points:
+	// 	points:
 
-			plan.rooms[0].points.map((elm) => ([ (elm.pixel_x - (window.innerWidth / 2)) * cast.PIXELS_TO_METERS, (elm.pixel_y - (window.innerHeight / 2)) * cast.PIXELS_TO_METERS ])),
+	// 		plan.rooms[0].points.map((elm) => ([ (elm.pixel_x - (window.innerWidth / 2)) * cast.PIXELS_TO_METERS, (elm.pixel_y - (window.innerHeight / 2)) * cast.PIXELS_TO_METERS ])),
 
-		walls:
+	// 	walls:
 
-			plan.rooms[0].walls.map((elm) => {
+	// 		plan.rooms[0].walls.map((elm) => {
 
-				return {
+	// 			return {
 
-					segments:
+	// 				segments:
 
-						elm.segments.map((segment) => segment.regions),
-				};
-			}),
-	};
+	// 					elm.segments.map((segment) => segment.polygons),
+	// 			};
+	// 		}),
+	// };
 
-	json.rooms.push(room1);
+	// json.rooms.push(room1);
 
-	const blob = new Blob([ JSON.stringify(json) ], { type: 'text/plain;charset=utf-8' });
+	// const blob = new Blob([ JSON.stringify(json) ], { type: 'text/plain;charset=utf-8' });
 
-	FileSaver.saveAs(blob, 'room.json');
+	// FileSaver.saveAs(blob, 'room.json');
 
 	load_INPUT.click();
 });
@@ -259,27 +273,110 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 		});
 
 	modal.style.display = 'none';
+
+	plan.pushState();
 });
 
 
 
-// window.addEventListener('keypress', (evt) => {
+window.addEventListener('keypress', (evt) => {
 
-// 	if (evt.code === 'KeyD' && Point.selected) {
+	if (evt.code === 'KeyD' && Point.selected) {
 
-// 		const new_points = room.points.slice();
+		const new_points = room.points.slice();
 
-// 		new_points.splice(new_points.indexOf(Point.selected), 1);
+		new_points.splice(new_points.indexOf(Point.selected), 1);
 
-// 		room.make(room.height, new_points);
-// 	}
-// });
+		room.update(new_points);
+	}
+});
+
+
+
+// let animation_allowed = true;
+
+
+
+window.addEventListener('mouseup', () => {
+
+	if (Point.selected) {
+
+		Point.selected.circle.classList.remove('-mousedown');
+
+		window.removeEventListener('mousemove', Point.move);
+
+		if (
+
+			Point.selected.prev_pixel_x !== Point.selected.pixel_x ||
+			Point.selected.prev_pixel_y !== Point.selected.pixel_y
+		) {
+
+			plan.pushState();
+
+			Point.selected.prev_pixel_x = Point.selected.pixel_x;
+			Point.selected.prev_pixel_y = Point.selected.pixel_y;
+		}
+
+		Point.selected = null;
+	}
+
+	if (Wall.selected) {
+
+		window.removeEventListener('mousemove', Wall.move);
+
+		if (
+
+			Wall.selected.points[0].prev_pixel_x !== Wall.selected.points[0].pixel_x ||
+			Wall.selected.points[0].prev_pixel_y !== Wall.selected.points[0].pixel_y
+		) {
+
+			// LOG(
+
+			// 	Wall.selected.points[0].prev_pixel_x, Wall.selected.points[0].pixel_x,
+			// 	Wall.selected.points[0].prev_pixel_y, Wall.selected.points[0].pixel_y,
+			// )
+
+			plan.pushState();
+
+			Wall.selected.points.forEach((point) => {
+
+				point.prev_pixel_x = point.pixel_x;
+				point.prev_pixel_y = point.pixel_y;
+			});
+		}
+
+		Wall.selected = null;
+	}
+});
+
+window.addEventListener('keypress', (evt) => {
+
+	if (evt.code === 'KeyZ') {
+
+		// animation_allowed = false;
+
+		plan.undo();
+
+		// setTimeout(() => {
+
+		// 	animation_allowed = true;
+
+		// 	// LOG(1)
+		// }, 0);
+	}
+	else if (evt.code === 'KeyY') {
+
+		plan.redo();
+	}
+});
 
 
 
 const animate = () => {
 
 	requestAnimationFrame(animate);
+
+	// if (animation_allowed) {
 
 	renderer.clear();
 
@@ -288,12 +385,14 @@ const animate = () => {
 		orbit_controls.update();
 
 		renderer.render(scene, orbit_camera);
-
 	}
 	else {
 
 		renderer.render(scene, plan_camera);
 	}
+	// }
 };
+
+
 
 animate();

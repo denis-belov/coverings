@@ -49,8 +49,13 @@ export default class Wall extends Tileable {
 
 		this.pixel_length = point1.distanceTo(point2);
 
-		this.points[0].walls.push(this);
-		this.points[1].walls.push(this);
+		!this.points[0].walls.includes(this) &&
+
+			this.points[0].walls.push(this);
+
+		!this.points[1].walls.includes(this) &&
+
+			this.points[1].walls.push(this);
 
 		this.rect = document.createElement('div');
 		this.rect.className = 'coverings-plan-rect';
@@ -82,7 +87,7 @@ export default class Wall extends Tileable {
 				const p1_index = this.room.points.indexOf(this.points[0]);
 				const p2_index = this.room.points.indexOf(this.points[1]);
 
-				const old_points = this.room.points.slice();
+				// const old_points = this.room.points.slice();
 				const new_points = this.room.points.slice();
 
 				new_points.splice(
@@ -184,6 +189,8 @@ export default class Wall extends Tileable {
 	}
 
 	remove () {
+
+		// LOG(this.rect)
 
 		coverings_plan_NODE.removeChild(this.rect);
 
