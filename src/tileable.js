@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 
+import Loader from 'external-data-loader';
+
 import { transparent_IMG } from './dom';
+
+import textures from './textures';
 
 import {
 
@@ -15,10 +19,15 @@ import {
 
 
 
+const loader = new Loader();
+
+
+
 export default class Tileable {
 
 	constructor (room) {
 
+		// rename to smth
 		this.tile = null;
 
 		this.quaternion = new THREE.Quaternion();
@@ -67,7 +76,7 @@ export default class Tileable {
 		metalness_map.wrapS = THREE.RepeatWrapping;
 		metalness_map.wrapT = THREE.RepeatWrapping;
 
-		this.material = new THREE.MeshPhysicalMaterial({
+		this.physical_material = new THREE.MeshPhysicalMaterial({
 
 			map,
 			normalMap: normal_map,
@@ -78,13 +87,13 @@ export default class Tileable {
 			wireframe: MATERIAL_WIREFRAME,
 		});
 
-		this.material2 = new THREE.MeshBasicMaterial({
+		this.basic_material = new THREE.MeshBasicMaterial({
 
 			map,
 			side: THREE.BackSide,
 		});
 
-		this.mesh = new THREE.Mesh(geometry, this.material);
+		this.mesh = new THREE.Mesh(geometry, this.physical_material);
 		// remove ?
 		this.mesh.matrixAutoUpdate = false;
 
@@ -109,31 +118,110 @@ export default class Tileable {
 		this.mesh.material = tileable.mesh.material;
 	}
 
-	setTile (tile) {
+	// setTile2 (tile) {
 
-		this.tile = tile;
+	// 	this.tile = tile;
 
-		this.material.map.image = this.tile.textures.map || transparent_IMG;
-		this.material.normalMap.image = this.tile.textures.normal_map || transparent_IMG;
-		this.material.aoMap.image = this.tile.textures.ao_map || transparent_IMG;
-		this.material.roughnessMap.image = this.tile.textures.roughness_map || transparent_IMG;
-		this.material.metalnessMap.image = this.tile.textures.metalness_map || transparent_IMG;
+	// 	this.physical_material.map.image = this.tile.textures.map || transparent_IMG;
+	// 	this.physical_material.normalMap.image = this.tile.textures.normal_map || transparent_IMG;
+	// 	this.physical_material.aoMap.image = this.tile.textures.ao_map || transparent_IMG;
+	// 	this.physical_material.roughnessMap.image = this.tile.textures.roughness_map || transparent_IMG;
+	// 	this.physical_material.metalnessMap.image = this.tile.textures.metalness_map || transparent_IMG;
 
-		this.material.map.needsUpdate = true;
-		this.material.normalMap.needsUpdate = true;
-		this.material.aoMap.needsUpdate = true;
-		this.material.roughnessMap.needsUpdate = true;
-		this.material.metalnessMap.needsUpdate = true;
+	// 	this.physical_material.map.needsUpdate = true;
+	// 	this.physical_material.normalMap.needsUpdate = true;
+	// 	this.physical_material.aoMap.needsUpdate = true;
+	// 	this.physical_material.roughnessMap.needsUpdate = true;
+	// 	this.physical_material.metalnessMap.needsUpdate = true;
 
-		this.material.needsUpdate = true;
+	// 	this.physical_material.needsUpdate = true;
 
 
 
-		this.material2.map.image = this.tile.textures.map || transparent_IMG;
+	// 	this.basic_material.map.image = this.tile.textures.map || transparent_IMG;
 
-		this.material2.map.needsUpdate = true;
+	// 	this.basic_material.map.needsUpdate = true;
 
-		this.material2.needsUpdate = true;
+	// 	this.basic_material.needsUpdate = true;
+	// }
+
+	async setTile (tile_id) {
+
+		if (!textures[tile_id]) {
+
+			const info = await fetch(
+
+				tile_id,
+
+				{ method: 'get' },
+			)
+				.then((response) => response.json());
+
+
+
+			if (info.textures) {
+
+				const sources = {};
+
+				for (const texture in info.textures) {
+
+					sources[texture] = { source: `${ __STATIC_PATH__ }${ info.textures[texture] }`, type: 'image' };
+				}
+
+				await loader.load({
+
+					sources,
+
+					// progress: () => 0,
+				});
+			}
+
+
+
+			info.id = tile_id;
+
+			info.textures = loader.content;
+
+			loader.content = {};
+
+			textures[tile_id] = info;
+		}
+
+		// LOG(textures[tile_id])
+
+		this.tile = textures[tile_id];
+
+		this.physical_material.map.image = this.tile.textures.map || transparent_IMG;
+		this.physical_material.normalMap.image = this.tile.textures.normal_map || transparent_IMG;
+		this.physical_material.aoMap.image = this.tile.textures.ao_map || transparent_IMG;
+		this.physical_material.roughnessMap.image = this.tile.textures.roughness_map || transparent_IMG;
+		this.physical_material.metalnessMap.image = this.tile.textures.metalness_map || transparent_IMG;
+
+		this.physical_material.map.needsUpdate = true;
+		this.physical_material.normalMap.needsUpdate = true;
+		this.physical_material.aoMap.needsUpdate = true;
+		this.physical_material.roughnessMap.needsUpdate = true;
+		this.physical_material.metalnessMap.needsUpdate = true;
+
+		this.physical_material.needsUpdate = true;
+
+
+
+		this.basic_material.map.image = this.tile.textures.map || transparent_IMG;
+
+		this.basic_material.map.needsUpdate = true;
+
+		this.basic_material.needsUpdate = true;
+	}
+
+	setBasicMaterial () {
+
+		this.mesh.material = this.basic_material;
+	}
+
+	setPhysicalMaterial () {
+
+		this.mesh.material = this.physical_material;
 	}
 
 	// Return polybooljs object (triangle) array that can be used as polybooljs boolean operation argument.

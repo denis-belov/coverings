@@ -9,18 +9,19 @@ no-new,
 import Loader from 'external-data-loader';
 
 // import { coverings_plan_NODE } from './dom';
-import cast from './cast';
+// import cast from './cast';
+import textures from './textures';
 
-import Point from './point';
+// import Point from './point';
 import Floor from './floor';
 import Wall from './wall';
-import Segment from './segment';
+// import Segment from './segment';
 
 import {
 
-	scene,
+	// scene,
 	orbit_controls,
-	raycastable_meshes,
+	// raycastable_meshes,
 } from './three';
 
 
@@ -29,7 +30,7 @@ const loader = new Loader();
 
 
 
-export class Room {
+export default class Room {
 
 	static floor_tile_default = null;
 	static wall_tile_default = null;
@@ -72,10 +73,14 @@ export class Room {
 
 		Room.floor_tile_default = {
 
+			id: `${ __STATIC_PATH__ }/textures/3/info.json`,
+
 			sizes: tile_floor.sizes,
 
 			textures: loader.content,
 		};
+
+		textures[`${ __STATIC_PATH__ }/textures/3/info.json`] = Room.floor_tile_default;
 
 		loader.content = {};
 
@@ -97,10 +102,14 @@ export class Room {
 
 		Room.wall_tile_default = {
 
+			id: `${ __STATIC_PATH__ }/textures/4/info.json`,
+
 			sizes: tile_wall.sizes,
 
 			textures: loader.content,
 		};
+
+		textures[`${ __STATIC_PATH__ }/textures/4/info.json`] = Room.wall_tile_default;
 
 		loader.content = {};
 	}
@@ -121,6 +130,8 @@ export class Room {
 		if (!Room.floor_tile_default || !Room.wall_tile_default) {
 
 			await Room.loadDefaultTextures();
+
+			// LOG(Room.floor_tile_default)
 		}
 
 		this.destroy();
@@ -131,9 +142,14 @@ export class Room {
 
 		this.points.push(...points);
 
+		this.floor.setTile(Room.floor_tile_default.id);
+		this.floor.updateGeometry();
+
 		this.points.forEach((point, index) => {
 
 			const wall = new Wall(this, points[index], points[index + 1] || points[0]);
+
+			wall.updateQuaternionAndPosition();
 
 			this.walls.push(wall);
 
@@ -143,9 +159,6 @@ export class Room {
 		orbit_controls.target.set(0, this.height / 2, 0);
 
 		this.points.forEach((point) => point.updateStyles());
-
-		this.floor.setTile(Room.floor_tile_default);
-		this.floor.updateGeometry();
 	}
 
 	update (new_points) {
@@ -252,135 +265,5 @@ export class Room {
 		this.walls.forEach((wall) => wall.remove());
 
 		this.walls.length = 0;
-	}
-}
-
-
-
-export class Plan {
-
-	constructor (rooms) {
-
-		this.rooms = rooms;
-
-		this.states = [];
-
-		this.state_index = -1;
-	}
-
-	pushState () {
-
-		const state = {};
-
-		state.rooms = [];
-
-		const room1 = {
-
-			name: 'room1',
-
-			height: this.rooms[0].height,
-
-			points:
-
-				this.rooms[0].points.map((elm) => ([ (elm.pixel_x - (window.innerWidth / 2)) * cast.PIXELS_TO_METERS, (elm.pixel_y - (window.innerHeight / 2)) * cast.PIXELS_TO_METERS ])),
-
-			walls:
-
-			this.rooms[0].walls.map((elm) => {
-
-					return {
-
-						segments:
-
-							elm.segments.map((segment) => segment.polygons),
-					};
-				}),
-		};
-
-		state.rooms.push(room1);
-
-		this.states = this.states.slice(0, this.state_index + 1);
-
-		this.states.push(state);
-
-		++this.state_index;
-
-		// LOG(this.states, this.state_index)
-	}
-
-	makeFromJson (json) {
-
-		// this.destroy();
-
-		const new_rooms = [];
-
-		json.rooms &&
-
-			json.rooms.forEach(async (json_room) => {
-
-				const points = json_room.points.map((json_room_point) => new Point(...json_room_point));
-
-				const room = new Room();
-
-				// this.rooms.push(room);
-				new_rooms.push(room);
-
-				await room.make(json_room.height, points);
-
-				json_room.walls.forEach((wall, wall_index) => {
-
-					if (wall.segments.length > 0) {
-
-						wall.segments.map(
-
-							(json_room_wall_segment) =>
-								new Segment(
-
-									null,
-									room.walls[wall_index],
-									json_room_wall_segment,
-								),
-						);
-
-
-
-						raycastable_meshes.splice(
-
-							raycastable_meshes.indexOf(room.walls[wall_index].mesh),
-
-							1,
-						);
-
-						scene.remove(room.walls[wall_index].mesh);
-					}
-				});
-			});
-
-		this.destroy();
-
-		this.rooms = new_rooms;
-	}
-
-	undo () {
-
-		if (this.state_index > 0) {
-
-			this.makeFromJson(this.states[--this.state_index]);
-		}
-	}
-
-	redo () {
-
-		if (this.state_index < this.states.length - 1) {
-
-			this.makeFromJson(this.states[++this.state_index]);
-		}
-	}
-
-	destroy () {
-
-		this.rooms.forEach((room) => room.destroy());
-
-		this.rooms.length = 0;
 	}
 }

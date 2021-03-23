@@ -120,6 +120,28 @@ export default class Wall extends Tileable {
 		coverings_plan_NODE.appendChild(this.rect);
 	}
 
+	updateQuaternionAndPosition () {
+
+		const [ point, next_point ] = this.points;
+
+		const vv1 = new THREE.Vector3(1, 0, 0);
+
+		const vv2 =
+			new THREE.Vector3(next_point.scene_x, 0, next_point.scene_z)
+				.sub(new THREE.Vector3(point.scene_x, 0, point.scene_z))
+				.normalize();
+
+		this.quaternion.setFromUnitVectors(vv1, vv2);
+
+		const position = point.centerWith2(next_point);
+
+		this.position.set(position[0], this.room.height / 2, position[1]);
+
+		this.mesh.quaternion.copy(this.quaternion);
+		this.mesh.position.copy(this.position);
+		this.mesh.updateMatrix();
+	}
+
 	updateGeometry () {
 
 		const [ point, next_point ] = this.points;
@@ -134,18 +156,18 @@ export default class Wall extends Tileable {
 				this.room.height,
 			);
 
-		const vv1 = new THREE.Vector3(1, 0, 0);
+		// const vv1 = new THREE.Vector3(1, 0, 0);
 
-		const vv2 =
-			new THREE.Vector3(next_point.scene_x, 0, next_point.scene_z)
-				.sub(new THREE.Vector3(point.scene_x, 0, point.scene_z))
-				.normalize();
+		// const vv2 =
+		// 	new THREE.Vector3(next_point.scene_x, 0, next_point.scene_z)
+		// 		.sub(new THREE.Vector3(point.scene_x, 0, point.scene_z))
+		// 		.normalize();
 
-		this.quaternion.setFromUnitVectors(vv1, vv2);
+		// this.quaternion.setFromUnitVectors(vv1, vv2);
 
-		const position = point.centerWith2(next_point);
+		// const position = point.centerWith2(next_point);
 
-		this.position.set(position[0], this.room.height / 2, position[1]);
+		// this.position.set(position[0], this.room.height / 2, position[1]);
 
 		if (this.mesh.geometry.index.array.length === 0) {
 
@@ -181,22 +203,23 @@ export default class Wall extends Tileable {
 			'uv2', new THREE.BufferAttribute(plane_geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
 		);
 
-		this.mesh.quaternion.copy(this.quaternion);
-		this.mesh.position.copy(this.position);
-		this.mesh.updateMatrix();
+
 
 		this.mesh.geometry.computeBoundingSphere();
 	}
 
 	remove () {
 
-		// LOG(this.rect)
+		this.segments.forEach((segment) => segment.remove());
+
+		this.segments.length = 0;
 
 		coverings_plan_NODE.removeChild(this.rect);
 
-		raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
+		if (raycastable_meshes.includes(this.mesh)) {
 
-		this.segments.forEach((segment) => segment.remove());
+			raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
+		}
 
 		scene.remove(this.mesh);
 	}

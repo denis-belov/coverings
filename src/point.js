@@ -20,7 +20,19 @@ export default class Point {
 
 	static move ({ clientX, clientY }) {
 
-		// Point.moved = true;
+		if (Point.selected.walls[0].segments.length > 0) {
+
+			Point.selected.walls[0].segments.forEach((segment) => segment.remove());
+
+			Point.selected.walls[0].segments.length = 0;
+		}
+
+		if (Point.selected.walls[1].segments.length > 0) {
+
+			Point.selected.walls[1].segments.forEach((segment) => segment.remove());
+
+			Point.selected.walls[1].segments.length = 0;
+		}
 
 		if (Point.selected.walls[0].room.floor.segments.length > 0) {
 

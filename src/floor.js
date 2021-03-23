@@ -19,14 +19,14 @@ export default class Floor extends Tileable {
 
 		super(room);
 
-		// this.mesh2 = new THREE.Mesh(this.mesh.geometry, this.mesh.material);
-
-		// this.type = 'floor';
-
 		this.quaternion
 			.copy(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, -1), new THREE.Vector3(1, 0, 0)))
 			.multiply(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 0, 1)))
 			.multiply(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, -1, 0)));
+
+		this.mesh.quaternion.copy(this.quaternion);
+		this.mesh.position.copy(this.position);
+		this.mesh.updateMatrix();
 	}
 
 	updateGeometry () {
@@ -83,19 +83,22 @@ export default class Floor extends Tileable {
 			'uv2', new THREE.BufferAttribute(this.mesh.geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
 		);
 
-		this.mesh.quaternion.copy(this.quaternion);
-		this.mesh.position.copy(this.position);
-		this.mesh.updateMatrix();
+
 
 		this.mesh.geometry.computeBoundingSphere();
 	}
 
 	remove () {
 
-		raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
+		this.segments.forEach((segment) => segment.remove());
+
+		this.segments.length = 0;
+
+		if (raycastable_meshes.includes(this.mesh)) {
+
+			raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
+		}
 
 		scene.remove(this.mesh);
-
-		this.segments.forEach((segment) => segment.remove());
 	}
 }

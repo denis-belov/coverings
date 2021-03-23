@@ -15,6 +15,7 @@ import cast from './cast';
 // import Point from './point';
 // import Wall from './wall';
 import Segment from './segment';
+import plan from './plan';
 
 // import undo from './undo';
 
@@ -234,7 +235,7 @@ mode_selection_BUTTON.addEventListener('click', () => {
 		plan_camera.position.set(0, 0, 0);
 		plan_camera.translateZ(1);
 
-		whole.mesh.material = whole.material2;
+		whole.setBasicMaterial();
 
 		whole.mesh.quaternion.set(0, 0, 0, 1);
 		whole.mesh.position.set(0, 0, 0);
@@ -242,7 +243,7 @@ mode_selection_BUTTON.addEventListener('click', () => {
 
 		whole.segments.forEach((segment) => {
 
-			segment.mesh.material = segment.material2;
+			segment.setBasicMaterial();
 
 			segment.mesh.quaternion.set(0, 0, 0, 1);
 			segment.mesh.position.set(0, 0, 0);
@@ -270,7 +271,7 @@ mode_selection_BUTTON.addEventListener('click', () => {
 		plan_camera.position.set(0, 0, 0);
 		plan_camera.translateZ(1);
 
-		whole.mesh.material = whole.material;
+		whole.setPhysicalMaterial();
 
 		whole.mesh.quaternion.copy(whole.quaternion);
 		whole.mesh.position.copy(whole.position);
@@ -278,13 +279,11 @@ mode_selection_BUTTON.addEventListener('click', () => {
 
 		whole.segments.forEach((segment) => {
 
-			segment.mesh.material = segment.material;
+			segment.setPhysicalMaterial();
 
 			segment.mesh.quaternion.copy(whole.quaternion);
 			segment.mesh.position.copy(whole.position);
 			segment.mesh.updateMatrix();
-
-			// segment.mesh.geometry.computeBoundingSphere();
 		});
 
 		document.body.contains(selection_area_div) &&
@@ -357,10 +356,6 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 
-	// const object_polygons = selected_area_polygons;
-
-
-
 	if (whole.segments.length) {
 
 		const segments = whole.segments.slice();
@@ -375,7 +370,6 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 
-			// rename
 			const difference_polygons = [];
 			const intersection_polygons = [];
 
@@ -503,15 +497,11 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 					object_not_entirely_inside_any_subject_triangle = true;
 
-					// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
-
 					polybooljs.difference(subject_polygons[k], selected_area_polygons).regions
 						.forEach((region) => difference_polygons.push(region));
 				}
 				// object entirely outside subject triangle
 				else {
-
-					// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
 					polybooljs.difference(subject_polygons[k], selected_area_polygons).regions
 						.forEach((region) => difference_polygons.push(region));
@@ -530,12 +520,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 						difference_polygons,
 					);
 
-				segment.mesh.material = segment.material2;
-
-				// whole.segments.push(segment);
-
-				segment.setTile(whole.tile);
-
+				segment.setBasicMaterial();
+				segment.setTile(_segment.tile.id);
 				segment.updateGeometry();
 
 
@@ -544,9 +530,9 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 
-				// whole.segments.splice(whole.segments.indexOf(_segment), 1);
+				whole.segments.splice(whole.segments.indexOf(_segment), 1);
 
-				// scene.remove(_segment.mesh);
+
 
 				_segment.remove();
 			}
@@ -562,13 +548,13 @@ apply_segment_BUTTON.addEventListener('click', () => {
 					all_segments_intersection_polygons,
 				);
 
-			segment.mesh.material = segment.material2;
-
-			// whole.segments.push(segment);
-
-			segment.setTile(whole.tile);
-
+			segment.setBasicMaterial();
+			segment.setTile(whole.tile.id);
 			segment.updateGeometry();
+
+
+
+			plan.pushState();
 		}
 	}
 	else {
@@ -577,7 +563,6 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 
 
-		// rename
 		const difference_polygons = [];
 		const intersection_polygons = [];
 
@@ -589,7 +574,7 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 		for (let k = 0; k < subject_polygons.length; ++k) {
 
-			// object part left after intersection
+			// object's part left after intersection
 			intersection_polygons.push(...polybooljs.intersect(subject_polygons[k], selected_area_polygons).regions);
 
 
@@ -608,8 +593,6 @@ apply_segment_BUTTON.addEventListener('click', () => {
 						).length === region.length,
 				).length === selected_area_polygons.regions.length
 			) {
-
-				// LOG(12)
 
 				// rename
 				let xx = 0;
@@ -672,12 +655,10 @@ apply_segment_BUTTON.addEventListener('click', () => {
 
 				const difference_polygons3 = polybooljs.intersect(difference_polygons1, difference_polygons2);
 
-				// difference_polygons3.regions.forEach((region) => ppp.push(region));
 				difference_polygons.push(...difference_polygons3.regions);
 
 				const difference_polygons4 = polybooljs.xor(difference_polygons1, difference_polygons2);
 
-				// difference_polygons4.regions.forEach((region) => ppp.push(region));
 				difference_polygons.push(...difference_polygons4.regions);
 
 
@@ -712,19 +693,13 @@ apply_segment_BUTTON.addEventListener('click', () => {
 				).length > 0
 			) {
 
-				// LOG(14)
-
 				object_not_entirely_inside_any_subject_triangle = true;
-
-				// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
 				polybooljs.difference(subject_polygons[k], selected_area_polygons).regions
 					.forEach((region) => difference_polygons.push(region));
 			}
 			// object entirely outside subject triangle
 			else {
-
-				// const difference_polygons = polybooljs.difference(subject_polygons[k], selected_area_polygons);
 
 				polybooljs.difference(subject_polygons[k], selected_area_polygons).regions
 					.forEach((region) => difference_polygons.push(region));
@@ -743,10 +718,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 					difference_polygons,
 				);
 
-			segment1.mesh.material = segment1.material2;
-
-			segment1.setTile(whole.tile);
-
+			segment1.setBasicMaterial();
+			segment1.setTile(whole.tile.id);
 			segment1.updateGeometry();
 
 
@@ -759,24 +732,25 @@ apply_segment_BUTTON.addEventListener('click', () => {
 					intersection_polygons,
 				);
 
-			segment2.mesh.material = segment2.material2;
-
-			segment2.setTile(whole.tile);
-
+			segment2.setBasicMaterial();
+			segment2.setTile(whole.tile.id);
 			segment2.updateGeometry();
 
 
 
-			raycastable_meshes.splice(
+			if (raycastable_meshes.includes(whole.mesh)) {
 
-				raycastable_meshes.indexOf(whole.mesh),
+				raycastable_meshes.splice(
 
-				1,
-			);
+					raycastable_meshes.indexOf(whole.mesh),
+
+					1,
+				);
+			}
 
 			scene.remove(whole.mesh);
 
-			// whole.mesh.visible = false;
+			plan.pushState();
 		}
 	}
 

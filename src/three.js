@@ -210,7 +210,7 @@ canvas.addEventListener('mousemove', (evt) => {
 
 		const _intersects = raycaster.intersectObjects(raycastable_meshes);
 
-		// LOG(_intersects)
+		// LOG(raycastable_meshes, _intersects)
 
 		if (_intersects.length) {
 
@@ -274,14 +274,14 @@ canvas.addEventListener('mousemove', (evt) => {
 
 	// 			// raycasted_mesh._meshes.forEach((elm) => {
 
-	// 			// 	elm.material = elm.userData.parent.material2;
+	// 			// 	elm.material = elm.userData.parent.basic_material;
 	// 			// });
 	// 		}
 	// 		else {
 
 	// 			raycasted_mesh.material.color.set(0xADD8E6);
 
-	// 			// raycasted_mesh.material = raycasted_mesh.userData.parent.material2;
+	// 			// raycasted_mesh.material = raycasted_mesh.userData.parent.basic_material;
 	// 		}
 	// 	}
 	// 	else if (raycasted_mesh) {
@@ -399,7 +399,7 @@ canvas.addEventListener('dblclick', () => {
 		// 	tileable_mesh._ = null;
 		// }
 
-		// tileable_mesh._.material = tileable_mesh._.userData.parent.material2;
+		// tileable_mesh._.material = tileable_mesh._.userData.parent.basic_material;
 
 		// scene_floor.children.forEach((child) => {
 

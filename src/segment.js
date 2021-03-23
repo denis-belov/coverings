@@ -1,11 +1,3 @@
-/*
-eslint-disable
-
-max-params,
-*/
-
-
-
 import * as THREE from 'three';
 import earcut from 'earcut';
 
@@ -33,8 +25,6 @@ export default class Segment extends Tileable {
 		this.polygons = polygons;
 
 		this.tileable.segments.push(this);
-
-		// LOG(this.polygons)
 	}
 
 	updateGeometry () {
@@ -45,8 +35,6 @@ export default class Segment extends Tileable {
 		const uv_data = [];
 
 
-
-		// this.polygons = polygons;
 
 		this.polygons.forEach((polygon) => {
 
@@ -101,14 +89,23 @@ export default class Segment extends Tileable {
 
 			'uv2', new THREE.BufferAttribute(this.mesh.geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
 		);
+
+
+
+		this.mesh.quaternion.copy(this.tileable.mesh.quaternion);
+		this.mesh.position.copy(this.tileable.mesh.position);
+		this.mesh.updateMatrix();
+
+		this.mesh.geometry.computeBoundingSphere();
 	}
 
 	// rename to destroy
 	remove () {
 
-		this.tileable.segments.splice(this.tileable.segments.indexOf(this), 1);
+		if (raycastable_meshes.includes(this.mesh)) {
 
-		raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
+			raycastable_meshes.splice(raycastable_meshes.indexOf(this.mesh), 1);
+		}
 
 		scene.remove(this.mesh);
 	}

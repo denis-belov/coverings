@@ -7,14 +7,16 @@ import * as THREE from 'three';
 import './index.scss';
 import '@babel/polyfill';
 
-import Loader from 'external-data-loader';
+// import Loader from 'external-data-loader';
 
 import modes from './modes';
+// import textures from './textures';
 // import cast from './cast';
 
 import Point from './point';
 import Wall from './wall';
-import { Room, Plan } from './room';
+import Room from './room';
+import plan from './plan';
 
 import {
 
@@ -44,10 +46,6 @@ import './events';
 
 
 
-const loader = new Loader();
-
-
-
 const room = new Room();
 
 room.make(
@@ -67,7 +65,11 @@ room.make(
 
 
 
-const plan = new Plan([ room ]);
+plan.rooms = [ room ];
+
+
+
+// const plan = new Plan([ room ]);
 
 
 
@@ -87,26 +89,27 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 			_room.walls.forEach((wall) => {
 
-				wall.tile ||
+				wall.updateQuaternionAndPosition();
 
-					wall.setTile(Room.wall_tile_default);
+				if (wall.segments.length > 0) {
 
-				wall.updateGeometry();
+					wall.segments.forEach((segment) => {
 
-				wall.segments.forEach((segment) => {
+						segment.tile ||
 
-					segment.mesh.quaternion.copy(wall.quaternion);
-					segment.mesh.position.copy(wall.position);
-					segment.mesh.updateMatrix();
+							segment.setTile(Room.wall_tile_default.id);
 
-					segment.tile ||
+						segment.updateGeometry();
+					});
+				}
+				else {
 
-						segment.setTile(Room.wall_tile_default);
+					wall.tile ||
 
-					segment.updateGeometry();
+						wall.setTile(Room.wall_tile_default.id);
 
-					segment.mesh.geometry.computeBoundingSphere();
-				});
+					wall.updateGeometry();
+				}
 			});
 		});
 	}
@@ -128,42 +131,13 @@ material_BUTTONS.forEach((BUTTON) => {
 
 		if (tileable_mesh._) {
 
-			const info = await fetch(
+			const tile_id = `${ __STATIC_PATH__ }/textures/${ BUTTON.innerHTML }/info.json`;
 
-				`${ __STATIC_PATH__ }/textures/${ BUTTON.innerHTML }/info.json`,
-
-				{ method: 'get' },
-			)
-				.then((response) => response.json());
-
-
-
-			if (info.textures) {
-
-				const sources = {};
-
-				for (const texture in info.textures) {
-
-					sources[texture] = { source: `${ __STATIC_PATH__ }${ info.textures[texture] }`, type: 'image' };
-				}
-
-				await loader.load({
-
-					sources,
-
-					// progress: () => 0,
-				});
-			}
-
-
-
-			info.textures = loader.content;
-
-			tileable_mesh._.userData.parent.setTile(info);
-
-			loader.content = {};
+			await tileable_mesh._.userData.parent.setTile(tile_id);
 
 			tileable_mesh._.userData.parent.updateGeometry(tileable_mesh._.userData.parent.regions);
+
+			plan.pushState();
 		}
 	});
 });
@@ -185,39 +159,6 @@ load_INPUT.addEventListener('change', (evt) => {
 });
 
 load_BUTTON.addEventListener('click', () => {
-
-	// const json = {};
-
-	// json.rooms = [];
-
-	// const room1 = {
-
-	// 	name: 'room1',
-
-	// 	height: plan.rooms[0].height,
-
-	// 	points:
-
-	// 		plan.rooms[0].points.map((elm) => ([ (elm.pixel_x - (window.innerWidth / 2)) * cast.PIXELS_TO_METERS, (elm.pixel_y - (window.innerHeight / 2)) * cast.PIXELS_TO_METERS ])),
-
-	// 	walls:
-
-	// 		plan.rooms[0].walls.map((elm) => {
-
-	// 			return {
-
-	// 				segments:
-
-	// 					elm.segments.map((segment) => segment.polygons),
-	// 			};
-	// 		}),
-	// };
-
-	// json.rooms.push(room1);
-
-	// const blob = new Blob([ JSON.stringify(json) ], { type: 'text/plain;charset=utf-8' });
-
-	// FileSaver.saveAs(blob, 'room.json');
 
 	load_INPUT.click();
 });
@@ -279,24 +220,6 @@ apply_sizes_BUTTON.addEventListener('click', () => {
 
 
 
-window.addEventListener('keypress', (evt) => {
-
-	if (evt.code === 'KeyD' && Point.selected) {
-
-		const new_points = room.points.slice();
-
-		new_points.splice(new_points.indexOf(Point.selected), 1);
-
-		room.update(new_points);
-	}
-});
-
-
-
-// let animation_allowed = true;
-
-
-
 window.addEventListener('mouseup', () => {
 
 	if (Point.selected) {
@@ -330,12 +253,6 @@ window.addEventListener('mouseup', () => {
 			Wall.selected.points[0].prev_pixel_y !== Wall.selected.points[0].pixel_y
 		) {
 
-			// LOG(
-
-			// 	Wall.selected.points[0].prev_pixel_x, Wall.selected.points[0].pixel_x,
-			// 	Wall.selected.points[0].prev_pixel_y, Wall.selected.points[0].pixel_y,
-			// )
-
 			plan.pushState();
 
 			Wall.selected.points.forEach((point) => {
@@ -353,20 +270,29 @@ window.addEventListener('keypress', (evt) => {
 
 	if (evt.code === 'KeyZ') {
 
-		// animation_allowed = false;
-
 		plan.undo();
-
-		// setTimeout(() => {
-
-		// 	animation_allowed = true;
-
-		// 	// LOG(1)
-		// }, 0);
 	}
 	else if (evt.code === 'KeyY') {
 
 		plan.redo();
+	}
+	else if (evt.code === 'KeyD') {
+
+		if (Point.selected) {
+
+			const new_points = room.points.slice();
+
+			new_points.splice(new_points.indexOf(Point.selected), 1);
+
+			room.update(new_points);
+		}
+	}
+	else if (evt.code === 'KeyS') {
+
+		const blob =
+			new Blob([ JSON.stringify(plan.states[plan.states.length - 1]) ], { type: 'text/plain;charset=utf-8' });
+
+		FileSaver.saveAs(blob, 'room.json');
 	}
 });
 
@@ -375,8 +301,6 @@ window.addEventListener('keypress', (evt) => {
 const animate = () => {
 
 	requestAnimationFrame(animate);
-
-	// if (animation_allowed) {
 
 	renderer.clear();
 
@@ -390,7 +314,6 @@ const animate = () => {
 
 		renderer.render(scene, plan_camera);
 	}
-	// }
 };
 
 
