@@ -25,6 +25,10 @@ export default class Point {
 			Point.selected.walls[0].segments.forEach((segment) => segment.remove());
 
 			Point.selected.walls[0].segments.length = 0;
+
+			raycastable_meshes.push(Point.selected.walls[0].mesh);
+
+			scene.add(Point.selected.walls[0].mesh);
 		}
 
 		if (Point.selected.walls[1].segments.length > 0) {
@@ -32,6 +36,10 @@ export default class Point {
 			Point.selected.walls[1].segments.forEach((segment) => segment.remove());
 
 			Point.selected.walls[1].segments.length = 0;
+
+			raycastable_meshes.push(Point.selected.walls[1].mesh);
+
+			scene.add(Point.selected.walls[1].mesh);
 		}
 
 		if (Point.selected.walls[0].room.floor.segments.length > 0) {
@@ -97,6 +105,8 @@ export default class Point {
 				window.addEventListener('mousemove', Point.move);
 
 				Point.selected = this;
+
+				// LOG(Point.selected)
 			}
 		});
 

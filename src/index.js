@@ -87,6 +87,8 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 		plan.rooms.forEach((_room) => {
 
+			// LOG(_room.walls, _room.walls.length)
+
 			_room.walls.forEach((wall) => {
 
 				wall.updateQuaternionAndPosition();
@@ -239,8 +241,6 @@ window.addEventListener('mouseup', () => {
 			Point.selected.prev_pixel_x = Point.selected.pixel_x;
 			Point.selected.prev_pixel_y = Point.selected.pixel_y;
 		}
-
-		Point.selected = null;
 	}
 
 	if (Wall.selected) {
@@ -261,8 +261,6 @@ window.addEventListener('mouseup', () => {
 				point.prev_pixel_y = point.pixel_y;
 			});
 		}
-
-		Wall.selected = null;
 	}
 });
 
@@ -280,11 +278,15 @@ window.addEventListener('keypress', (evt) => {
 
 		if (Point.selected) {
 
-			const new_points = room.points.slice();
+			const new_points = plan.rooms[0].points.slice();
 
 			new_points.splice(new_points.indexOf(Point.selected), 1);
 
-			room.update(new_points);
+			plan.rooms[0].update(new_points);
+
+			Point.selected = null;
+
+			plan.pushState();
 		}
 	}
 	else if (evt.code === 'KeyS') {

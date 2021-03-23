@@ -21,6 +21,8 @@ import cast from './cast';
 
 import Tileable from './tileable';
 
+import plan from './plan';
+
 
 
 export default class Wall extends Tileable {
@@ -102,6 +104,8 @@ export default class Wall extends Tileable {
 				);
 
 				this.room.update(new_points);
+
+				plan.pushState();
 			}
 		});
 

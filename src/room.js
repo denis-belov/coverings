@@ -163,8 +163,6 @@ export default class Room {
 
 	update (new_points) {
 
-		this.walls.length = 0;
-
 		if (new_points.length > this.points.length) {
 
 			new_points.forEach((point, index) => {
@@ -175,9 +173,6 @@ export default class Room {
 
 					const prev_point = new_points[index - 1] || new_points[new_points.length - 1];
 					const next_point = new_points[index + 1] || new_points[0];
-
-					new Wall(this, prev_point, point);
-					new Wall(this, point, next_point);
 
 					const [ removed_wall ] = prev_point.walls.filter((wall) => next_point.walls.includes(wall));
 
@@ -195,13 +190,22 @@ export default class Room {
 						1,
 					);
 
+					this.walls.splice(
+
+						this.walls.indexOf(removed_wall),
+
+						1,
+
+						new Wall(this, prev_point, point),
+
+						new Wall(this, point, next_point),
+					);
+
 					removed_wall.remove();
 				}
 			});
 		}
 		else {
-
-			let removed_point = null;
 
 			this.points.forEach((point, index) => {
 
@@ -211,8 +215,6 @@ export default class Room {
 
 					const prev_point = this.points[index - 1] || this.points[this.points.length - 1];
 					const next_point = this.points[index + 1] || this.points[0];
-
-					new Wall(this, prev_point, next_point);
 
 					prev_point.walls.splice(
 
@@ -228,25 +230,27 @@ export default class Room {
 						1,
 					);
 
+					this.walls.splice(
+
+						this.walls.indexOf(point.walls[0]),
+
+						2,
+
+						new Wall(this, prev_point, next_point),
+					);
+
 					point.walls.forEach((wall) => wall.remove());
 
-					removed_point = point;
+					point.remove();
 				}
 			});
-
-			removed_point.remove();
 		}
 
 		this.points = new_points;
 
 		this.floor.updateGeometry();
 
-		this.points.forEach((point) => {
-
-			this.walls.push(point.walls[0]);
-
-			point.updateStyles();
-		});
+		this.points.forEach((point) => point.updateStyles());
 	}
 
 	destroy () {

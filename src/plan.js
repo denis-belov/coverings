@@ -104,7 +104,7 @@ class Plan {
 
 		++this.state_index;
 
-		LOG(this)
+		// LOG(this)
 	}
 
 	makeFromJson (json) {
