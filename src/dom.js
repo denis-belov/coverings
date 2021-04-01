@@ -35,8 +35,44 @@ export const [ modal ] = document.getElementsByClassName('modal');
 
 export const [
 
+	// // width_INPUT,
+	// // length_INPUT,
+	// // height_INPUT,
+	// pick_kitchen_BUTTON,
+	// pick_bathroom_BUTTON,
+	// pick_manual_input_BUTTON,
+	// // apply_sizes_BUTTON,
+	room_picker_MODAL,
+	manual_input_MODAL,
+] = document.getElementsByClassName('modal-inner')[0].children;
+
+// LOG(room_picker_MODAL)
+
+export const [
+
+	// width_INPUT,
+	// length_INPUT,
+	// height_INPUT,
+	pick_kitchen_BUTTON,
+	pick_bathroom_BUTTON,
+	pick_manual_input_BUTTON,
+	// apply_sizes_BUTTON,
+	// room_picker_MODAL,
+	// manual_input_MODAL,
+] = room_picker_MODAL.children;
+
+export const [
+
+	back_BUTTON,
 	width_INPUT,
 	length_INPUT,
 	height_INPUT,
+	// pick_kitchen_BUTTON,
+	// pick_bathroom_BUTTON,
+	// pick_manual_input_BUTTON,
 	apply_sizes_BUTTON,
-] = document.getElementsByClassName('modal-inner')[0].children[0].children;
+	// room_picker_MODAL,
+	// manual_input_MODAL,
+] = manual_input_MODAL.children;
+
+// LOG(apply_sizes_BUTTON)

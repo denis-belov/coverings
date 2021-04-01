@@ -37,8 +37,15 @@ html
 
 			.modal-inner
 
-				.coverings-actions.-modal
+				#room_picker_MODAL.coverings-actions.-modal
 
+					#pick_kitchen_BUTTON.coverings-actions-form_submit Kitchen
+					#pick_bathroom_BUTTON.coverings-actions-form_submit Bathroom
+					#pick_manual_input_BUTTON.coverings-actions-form_submit Manual input
+
+				#manual_input_MODAL.coverings-actions.-modal(style="display: none;")
+
+					#back_BUTTON.coverings-actions-form_submit Back
 					input.coverings-actions-input(value="2.5 m")
 					input.coverings-actions-input(value="4 m")
 					input.coverings-actions-input(value="2.5 m")
