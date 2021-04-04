@@ -7,9 +7,9 @@ no-new,
 
 
 import cast from './cast';
-// import textures from './textures';
 
 import Point from './point';
+import Material from './material';
 import Room from './room';
 import Segment from './segment';
 
@@ -58,7 +58,7 @@ class Plan {
 
 			floor: {
 
-				material: this.rooms[0].floor.tile?.id || null,
+				material: this.rooms[0].floor.material?.id || null,
 
 				segments:
 
@@ -66,7 +66,7 @@ class Plan {
 
 						(segment) => ({
 
-							material: segment.tile?.id || null,
+							material: segment.material?.id || null,
 
 							polygons: segment.polygons,
 						}),
@@ -79,7 +79,7 @@ class Plan {
 
 					(wall) => ({
 
-						material: wall.tile?.id || null,
+						material: wall.material?.id || null,
 
 						segments:
 
@@ -87,7 +87,7 @@ class Plan {
 
 								(segment) => ({
 
-									material: segment.tile?.id || null,
+									material: segment.material?.id || null,
 
 									polygons: segment.polygons,
 								}),
@@ -103,8 +103,6 @@ class Plan {
 		this.states.push(state);
 
 		++this.state_index;
-
-		// LOG(this)
 	}
 
 	makeFromJson (json) {
@@ -121,21 +119,14 @@ class Plan {
 
 				new_rooms.push(room);
 
-				room.make(json_room.height, points);
+				room.make2(json_room.height, points);
 
 
 
 				const { floor } = room;
 
-				// wall tile is being set to allow the segments use this after undo or redo action or restoring
-				if (json_room.floor.material) {
-
-					await floor.setTile(json_room.floor.material);
-				}
-				else {
-
-					floor.setTile(Room.floor_tile_default.id);
-				}
+				// floor tile is being set to allow the segments use this after undo or redo action or restoring
+				await floor.applyMaterial(json_room.floor.material || Material.default.id);
 
 
 
@@ -154,14 +145,7 @@ class Plan {
 
 							// if mode == orbit
 
-							if (json_segment.material) {
-
-								await segment.setTile(json_segment.material);
-							}
-							else {
-
-								segment.setTile(Room.floor_tile_default.id);
-							}
+							await segment.applyMaterial(json_segment.material || Material.default.id);
 
 							segment.updateGeometry();
 						},
@@ -193,14 +177,8 @@ class Plan {
 					const wall = room.walls[wall_index];
 
 					// wall tile is being set to allow the segments use this after undo or redo action or restoring
-					if (json_wall.material) {
 
-						await wall.setTile(json_wall.material);
-					}
-					else {
-
-						wall.setTile(Room.wall_tile_default.id);
-					}
+					await wall.applyMaterial(json_wall.material || Material.default.id);
 
 
 
@@ -219,14 +197,7 @@ class Plan {
 
 								// if mode == orbit
 
-								if (json_segment.material) {
-
-									await segment.setTile(json_segment.material);
-								}
-								else {
-
-									segment.setTile(Room.wall_tile_default.id);
-								}
+								await segment.applyMaterial(json_segment.material || Material.default.id);
 
 								segment.updateGeometry();
 							},

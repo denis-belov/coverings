@@ -6,13 +6,14 @@ no-new,
 
 
 
-import Loader from 'external-data-loader';
+// import Loader from 'external-data-loader';
 
 // import { coverings_plan_NODE } from './dom';
 // import cast from './cast';
-import textures from './textures';
+// import textures from './textures';
 
 // import Point from './point';
+import Material from './material';
 import Floor from './floor';
 import Wall from './wall';
 // import Segment from './segment';
@@ -26,93 +27,11 @@ import {
 
 
 
-const loader = new Loader();
+// const loader = new Loader();
 
 
 
 export default class Room {
-
-	static floor_tile_default = null;
-	static wall_tile_default = null;
-
-	static loadDefaultTextures = async () => {
-
-		const tile_floor = await fetch(
-
-			`${ __STATIC_PATH__ }/textures/3/info.json`,
-
-			{ method: 'get' },
-		)
-			.then((response) => response.json());
-
-
-
-		const tile_wall = await fetch(
-
-			`${ __STATIC_PATH__ }/textures/4/info.json`,
-
-			{ method: 'get' },
-		)
-			.then((response) => response.json());
-
-
-
-		let sources = {};
-
-		for (const texture in tile_floor.textures) {
-
-			sources[texture] = { source: `${ __STATIC_PATH__ }${ tile_floor.textures[texture] }`, type: 'image' };
-		}
-
-		await loader.load({
-
-			sources,
-
-			// progress: () => 0,
-		});
-
-		Room.floor_tile_default = {
-
-			id: `${ __STATIC_PATH__ }/textures/3/info.json`,
-
-			sizes: tile_floor.sizes,
-
-			textures: loader.content,
-		};
-
-		textures[`${ __STATIC_PATH__ }/textures/3/info.json`] = Room.floor_tile_default;
-
-		loader.content = {};
-
-
-
-		sources = {};
-
-		for (const texture in tile_wall.textures) {
-
-			sources[texture] = { source: `${ __STATIC_PATH__ }${ tile_wall.textures[texture] }`, type: 'image' };
-		}
-
-		await loader.load({
-
-			sources,
-
-			// progress: () => 0,
-		});
-
-		Room.wall_tile_default = {
-
-			id: `${ __STATIC_PATH__ }/textures/4/info.json`,
-
-			sizes: tile_wall.sizes,
-
-			textures: loader.content,
-		};
-
-		textures[`${ __STATIC_PATH__ }/textures/4/info.json`] = Room.wall_tile_default;
-
-		loader.content = {};
-	}
 
 	constructor () {
 
@@ -125,14 +44,7 @@ export default class Room {
 		this.height = 0;
 	}
 
-	async make (height, points) {
-
-		if (!Room.floor_tile_default || !Room.wall_tile_default) {
-
-			await Room.loadDefaultTextures();
-
-			// LOG(Room.floor_tile_default)
-		}
+	make (height, points) {
 
 		this.destroy();
 
@@ -142,8 +54,49 @@ export default class Room {
 
 		this.points.push(...points);
 
-		this.floor.setTile(Room.floor_tile_default.id);
+		this.points.forEach((point) => {
+
+			point.updateSceneCoordinates();
+			// point.updateStyles();
+		});
+
+		this.floor.applyMaterial(Material.default.id);
 		this.floor.updateGeometry();
+
+		this.points.forEach((point, index) => {
+
+			const wall = new Wall(this, points[index], points[index + 1] || points[0]);
+
+			wall.updateQuaternionAndPosition();
+
+			this.walls.push(wall);
+
+			point.z_index = index;
+		});
+
+		orbit_controls.target.set(0, this.height / 2, 0);
+
+		this.points.forEach((point) => point.updateStyles());
+	}
+
+	make2 (height, points) {
+
+		this.destroy();
+
+		this.floor = new Floor(this);
+
+		this.height = height;
+
+		this.points.push(...points);
+
+		this.points.forEach((point) => {
+
+			point.updateSceneCoordinates();
+			// point.updateStyles();
+		});
+
+		// this.floor.applyMaterial(Material.default.id);
+		// this.floor.updateGeometry();
 
 		this.points.forEach((point, index) => {
 
@@ -248,9 +201,15 @@ export default class Room {
 
 		this.points = new_points;
 
+		this.points.forEach((point) => {
+
+			point.updateSceneCoordinates();
+			point.updateStyles();
+		});
+
 		this.floor.updateGeometry();
 
-		this.points.forEach((point) => point.updateStyles());
+		// this.points.forEach((point) => point.updateStyles());
 	}
 
 	destroy () {

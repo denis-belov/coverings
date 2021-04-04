@@ -193,8 +193,8 @@ export default class Wall extends Tileable {
 			// plane_geometry.attributes.uv.array[i + 0] *= this.pixel_length * cast.PIXELS_TO_METERS / this.tile.sizes[0];
 			// plane_geometry.attributes.uv.array[i + 1] *= this.room.height / this.tile.sizes[1];
 
-			plane_geometry.attributes.uv.array[i + 0] = plane_geometry.attributes.position.array[(i / 2 * 3) + 0] / this.tile.sizes[0];
-			plane_geometry.attributes.uv.array[i + 1] = plane_geometry.attributes.position.array[(i / 2 * 3) + 1] / this.tile.sizes[1];
+			plane_geometry.attributes.uv.array[i + 0] = plane_geometry.attributes.position.array[(i / 2 * 3) + 0] / this.material.sizes[0];
+			plane_geometry.attributes.uv.array[i + 1] = plane_geometry.attributes.position.array[(i / 2 * 3) + 1] / this.material.sizes[1];
 		}
 
 		this.mesh.geometry.setAttribute(

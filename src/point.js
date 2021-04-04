@@ -265,6 +265,8 @@ export default class Point {
 
 		this.updateStyles();
 
+		this.walls[0].room.points.forEach((point) => point.updateSceneCoordinates());
+
 		this.walls[0].room.floor.updateGeometry();
 	}
 
@@ -279,6 +281,8 @@ export default class Point {
 		this.updateStyles();
 
 		// LOG(this.walls[0].room)
+
+		this.walls[0].room.points.forEach((point) => point.updateSceneCoordinates());
 
 		this.walls[0].room.floor.updateGeometry();
 	}

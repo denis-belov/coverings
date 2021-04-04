@@ -61,10 +61,10 @@ export default class Segment extends Tileable {
 					normal_data[(_index * ATTRIBUTE_SIZE_3) + 2] = 1;
 
 					uv_data[(_index * ATTRIBUTE_SIZE_2) + 0] =
-						scene_coordinates[((_index - qwe) * 2) + 0] / this.tile.sizes[0];
+						scene_coordinates[((_index - qwe) * 2) + 0] / this.material.sizes[0];
 
 					uv_data[(_index * ATTRIBUTE_SIZE_2) + 1] =
-						scene_coordinates[((_index - qwe) * 2) + 1] / this.tile.sizes[1];
+						scene_coordinates[((_index - qwe) * 2) + 1] / this.material.sizes[1];
 				}
 			});
 		});

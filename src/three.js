@@ -197,7 +197,11 @@ canvas.addEventListener('mousemove', (evt) => {
 
 		raycasted_mesh &&
 
-			raycasted_mesh.material.color.set(0xFFFFFF);
+		// 	// raycasted_mesh.material.color.set(0xFFFFFF);
+
+		raycasted_mesh.userData.parent.usePhysicalMaterial();
+
+		// LOG(raycasted_mesh)
 
 		raycasted_mesh = null;
 
@@ -218,7 +222,9 @@ canvas.addEventListener('mousemove', (evt) => {
 
 			raycasted_mesh = nearest.object;
 
-			raycasted_mesh.material.color.set(0xADD8E6);
+			// raycasted_mesh.material.color.set(0xADD8E6);
+
+			raycasted_mesh.userData.parent.useHoverMaterial();
 
 			// return;
 		}

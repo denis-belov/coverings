@@ -235,7 +235,7 @@ mode_selection_BUTTON.addEventListener('click', () => {
 		plan_camera.position.set(0, 0, 0);
 		plan_camera.translateZ(1);
 
-		whole.setBasicMaterial();
+		whole.useBasicMaterial();
 
 		whole.mesh.quaternion.set(0, 0, 0, 1);
 		whole.mesh.position.set(0, 0, 0);
@@ -243,7 +243,7 @@ mode_selection_BUTTON.addEventListener('click', () => {
 
 		whole.segments.forEach((segment) => {
 
-			segment.setBasicMaterial();
+			segment.useBasicMaterial();
 
 			segment.mesh.quaternion.set(0, 0, 0, 1);
 			segment.mesh.position.set(0, 0, 0);
@@ -271,7 +271,7 @@ mode_selection_BUTTON.addEventListener('click', () => {
 		plan_camera.position.set(0, 0, 0);
 		plan_camera.translateZ(1);
 
-		whole.setPhysicalMaterial();
+		whole.usePhysicalMaterial();
 
 		whole.mesh.quaternion.copy(whole.quaternion);
 		whole.mesh.position.copy(whole.position);
@@ -279,7 +279,7 @@ mode_selection_BUTTON.addEventListener('click', () => {
 
 		whole.segments.forEach((segment) => {
 
-			segment.setPhysicalMaterial();
+			segment.usePhysicalMaterial();
 
 			segment.mesh.quaternion.copy(whole.quaternion);
 			segment.mesh.position.copy(whole.position);
@@ -520,8 +520,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 						difference_polygons,
 					);
 
-				segment.setBasicMaterial();
-				segment.setTile(_segment.tile.id);
+				segment.applyMaterial(_segment.material.id);
+				segment.useBasicMaterial();
 				segment.updateGeometry();
 
 
@@ -548,8 +548,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 					all_segments_intersection_polygons,
 				);
 
-			segment.setBasicMaterial();
-			segment.setTile(whole.tile.id);
+			segment.applyMaterial(whole.material.id);
+			segment.useBasicMaterial();
 			segment.updateGeometry();
 
 
@@ -718,8 +718,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 					difference_polygons,
 				);
 
-			segment1.setBasicMaterial();
-			segment1.setTile(whole.tile.id);
+			segment1.applyMaterial(whole.material.id);
+			segment1.useBasicMaterial();
 			segment1.updateGeometry();
 
 
@@ -732,8 +732,8 @@ apply_segment_BUTTON.addEventListener('click', () => {
 					intersection_polygons,
 				);
 
-			segment2.setBasicMaterial();
-			segment2.setTile(whole.tile.id);
+			segment2.applyMaterial(whole.material.id);
+			segment2.useBasicMaterial();
 			segment2.updateGeometry();
 
 

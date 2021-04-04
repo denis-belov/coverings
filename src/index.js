@@ -14,6 +14,7 @@ import modes from './modes';
 // import cast from './cast';
 
 import Point from './point';
+import Material from './material';
 import Wall from './wall';
 import Room from './room';
 import plan from './plan';
@@ -52,33 +53,6 @@ import './events';
 
 
 
-// const room = new Room();
-
-// room.make(
-
-// 	2.5,
-
-// 	[
-// 		new Point(-4 / 2, -2.5 / 2),
-
-// 		new Point(-4 / 2, 2.5 / 2),
-
-// 		new Point(4 / 2, 2.5 / 2),
-
-// 		new Point(4 / 2, -2.5 / 2),
-// 	],
-// );
-
-
-
-// plan.rooms = [ room ];
-
-
-
-// const plan = new Plan([ room ]);
-
-
-
 mode_toggle_BUTTON.addEventListener('click', () => {
 
 	modes.orbit_mode = 1 - modes.orbit_mode;
@@ -103,18 +77,18 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 
 					wall.segments.forEach((segment) => {
 
-						segment.tile ||
+						segment.material ||
 
-							segment.setTile(Room.wall_tile_default.id);
+							segment.applyMaterial(Material.default.id);
 
 						segment.updateGeometry();
 					});
 				}
 				else {
 
-					wall.tile ||
+					wall.material ||
 
-						wall.setTile(Room.wall_tile_default.id);
+						wall.applyMaterial(Material.default.id);
 
 					wall.updateGeometry();
 				}
@@ -139,9 +113,9 @@ material_BUTTONS.forEach((BUTTON) => {
 
 		if (tileable_mesh._) {
 
-			const tile_id = `${ __STATIC_PATH__ }/textures/${ BUTTON.innerHTML }/info.json`;
+			const material_id = `${ __STATIC_PATH__ }/textures/${ BUTTON.innerHTML }/info.json`;
 
-			await tileable_mesh._.userData.parent.setTile(tile_id);
+			await tileable_mesh._.userData.parent.applyMaterial(material_id);
 
 			tileable_mesh._.userData.parent.updateGeometry(tileable_mesh._.userData.parent.regions);
 
@@ -175,6 +149,10 @@ load_BUTTON.addEventListener('click', () => {
 
 apply_sizes_BUTTON.addEventListener('click', async () => {
 
+	await Material.loadDefault();
+
+
+
 	const width = parseFloat(width_INPUT.value);
 	const length = parseFloat(length_INPUT.value);
 	const height = parseFloat(height_INPUT.value);
@@ -187,7 +165,7 @@ apply_sizes_BUTTON.addEventListener('click', async () => {
 
 
 
-	await plan.rooms[0].make(
+	plan.rooms[0].make(
 
 		height,
 
@@ -236,6 +214,10 @@ apply_sizes_BUTTON.addEventListener('click', async () => {
 
 pick_kitchen_BUTTON.addEventListener('click', async () => {
 
+	await Material.loadDefault();
+
+
+
 	const width = 4;
 	const length = 6;
 	const height = 2.5;
@@ -248,7 +230,7 @@ pick_kitchen_BUTTON.addEventListener('click', async () => {
 
 
 
-	await plan.rooms[0].make(
+	plan.rooms[0].make(
 
 		height,
 
@@ -297,6 +279,10 @@ pick_kitchen_BUTTON.addEventListener('click', async () => {
 
 pick_bathroom_BUTTON.addEventListener('click', async () => {
 
+	await Material.loadDefault();
+
+
+
 	const width = 3;
 	const length = 3;
 	const height = 2.5;
@@ -309,7 +295,7 @@ pick_bathroom_BUTTON.addEventListener('click', async () => {
 
 
 
-	await plan.rooms[0].make(
+	plan.rooms[0].make(
 
 		height,
 

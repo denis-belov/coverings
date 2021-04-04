@@ -2,24 +2,34 @@ import * as THREE from 'three';
 
 import Loader from 'external-data-loader';
 
-import { transparent_IMG } from './dom';
+// import { transparent_IMG } from './dom';
 
-import textures from './textures';
+// import textures from './textures';
 
 import {
 
 	scene,
 	raycastable_meshes,
-	WEBGL_MAXIMUM_ANISOTROPY,
-	MATERIAL_WIREFRAME,
+	// WEBGL_MAXIMUM_ANISOTROPY,
+	// MATERIAL_WIREFRAME,
 	ATTRIBUTE_SIZE_1,
 	ATTRIBUTE_SIZE_2,
 	ATTRIBUTE_SIZE_3,
 } from './three';
 
+import Material from './material';
+
 
 
 const loader = new Loader();
+
+
+
+const default_material = new THREE.MeshBasicMaterial({
+
+	color: 'white',
+	side: THREE.BackSide,
+});
 
 
 
@@ -28,7 +38,7 @@ export default class Tileable {
 	constructor (room) {
 
 		// rename to smth
-		this.tile = null;
+		// this.tile = null;
 
 		this.quaternion = new THREE.Quaternion();
 		this.position = new THREE.Vector3();
@@ -45,57 +55,9 @@ export default class Tileable {
 			'uv2', new THREE.BufferAttribute(new Float32Array(), ATTRIBUTE_SIZE_2),
 		);
 
-		const map = new THREE.Texture();
-		map.image = transparent_IMG;
-		map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
-		map.wrapS = THREE.RepeatWrapping;
-		map.wrapT = THREE.RepeatWrapping;
-
-		const normal_map = new THREE.Texture();
-		normal_map.image = transparent_IMG;
-		normal_map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
-		normal_map.wrapS = THREE.RepeatWrapping;
-		normal_map.wrapT = THREE.RepeatWrapping;
-
-		// ambient_occlusion
-		const ao_map = new THREE.Texture();
-		ao_map.image = transparent_IMG;
-		ao_map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
-		ao_map.wrapS = THREE.RepeatWrapping;
-		ao_map.wrapT = THREE.RepeatWrapping;
-
-		const roughness_map = new THREE.Texture();
-		roughness_map.image = transparent_IMG;
-		roughness_map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
-		roughness_map.wrapS = THREE.RepeatWrapping;
-		roughness_map.wrapT = THREE.RepeatWrapping;
-
-		const metalness_map = new THREE.Texture();
-		metalness_map.image = transparent_IMG;
-		metalness_map.anisotropy = WEBGL_MAXIMUM_ANISOTROPY;
-		metalness_map.wrapS = THREE.RepeatWrapping;
-		metalness_map.wrapT = THREE.RepeatWrapping;
-
-		this.physical_material = new THREE.MeshPhysicalMaterial({
-
-			map,
-			normalMap: normal_map,
-			aoMap: ao_map,
-			roughnessMap: roughness_map,
-			metalnessMap: metalness_map,
-			side: THREE.BackSide,
-			wireframe: MATERIAL_WIREFRAME,
-		});
-
-		this.basic_material = new THREE.MeshBasicMaterial({
-
-			map,
-			side: THREE.BackSide,
-		});
-
-		this.mesh = new THREE.Mesh(geometry, this.physical_material);
+		this.mesh = new THREE.Mesh(geometry, default_material);
 		// remove ?
-		this.mesh.matrixAutoUpdate = false;
+		// this.mesh.matrixAutoUpdate = false;
 
 		// rename
 		this.mesh.userData.parent = this;
@@ -113,45 +75,22 @@ export default class Tileable {
 
 	copy (tileable) {
 
-		this.tile = tileable.tile;
+		this.material = tileable.material;
 
 		this.mesh.material = tileable.mesh.material;
 	}
 
-	// setTile2 (tile) {
+	async applyMaterial (material_id) {
 
-	// 	this.tile = tile;
+		if (Material.instances[material_id]) {
 
-	// 	this.physical_material.map.image = this.tile.textures.map || transparent_IMG;
-	// 	this.physical_material.normalMap.image = this.tile.textures.normal_map || transparent_IMG;
-	// 	this.physical_material.aoMap.image = this.tile.textures.ao_map || transparent_IMG;
-	// 	this.physical_material.roughnessMap.image = this.tile.textures.roughness_map || transparent_IMG;
-	// 	this.physical_material.metalnessMap.image = this.tile.textures.metalness_map || transparent_IMG;
+			this.material = Material.instances[material_id];
+		}
+		else {
 
-	// 	this.physical_material.map.needsUpdate = true;
-	// 	this.physical_material.normalMap.needsUpdate = true;
-	// 	this.physical_material.aoMap.needsUpdate = true;
-	// 	this.physical_material.roughnessMap.needsUpdate = true;
-	// 	this.physical_material.metalnessMap.needsUpdate = true;
+			const attributes = await fetch(
 
-	// 	this.physical_material.needsUpdate = true;
-
-
-
-	// 	this.basic_material.map.image = this.tile.textures.map || transparent_IMG;
-
-	// 	this.basic_material.map.needsUpdate = true;
-
-	// 	this.basic_material.needsUpdate = true;
-	// }
-
-	async setTile (tile_id) {
-
-		if (!textures[tile_id]) {
-
-			const info = await fetch(
-
-				tile_id,
+				material_id,
 
 				{ method: 'get' },
 			)
@@ -159,69 +98,45 @@ export default class Tileable {
 
 
 
-			if (info.textures) {
+			const sources = {};
 
-				const sources = {};
+			for (const texture in attributes.textures) {
 
-				for (const texture in info.textures) {
-
-					sources[texture] = { source: `${ __STATIC_PATH__ }${ info.textures[texture] }`, type: 'image' };
-				}
-
-				await loader.load({
-
-					sources,
-
-					// progress: () => 0,
-				});
+				sources[texture] = { source: `${ __STATIC_PATH__ }${ attributes.textures[texture] }`, type: 'image' };
 			}
 
+			attributes.textures = await loader.load({
+
+				sources,
+
+				// progress: () => 0,
+			});
 
 
-			info.id = tile_id;
-
-			info.textures = loader.content;
 
 			loader.content = {};
 
-			textures[tile_id] = info;
+			this.material = new Material(material_id, attributes);
 		}
 
-		// LOG(textures[tile_id])
-
-		this.tile = textures[tile_id];
-
-		this.physical_material.map.image = this.tile.textures.map || transparent_IMG;
-		this.physical_material.normalMap.image = this.tile.textures.normal_map || transparent_IMG;
-		this.physical_material.aoMap.image = this.tile.textures.ao_map || transparent_IMG;
-		this.physical_material.roughnessMap.image = this.tile.textures.roughness_map || transparent_IMG;
-		this.physical_material.metalnessMap.image = this.tile.textures.metalness_map || transparent_IMG;
-
-		this.physical_material.map.needsUpdate = true;
-		this.physical_material.normalMap.needsUpdate = true;
-		this.physical_material.aoMap.needsUpdate = true;
-		this.physical_material.roughnessMap.needsUpdate = true;
-		this.physical_material.metalnessMap.needsUpdate = true;
-
-		this.physical_material.needsUpdate = true;
 
 
-
-		this.basic_material.map.image = this.tile.textures.map || transparent_IMG;
-
-		this.basic_material.map.needsUpdate = true;
-
-		this.basic_material.needsUpdate = true;
+		this.usePhysicalMaterial();
 	}
 
-	setBasicMaterial () {
+	useBasicMaterial () {
 
-		this.mesh.material = this.basic_material;
+		this.mesh.material = this.material.basic;
 	}
 
-	setPhysicalMaterial () {
+	usePhysicalMaterial () {
 
-		this.mesh.material = this.physical_material;
+		this.mesh.material = this.material.physical;
+	}
+
+	useHoverMaterial () {
+
+		this.mesh.material = this.material.hover;
 	}
 
 	// Return polybooljs object (triangle) array that can be used as polybooljs boolean operation argument.
