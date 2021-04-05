@@ -37,6 +37,7 @@ import {
 	pick_manual_input_BUTTON,
 	room_picker_MODAL,
 	manual_input_MODAL,
+	texture_transformation_center_NODE,
 } from './dom';
 
 import {
@@ -66,8 +67,6 @@ mode_toggle_BUTTON.addEventListener('click', () => {
 		coverings_plan_NODE.classList.add('-hidden');
 
 		plan.rooms.forEach((_room) => {
-
-			// LOG(_room.walls, _room.walls.length)
 
 			_room.walls.forEach((wall) => {
 
@@ -403,7 +402,92 @@ window.addEventListener('mouseup', () => {
 	}
 });
 
+window.addEventListener('keydown', (evt) => {
+
+	evt.preventDefault();
+
+	if (evt.ctrlKey) {
+
+		if (evt.code === 'ArrowLeft') {
+
+			if (tileable_mesh._) {
+
+				texture_transformation_center_NODE.style.display = 'block';
+
+				tileable_mesh._.userData.parent.texture_rotation += Math.PI * 0.01;
+
+				tileable_mesh._.userData.parent.updateGeometry();
+			}
+		}
+		else if (evt.code === 'ArrowRight') {
+
+			if (tileable_mesh._) {
+
+				texture_transformation_center_NODE.style.display = 'block';
+
+				tileable_mesh._.userData.parent.texture_rotation -= Math.PI * 0.01;
+
+				tileable_mesh._.userData.parent.updateGeometry();
+			}
+		}
+	}
+	else if (evt.altKey) {
+
+		if (evt.code === 'ArrowLeft') {
+
+			if (tileable_mesh._) {
+
+				texture_transformation_center_NODE.style.display = 'block';
+
+				tileable_mesh._.userData.parent.texture_translation_x -= 0.01;
+
+				tileable_mesh._.userData.parent.updateGeometry();
+			}
+		}
+		else if (evt.code === 'ArrowRight') {
+
+			if (tileable_mesh._) {
+
+				texture_transformation_center_NODE.style.display = 'block';
+
+				tileable_mesh._.userData.parent.texture_translation_x += 0.01;
+
+				tileable_mesh._.userData.parent.updateGeometry();
+			}
+		}
+		else if (evt.code === 'ArrowUp') {
+
+			if (tileable_mesh._) {
+
+				texture_transformation_center_NODE.style.display = 'block';
+
+				tileable_mesh._.userData.parent.texture_translation_y -= 0.01;
+
+				tileable_mesh._.userData.parent.updateGeometry();
+			}
+		}
+		else if (evt.code === 'ArrowDown') {
+
+			if (tileable_mesh._) {
+
+				texture_transformation_center_NODE.style.display = 'block';
+
+				tileable_mesh._.userData.parent.texture_translation_y += 0.01;
+
+				tileable_mesh._.userData.parent.updateGeometry();
+			}
+		}
+	}
+});
+
+window.addEventListener('keyup', () => {
+
+	texture_transformation_center_NODE.style.display = 'none';
+});
+
 window.addEventListener('keypress', (evt) => {
+
+	evt.preventDefault();
 
 	if (evt.code === 'KeyZ') {
 

@@ -27,6 +27,13 @@ export default class Segment extends Tileable {
 		this.tileable.segments.push(this);
 	}
 
+	updateQuaternionAndPosition () {
+
+		this.mesh.quaternion.copy(this.tileable.mesh.quaternion);
+		this.mesh.position.copy(this.tileable.mesh.position);
+		this.mesh.updateMatrix();
+	}
+
 	updateGeometry () {
 
 		const index_data = [];
@@ -60,11 +67,31 @@ export default class Segment extends Tileable {
 					normal_data[(_index * ATTRIBUTE_SIZE_3) + 1] = 0;
 					normal_data[(_index * ATTRIBUTE_SIZE_3) + 2] = 1;
 
-					uv_data[(_index * ATTRIBUTE_SIZE_2) + 0] =
+					// uv_data[(_index * ATTRIBUTE_SIZE_2) + 0] =
+					// 	scene_coordinates[((_index - qwe) * 2) + 0] / this.material.sizes[0];
+
+					// uv_data[(_index * ATTRIBUTE_SIZE_2) + 1] =
+					// 	scene_coordinates[((_index - qwe) * 2) + 1] / this.material.sizes[1];
+
+					const translation_x =
+						(this.texture_translation_x * Math.cos(this.texture_rotation)) -
+						(this.texture_translation_y * Math.sin(this.texture_rotation));
+
+					const translation_y =
+						(this.texture_translation_x * Math.sin(this.texture_rotation)) +
+						(this.texture_translation_y * Math.cos(this.texture_rotation));
+
+					const x =
 						scene_coordinates[((_index - qwe) * 2) + 0] / this.material.sizes[0];
 
-					uv_data[(_index * ATTRIBUTE_SIZE_2) + 1] =
+					const y =
 						scene_coordinates[((_index - qwe) * 2) + 1] / this.material.sizes[1];
+
+					uv_data[(_index * ATTRIBUTE_SIZE_2) + 0] =
+						(x * Math.cos(this.texture_rotation)) - (y * Math.sin(this.texture_rotation)) + translation_x;
+
+					uv_data[(_index * ATTRIBUTE_SIZE_2) + 1] =
+						(x * Math.sin(this.texture_rotation)) + (y * Math.cos(this.texture_rotation)) + translation_y;
 				}
 			});
 		});
@@ -92,9 +119,9 @@ export default class Segment extends Tileable {
 
 
 
-		this.mesh.quaternion.copy(this.tileable.mesh.quaternion);
-		this.mesh.position.copy(this.tileable.mesh.position);
-		this.mesh.updateMatrix();
+		// this.mesh.quaternion.copy(this.tileable.mesh.quaternion);
+		// this.mesh.position.copy(this.tileable.mesh.position);
+		// this.mesh.updateMatrix();
 
 		this.mesh.geometry.computeBoundingSphere();
 	}

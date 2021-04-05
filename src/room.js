@@ -67,7 +67,7 @@ export default class Room {
 
 			const wall = new Wall(this, points[index], points[index + 1] || points[0]);
 
-			wall.updateQuaternionAndPosition();
+			// wall.updateQuaternionAndPosition();
 
 			this.walls.push(wall);
 

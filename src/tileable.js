@@ -37,16 +37,18 @@ export default class Tileable {
 
 	constructor (room) {
 
-		// rename to smth
-		// this.tile = null;
-
 		this.quaternion = new THREE.Quaternion();
 		this.position = new THREE.Vector3();
+		this.texture_rotation = 0;
+		this.texture_translation_x = 0;
+		this.texture_translation_y = 0;
 
 		this.segments = [];
 
 		const geometry = new THREE.BufferGeometry();
+
 		geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(), ATTRIBUTE_SIZE_1));
+
 		geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(), ATTRIBUTE_SIZE_3));
 		geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(), ATTRIBUTE_SIZE_3));
 		geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(), ATTRIBUTE_SIZE_2));
@@ -57,7 +59,7 @@ export default class Tileable {
 
 		this.mesh = new THREE.Mesh(geometry, default_material);
 		// remove ?
-		// this.mesh.matrixAutoUpdate = false;
+		this.mesh.matrixAutoUpdate = false;
 
 		// rename
 		this.mesh.userData.parent = this;

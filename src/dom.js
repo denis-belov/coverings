@@ -75,4 +75,6 @@ export const [
 	// manual_input_MODAL,
 ] = manual_input_MODAL.children;
 
+export const texture_transformation_center_NODE = document.getElementById('texture_transformation_center');
+
 // LOG(apply_sizes_BUTTON)

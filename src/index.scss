@@ -48,6 +48,19 @@ canvas {
 
   display: none;
 }
+#texture_transformation_center {
+
+  display: none;
+  position: absolute;
+
+  width: 20px;
+  height: 20px;
+
+  margin-left: -10px;
+  margin-top: -10px;
+
+  background-color: red;
+}
 
 .coverings {
 

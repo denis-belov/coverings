@@ -144,6 +144,8 @@ export default class Wall extends Tileable {
 		this.mesh.quaternion.copy(this.quaternion);
 		this.mesh.position.copy(this.position);
 		this.mesh.updateMatrix();
+
+		this.segments.forEach((segment) => segment.updateQuaternionAndPosition());
 	}
 
 	updateGeometry () {
@@ -190,11 +192,34 @@ export default class Wall extends Tileable {
 
 		for (let i = 0; i < plane_geometry.attributes.uv.array.length; i += 2) {
 
-			// plane_geometry.attributes.uv.array[i + 0] *= this.pixel_length * cast.PIXELS_TO_METERS / this.tile.sizes[0];
-			// plane_geometry.attributes.uv.array[i + 1] *= this.room.height / this.tile.sizes[1];
+			// plane_geometry.attributes.uv.array[i + 0] *=
+			// 	this.pixel_length * cast.PIXELS_TO_METERS / this.tile.sizes[0];
 
-			plane_geometry.attributes.uv.array[i + 0] = plane_geometry.attributes.position.array[(i / 2 * 3) + 0] / this.material.sizes[0];
-			plane_geometry.attributes.uv.array[i + 1] = plane_geometry.attributes.position.array[(i / 2 * 3) + 1] / this.material.sizes[1];
+			// plane_geometry.attributes.uv.array[i + 1] *=
+			// 	this.room.height / this.tile.sizes[1];
+
+			// x' = x cos θ − y sin θ
+			// y' = x sin θ + y cos θ
+
+			const translation_x =
+				(this.texture_translation_x * Math.cos(this.texture_rotation)) -
+				(this.texture_translation_y * Math.sin(this.texture_rotation));
+
+			const translation_y =
+				(this.texture_translation_x * Math.sin(this.texture_rotation)) +
+				(this.texture_translation_y * Math.cos(this.texture_rotation));
+
+			const x =
+				plane_geometry.attributes.position.array[(i / 2 * 3) + 0] / this.material.sizes[0];
+
+			const y =
+				plane_geometry.attributes.position.array[(i / 2 * 3) + 1] / this.material.sizes[1];
+
+			plane_geometry.attributes.uv.array[i + 0] =
+				(x * Math.cos(this.texture_rotation)) - (y * Math.sin(this.texture_rotation)) + translation_x;
+
+			plane_geometry.attributes.uv.array[i + 1] =
+				(x * Math.sin(this.texture_rotation)) + (y * Math.cos(this.texture_rotation)) + translation_y;
 		}
 
 		this.mesh.geometry.setAttribute(

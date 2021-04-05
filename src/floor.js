@@ -58,26 +58,50 @@ export default class Floor extends Tileable {
 				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 1] = 0;
 				normal_data_floor[(index * ATTRIBUTE_SIZE_3) + 2] = 1;
 
-				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 0] = -this.room.points[index].scene_x / this.material.sizes[0];
-				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 1] = -this.room.points[index].scene_z / this.material.sizes[1];
+				// uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 0] = -this.room.points[index].scene_x / this.material.sizes[0];
+				// uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 1] = -this.room.points[index].scene_z / this.material.sizes[1];
+
+				const translation_x =
+					(this.texture_translation_x * Math.cos(this.texture_rotation)) -
+					(this.texture_translation_y * Math.sin(this.texture_rotation));
+
+				const translation_y =
+					(this.texture_translation_x * Math.sin(this.texture_rotation)) +
+					(this.texture_translation_y * Math.cos(this.texture_rotation));
+
+				const x =
+					-this.room.points[index].scene_x / this.material.sizes[0];
+
+				const y =
+					-this.room.points[index].scene_z / this.material.sizes[1];
+
+				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 0] =
+					(x * Math.cos(this.texture_rotation)) - (y * Math.sin(this.texture_rotation)) + translation_x;
+
+				uv_data_floor[(index * ATTRIBUTE_SIZE_2) + 1] =
+					(x * Math.sin(this.texture_rotation)) + (y * Math.cos(this.texture_rotation)) + translation_y;
 			}
 		});
 
 		// eliminate allocation of typed arrays from the function
 		// make walls geometry calculations when toggling orbital mode on and show walls in orbital mode only
 		this.mesh.geometry.setIndex(new THREE.BufferAttribute(new Uint16Array(index_data_floor), 1));
+
 		this.mesh.geometry.setAttribute(
 
 			'position', new THREE.BufferAttribute(new Float32Array(position_data_floor), ATTRIBUTE_SIZE_3),
 		);
+
 		this.mesh.geometry.setAttribute(
 
 			'normal', new THREE.BufferAttribute(new Float32Array(normal_data_floor), ATTRIBUTE_SIZE_3),
 		);
+
 		this.mesh.geometry.setAttribute(
 
 			'uv', new THREE.BufferAttribute(new Float32Array(uv_data_floor), ATTRIBUTE_SIZE_2),
 		);
+
 		this.mesh.geometry.setAttribute(
 
 			'uv2', new THREE.BufferAttribute(this.mesh.geometry.attributes.uv.array, ATTRIBUTE_SIZE_2),
