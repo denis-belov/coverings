@@ -9,6 +9,7 @@ export const [
 	load_BUTTON,
 	upload_model_BUTTON,
 	add_wall_mode_BUTTON,
+	locate_spotlights_BUTTON,
 	mode_toggle_BUTTON,
 	mode_selection_BUTTON,
 	apply_segment_BUTTON,

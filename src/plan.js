@@ -98,11 +98,11 @@ class Plan {
 
 		state.rooms.push(room1);
 
-		this.states = this.states.slice(0, this.state_index + 1);
+		this.states.splice(++this.state_index);
 
 		this.states.push(state);
 
-		++this.state_index;
+		// ++this.state_index;
 	}
 
 	makeFromJson (json) {
@@ -169,6 +169,8 @@ class Plan {
 
 					floor.updateGeometry();
 				}
+
+				room.locateSpotlights();
 
 
 

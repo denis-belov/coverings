@@ -89,7 +89,7 @@ plan_camera.zoom = cast.METERS_TO_PIXELS;
 plan_camera.updateProjectionMatrix();
 
 plan_camera.rotation.set(-Math.PI * 0.5, 0, 0);
-plan_camera.translateZ(1);
+plan_camera.translateZ(10);
 // plan_camera.lookAt(newscene_floor.position);
 
 export const orbit_camera = new THREE.PerspectiveCamera(...getPerspectiveCameraAttributes());

@@ -29,6 +29,7 @@ import {
 	modal,
 	pick_kitchen_BUTTON,
 	pick_bathroom_BUTTON,
+	locate_spotlights_BUTTON,
 	back_BUTTON,
 	width_INPUT,
 	length_INPUT,
@@ -146,15 +147,28 @@ load_BUTTON.addEventListener('click', () => {
 
 
 
-apply_sizes_BUTTON.addEventListener('click', async () => {
+const addSpotLight = (x, y, z) => {
+
+	const spot_light = new THREE.SpotLight(0xFFFFFF);
+	spot_light.intensity = 2;
+	spot_light.distance = 0;
+	spot_light.penumbra = 1;
+	spot_light.decay = 2;
+	spot_light.angle = Math.PI * 0.5;
+	spot_light.position.set(x, y, z);
+
+	// spot_light.target.position.y = 0;
+	// spot_light.target.position.set(...spot_light_position);
+
+	scene.add(spot_light);
+	scene.add(spot_light.target);
+
+	spot_light.target.userData.type = 'SPOT_LIGHT_TARGET';
+};
+
+const makeRoom = async (width, length, height) => {
 
 	await Material.loadDefault();
-
-
-
-	const width = parseFloat(width_INPUT.value);
-	const length = parseFloat(length_INPUT.value);
-	const height = parseFloat(height_INPUT.value);
 
 
 
@@ -181,163 +195,64 @@ apply_sizes_BUTTON.addEventListener('click', async () => {
 
 
 
-	[
-		[ 1.5, height, 1.5 ],
-		[ 1.5, height, -1.5 ],
-		[ -1.5, height, -1.5 ],
-		[ -1.5, height, 1.5 ],
-	]
-		.forEach((spot_light_position) => {
 
-			const spot_light = new THREE.SpotLight(0xFFFFFF);
-			spot_light.intensity = 10;
-			spot_light.distance = 0;
-			spot_light.penumbra = 1;
-			spot_light.decay = 2;
-			spot_light.angle = Math.PI * 0.5;
-			spot_light.position.set(...spot_light_position);
+	// [
+	// 	[ 1.5, height, 1.5 ],
+	// 	[ 1.5, height, -1.5 ],
+	// 	[ -1.5, height, -1.5 ],
+	// 	[ -1.5, height, 1.5 ],
+	// ]
+	// 	.forEach((spot_light_position) => {
 
-			// spot_light.target.position.y = 0;
-			// spot_light.target.position.set(...spot_light_position);
+	// 		const spot_light = new THREE.SpotLight(0xFFFFFF);
+	// 		spot_light.intensity = 10;
+	// 		spot_light.distance = 0;
+	// 		spot_light.penumbra = 1;
+	// 		spot_light.decay = 2;
+	// 		spot_light.angle = Math.PI * 0.5;
+	// 		spot_light.position.set(...spot_light_position);
 
-			scene.add(spot_light);
-			scene.add(spot_light.target);
-		});
+	// 		// spot_light.target.position.y = 0;
+	// 		// spot_light.target.position.set(...spot_light_position);
 
-	modal.style.display = 'none';
-
-	plan.pushState();
-});
-
-
-
-pick_kitchen_BUTTON.addEventListener('click', async () => {
-
-	await Material.loadDefault();
-
-
-
-	const width = 4;
-	const length = 6;
-	const height = 2.5;
-
-
-
-	const room = new Room();
-
-	plan.rooms = [ room ];
-
-
-
-	plan.rooms[0].make(
-
-		height,
-
-		[
-			new Point(-length / 2, -width / 2),
-
-			new Point(-length / 2, width / 2),
-
-			new Point(length / 2, width / 2),
-
-			new Point(length / 2, -width / 2),
-		],
-	);
-
-
-
-	[
-		[ 1.5, height, 1.5 ],
-		[ 1.5, height, -1.5 ],
-		[ -1.5, height, -1.5 ],
-		[ -1.5, height, 1.5 ],
-	]
-		.forEach((spot_light_position) => {
-
-			const spot_light = new THREE.SpotLight(0xFFFFFF);
-			spot_light.intensity = 10;
-			spot_light.distance = 0;
-			spot_light.penumbra = 1;
-			spot_light.decay = 2;
-			spot_light.angle = Math.PI * 0.5;
-			spot_light.position.set(...spot_light_position);
-
-			// spot_light.target.position.y = 0;
-			// spot_light.target.position.set(...spot_light_position);
-
-			scene.add(spot_light);
-			scene.add(spot_light.target);
-		});
+	// 		scene.add(spot_light);
+	// 		scene.add(spot_light.target);
+	// 	});
 
 	modal.style.display = 'none';
 
 	plan.pushState();
-});
+};
+
+apply_sizes_BUTTON.addEventListener(
+
+	'click',
+
+	() =>
+		makeRoom(
+
+			parseFloat(width_INPUT.value),
+			parseFloat(length_INPUT.value),
+			parseFloat(height_INPUT.value),
+		),
+);
+
+pick_kitchen_BUTTON.addEventListener(
+
+	'click',
+
+	() => makeRoom(4, 6, 2.5),
+);
+
+pick_bathroom_BUTTON.addEventListener(
+
+	'click',
+
+	() => makeRoom(3, 3, 2.5),
+);
 
 
-
-pick_bathroom_BUTTON.addEventListener('click', async () => {
-
-	await Material.loadDefault();
-
-
-
-	const width = 3;
-	const length = 3;
-	const height = 2.5;
-
-
-
-	const room = new Room();
-
-	plan.rooms = [ room ];
-
-
-
-	plan.rooms[0].make(
-
-		height,
-
-		[
-			new Point(-length / 2, -width / 2),
-
-			new Point(-length / 2, width / 2),
-
-			new Point(length / 2, width / 2),
-
-			new Point(length / 2, -width / 2),
-		],
-	);
-
-
-
-	[
-		[ 1.5, height, 1.5 ],
-		[ 1.5, height, -1.5 ],
-		[ -1.5, height, -1.5 ],
-		[ -1.5, height, 1.5 ],
-	]
-		.forEach((spot_light_position) => {
-
-			const spot_light = new THREE.SpotLight(0xFFFFFF);
-			spot_light.intensity = 10;
-			spot_light.distance = 0;
-			spot_light.penumbra = 1;
-			spot_light.decay = 2;
-			spot_light.angle = Math.PI * 0.5;
-			spot_light.position.set(...spot_light_position);
-
-			// spot_light.target.position.y = 0;
-			// spot_light.target.position.set(...spot_light_position);
-
-			scene.add(spot_light);
-			scene.add(spot_light.target);
-		});
-
-	modal.style.display = 'none';
-
-	plan.pushState();
-});
+locate_spotlights_BUTTON.addEventListener('click', () => plan.rooms.forEach((room) => room.locateSpotlights()));
 
 
 
@@ -404,9 +319,9 @@ window.addEventListener('mouseup', () => {
 
 window.addEventListener('keydown', (evt) => {
 
-	evt.preventDefault();
-
 	if (evt.ctrlKey) {
+
+		evt.preventDefault();
 
 		if (evt.code === 'ArrowLeft') {
 
