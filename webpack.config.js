@@ -33,7 +33,7 @@ module.exports = (env) => ({
 				exclude: /node_modules/,
 				use:
 
-					env === 'development' || env === 'production' ?
+					env === 'development' ?
 
 						'babel-loader' :
 
@@ -150,8 +150,10 @@ module.exports = (env) => ({
 
 		compress: true,
 		historyApiFallback: true,
-		host: 'localhost',
+		// host: 'localhost',
+		host: '0.0.0.0',
 		port: 8080,
 		open: true,
+		https: true,
 	},
 });
