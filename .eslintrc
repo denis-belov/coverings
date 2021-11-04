@@ -1,0 +1,77 @@
+{
+	"parser": "@babel/eslint-parser",
+
+	"parserOptions":
+	{
+		"ecmaVersion": 12,
+		"sourceType": "module",
+
+		"babelOptions":
+		{
+			"configFile": "./webapp/.babelrc"
+		}
+	},
+
+	"extends":
+	[
+		"strict",
+		"strict-react/es6"
+	],
+
+	"env":
+	{
+		"browser": true,
+		"node": true,
+		"es2021": true
+	},
+
+	"globals":
+	{
+		"LOG": "readonly"
+	},
+
+	"rules":
+	{
+		"indent": [ "error", "tab" ],
+		"func-style": [ "error", "expression" ],
+		"brace-style": [ "error", "allman" ],
+		"arrow-body-style": [ "error", "as-needed" ],
+		"comma-dangle":
+		[
+			"error",
+
+			{
+				"arrays": "always-multiline",
+				"objects": "always-multiline",
+				"imports": "always-multiline",
+				"exports": "always-multiline",
+				"functions": "always-multiline"
+			}
+		],
+		"max-depth": 0,
+		"no-tabs": 0,
+		"no-console": 0,
+		"array-element-newline": 0,
+		"array-bracket-newline": 0,
+		"camelcase": 0,
+		"id-length": 0,
+		"id-match": 0,
+		"padded-blocks": 0,
+		"space-before-function-paren": 0,
+		"no-multiple-empty-lines": 0,
+		"complexity": 0,
+		"no-sync": 0,
+		"no-underscore-dangle": 0,
+		"no-unused-expressions": 0,
+		"func-names": 0,
+		"func-call-spacing": 0,
+		"no-unexpected-multiline": 0,
+
+		"react/jsx-indent-props": [ "error", "tab" ],
+		"react/jsx-indent": 0,
+		"react/jsx-no-bind": 0,
+		"react/jsx-equals-spacing": 0,
+		"react/prop-types": 0,
+		"react/prefer-stateless-function": 0
+	}
+}
